@@ -28,7 +28,7 @@
     "dotenv": "^17.3.1",
     "ejs": "^5.0.2",
     "express": "^4.19.2",
-    "express-rate-limit": "^8.3.2",
+    "express-rate-limit": "^8.4.1",
     "helmet": "^8.1.0",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",

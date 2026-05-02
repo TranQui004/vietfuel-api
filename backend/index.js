@@ -75,7 +75,7 @@ app.get('/terms',      (req, res) => res.render('terms'));
  * ========================================================================== */
 
 // [404] API route không tồn tại.
-app.use('/api/*', (_, res) => {
+app.use('/api', (_, res) => {
   res.status(404).json({
     success: false,
     status: 'not_found',

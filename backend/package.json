@@ -27,11 +27,11 @@
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "ejs": "^5.0.2",
-    "express": "^4.19.2",
+    "express": "^5.2.1",
     "express-rate-limit": "^8.4.1",
     "helmet": "^8.1.0",
     "node-cache": "^5.1.2",
-    "node-cron": "^3.0.3",
+    "node-cron": "^4.2.1",
     "playwright": "^1.59.1",
     "winston": "^3.13.0",
     "ws": "^8.20.0"

@@ -17,3 +17,7 @@ Nếu bạn cần hỗ trợ, vui lòng:
 - Cách tái hiện.
 
 Cảm ơn bạn đã đồng hành cùng dự án cộng đồng VietFuelAPI.
+
+---
+**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*D? �n VietFuel API*

@@ -193,3 +193,7 @@ Frontend được serve trực tiếp bởi Express trong `backend/index.js` tr�
 | Vùng 1 toàn tỉnh | 43 | Giá tiêu chuẩn |
 | Vùng 2 toàn tỉnh | 15 | Tối đa +2% |
 | Bán phần (partial) | 4 (QN, BT, BR-VT, KG) | Một số huyện/đảo thuộc Vùng 2 |
+
+---
+**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*D? �n VietFuel API*

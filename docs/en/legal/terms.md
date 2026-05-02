@@ -84,3 +84,6 @@ VietFuelAPI may update these terms at any time. The "Last updated" date at the t
 ---
 
 🔗 [Back to Legal Index](README.md) | [Tiếng Việt →](../../vi/legal/terms.md)
+---
+**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*VietFuel API Project*

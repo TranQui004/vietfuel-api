@@ -1,4 +1,4 @@
-# Tài liệu tiếng Việt
+﻿# Tài liệu tiếng Việt
 
 Đây là chỉ mục tài liệu tiếng Việt của VietFuelAPI.
 
@@ -14,9 +14,9 @@
 
 ## Cộng đồng
 
-- Hướng dẫn đóng góp: [community/contributing.md](community/contributing.md)
+- Hướng dẫn đóng góp: [../../CONTRIBUTING.md](../../CONTRIBUTING.md)
 - Quy tắc ứng xử: [community/code-of-conduct.md](community/code-of-conduct.md)
-- Chính sách bảo mật: [community/security.md](community/security.md)
+- Chính sách bảo mật: [../../SECURITY.md](../../SECURITY.md)
 - Hỗ trợ: [community/support.md](community/support.md)
 
 ## Pháp lý
@@ -26,3 +26,8 @@
 ## Hướng dẫn nội bộ
 
 - Quy ước comment: [guides/comment-style.md](guides/comment-style.md)
+
+---
+**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*D? �n VietFuel API*
+

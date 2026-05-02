@@ -1,3 +1,12 @@
+/**
+ * VietFuel API
+ * Copyright (c) 2026 TranQui
+ * Github: https://github.com/TranQui004
+ * All rights reserved.
+ * 
+ * This source code is the intellectual property of TranQui.
+ * Community contributions and pull requests are highly welcomed!
+ */
 'use strict';
 /**
  * playground-anim.js v6 — Full 6 Endpoints
@@ -304,3 +313,4 @@ document.addEventListener('DOMContentLoaded', () => {
   const btn = $('pcReplayBtn');
   if (btn) btn.addEventListener('click', () => { if (!btn.disabled) runAnimation(); });
 });
+

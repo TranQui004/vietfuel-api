@@ -45,3 +45,7 @@ Bad:
 
 Because the project has existing history, old comments should be migrated incrementally when touching related code.
 All new files and newly edited code blocks must follow this convention.
+
+---
+**© 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*VietFuel API Project*

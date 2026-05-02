@@ -32,3 +32,7 @@ This applies to issues, pull requests, discussions, and any project-related comm
 ## Contact
 
 To report inappropriate behavior, please create an issue with label `conduct`.
+
+---
+**© 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*VietFuel API Project*

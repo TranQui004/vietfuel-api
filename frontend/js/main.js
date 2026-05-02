@@ -1,3 +1,12 @@
+/**
+ * VietFuel API
+ * Copyright (c) 2026 TranQui
+ * Github: https://github.com/TranQui004
+ * All rights reserved.
+ * 
+ * This source code is the intellectual property of TranQui.
+ * Community contributions and pull requests are highly welcomed!
+ */
 'use strict';
 
 /* ── CHUYỂN ĐỔI NGÔN NGỮ ─────────────────────────────────── */
@@ -210,3 +219,4 @@ const _base = applyLanguage;
 document.querySelectorAll('.copy-btn').forEach((btn) => {
   // handled in toggle
 });
+

@@ -244,7 +244,7 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 ## 🤝 Pháp lý & Cộng đồng
 
 - [Chỉ mục pháp lý](docs/vi/legal/README.md)
-- [Hướng dẫn đóng góp](docs/vi/community/contributing.md)
+- [Hướng dẫn đóng góp (CONTRIBUTING.md)](CONTRIBUTING.md)
 - [Quy tắc ứng xử](docs/vi/community/code-of-conduct.md)
 - [Chính sách bảo mật](docs/vi/community/security.md)
 - [Hỗ trợ](docs/vi/community/support.md)
@@ -271,5 +271,6 @@ Phân phối dưới giấy phép **MIT**. Xem `LICENSE` để biết thêm chi 
 </p>
 
 <p align="center">
+  <strong>© 2026 TranQui - <a href="https://github.com/TranQui004">GitHub: TranQui004</a></strong><br>
   Built with ❤️ by Developers for Developers.
 </p>

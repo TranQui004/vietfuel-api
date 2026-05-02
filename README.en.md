@@ -265,7 +265,7 @@ Vietnam's retail fuel prices are divided into two regions per current regulation
 ## 🤝 Legal & Community
 
 - [Legal Index](docs/en/legal/README.md)
-- [Contributing Guide](docs/en/community/contributing.md)
+- [Contributing Guide (CONTRIBUTING.md)](CONTRIBUTING.md)
 - [Code of Conduct](docs/en/community/code-of-conduct.md)
 - [Security Policy](docs/en/community/security.md)
 - [Support](docs/en/community/support.md)
@@ -292,5 +292,6 @@ Distributed under the **MIT** license. See `LICENSE` for more details.
 </p>
 
 <p align="center">
+  <strong>© 2026 TranQui - <a href="https://github.com/TranQui004">GitHub: TranQui004</a></strong><br>
   Built with ❤️ by Developers for Developers.
 </p>

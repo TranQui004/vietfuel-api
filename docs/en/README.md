@@ -1,4 +1,4 @@
-# English Documentation
+﻿# English Documentation
 
 This is the English documentation index for VietFuelAPI.
 
@@ -14,9 +14,9 @@ This is the English documentation index for VietFuelAPI.
 
 ## Community
 
-- Contributing: [community/contributing.md](community/contributing.md)
+- Contributing: [../../CONTRIBUTING.md](../../CONTRIBUTING.md)
 - Code of conduct: [community/code-of-conduct.md](community/code-of-conduct.md)
-- Security policy: [community/security.md](community/security.md)
+- Security policy: [../../SECURITY.md](../../SECURITY.md)
 - Support: [community/support.md](community/support.md)
 
 ## Legal
@@ -26,3 +26,8 @@ This is the English documentation index for VietFuelAPI.
 ## Internal Guide
 
 - Comment style guide: [guides/comment-style.md](guides/comment-style.md)
+
+---
+**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*VietFuel API Project*
+

@@ -1,3 +1,12 @@
+/**
+ * VietFuel API
+ * Copyright (c) 2026 TranQui
+ * Github: https://github.com/TranQui004
+ * All rights reserved.
+ * 
+ * This source code is the intellectual property of TranQui.
+ * Community contributions and pull requests are highly welcomed!
+ */
 (async () => {
   const res = await fetch('https://www.pvoil.com.vn/tin-gia-xang-dau', {
     headers: {
@@ -16,3 +25,4 @@
   console.log(res.status);
   console.log(text.substring(0, 1000));
 })();
+

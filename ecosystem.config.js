@@ -1,4 +1,13 @@
 /**
+ * VietFuel API
+ * Copyright (c) 2026 TranQui
+ * Github: https://github.com/TranQui004
+ * All rights reserved.
+ * 
+ * This source code is the intellectual property of TranQui.
+ * Community contributions and pull requests are highly welcomed!
+ */
+/**
  * PM2 Process Management Configuration for VietFuelAPI
  * 
  * Usage:
@@ -34,3 +43,4 @@ module.exports = {
     }
   ]
 };
+

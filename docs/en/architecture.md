@@ -193,3 +193,7 @@ Frontend pages are served by Express from the same runtime process and port as t
 | Region 1 (full province) | 43 | Standard price |
 | Region 2 (full province) | 15 | Up to +2% surcharge |
 | Partial (mixed region) | 4 (QN, BT, BR-VT, KG) | Specific districts only are Region 2 |
+
+---
+**© 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*VietFuel API Project*

@@ -1,3 +1,12 @@
+/**
+ * VietFuel API
+ * Copyright (c) 2026 TranQui
+ * Github: https://github.com/TranQui004
+ * All rights reserved.
+ * 
+ * This source code is the intellectual property of TranQui.
+ * Community contributions and pull requests are highly welcomed!
+ */
 'use strict';
 
 const { spawn } = require('child_process');
@@ -92,3 +101,4 @@ main()
     console.error(`[FAIL] test runner: ${err.message}`);
     process.exit(1);
   });
+

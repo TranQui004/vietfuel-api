@@ -17,3 +17,7 @@ If you need help, please:
 - Reproduction steps.
 
 Thank you for supporting the VietFuelAPI community project.
+
+---
+**© 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*VietFuel API Project*

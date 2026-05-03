@@ -1,3 +1,11 @@
+﻿/**
+ * VietFuel API
+ * Copyright (c) 2026 TranQui
+ * Github: https://github.com/TranQui004
+ *
+ * Licensed under the MIT License.
+ * See LICENSE file for details.
+ */
 /**
  * VietFuel API
  * Copyright (c) 2026 TranQui

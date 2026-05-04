@@ -10,7 +10,10 @@
 
 /* ==========================================================================
  * [SCRAPER] - PVOIL
- * Chiến lược 3 tầng (ba lớp dự phòng):
+ * Chiến lược 4 tầng (tối ưu RAM + độ ổn định):
+ *   0. [PRIMARY] Bypass Cloudflare qua IP gốc + header Host — không cần browser.
+ *      Kỹ thuật tham khảo từ bài blog "Xây dựng Vietfuel API phiên bản ít RAM"
+ *      của tác giả toidicakhia (https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram).
  *   1. Cào trực tiếp pvoil.com.vn với kỹ thuật stealth hợp pháp.
  *   2. Fallback văn bản qua giaxanghomnay.com (trung gian tổng hợp công khai).
  *   3. Fallback HTTP fetch nhẹ qua một trang tổng hợp khác (petrotimes rss).
@@ -62,6 +65,81 @@ function fetchPublicText(url, timeoutMs = 15000) {
     req.setTimeout(timeoutMs, () => { req.destroy(); reject(new Error('HTTP fetch timeout')); });
     req.on('error', reject);
   });
+}
+
+async function scrapeFromOriginIP() {
+  /**
+   * Tầng 0: Bypass Cloudflare bằng cách truy cập thẳng IP origin của PVOil.
+   * PVOil đứng sau Cloudflare, nhưng server thực vẫn nhận request khi ta truyền
+   * đúng header Host. IP gốc được phát hiện qua DNS history lookup.
+   * Kỹ thuật này hoàn toàn hợp pháp — chỉ đọc dữ liệu công khai.
+   *
+   * Credit: toidicakhia (https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram)
+   */
+  const PVOIL_ORIGIN_IP = '103.21.120.100';
+  const PVOIL_API_PATH = '/api/oilprice/load-view';
+  const targetUrl = `https://${PVOIL_ORIGIN_IP}${PVOIL_API_PATH}`;
+
+  const fetch = require('node-fetch');
+  const cheerio = require('cheerio');
+  const { extractDateFromText, extractPvoilPricesFromText } = require('./pvoil-parser');
+  const https = require('https');
+
+  // Bỏ qua kiểm tra SSL certificate vì dùng IP trực tiếp thay vì domain
+  const agent = new https.Agent({ rejectUnauthorized: false });
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const res = await fetch(targetUrl, {
+      signal: controller.signal,
+      agent,
+      headers: {
+        'Host': 'www.pvoil.com.vn',
+        'User-Agent': 'VietFuelBot/1.0 (non-profit; github.com/TranQui004/vietfuel-api)',
+        'Accept': 'text/html,*/*',
+      },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    // Parse bảng giá từ HTML trả về
+    const results = [];
+    $('tbody tr').each((_, row) => {
+      const cols = $(row).find('td');
+      if (cols.length >= 2) {
+        const name = cols.eq(0).text().trim();
+        const zone1 = cols.eq(1).text().trim();
+        if (name && zone1) results.push({ name, zone1Price: zone1 });
+      }
+    });
+
+    if (!results.length) throw new Error('Không parse được bảng giá từ IP origin');
+
+    const { parsePrice, deduplicate } = require('./utils');
+    const prices = deduplicate(results.map(r => ({
+      name: r.name,
+      region1: null,
+      region2: null,
+      price: parsePrice(r.zone1Price),
+      unit: 'VND/lít',
+    })).filter(r => r.price && /xăng|dầu|ron|do|mazut/i.test(r.name)));
+
+    if (!prices.length) throw new Error('Không trích xuất được giá hợp lệ từ IP origin');
+
+    const fullText = $.root().text();
+    return {
+      prices,
+      scrapedAt: new Date().toISOString(),
+      source: 'https://www.pvoil.com.vn',
+      priceDate: extractDateFromText(fullText),
+      priceDateSource: 'pvoil-origin-ip',
+      priceAnnouncedAt: null,
+    };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function scrapeFromPvoilDirect() {
@@ -189,8 +267,19 @@ async function scrapeFromLightFetch() {
  * @returns {Object} - prices, priceDate, priceDateSource, scrapedAt, source
  */
 async function scrapePVOil() {
-  logger.info('[Scraper:PVOil] Bắt đầu cào dữ liệu (chiến lược 3 tầng)...');
+  logger.info('[Scraper:PVOil] Bắt đầu cào dữ liệu (chiến lược 4 tầng)...');
   const start = Date.now();
+
+  // Tầng 0: Bypass Cloudflare qua IP gốc (nhẹ, không cần browser)
+  try {
+    const result = await scrapeFromOriginIP();
+    logger.info('[Scraper:PVOil] [Tầng 0] Thành công từ IP origin (bypass Cloudflare).');
+    result._tier = 0;
+    logger.info(`[Scraper:PVOil] Cào được ${result.prices.length} sản phẩm. priceDate=${result.priceDate} (${((Date.now() - start) / 1000).toFixed(2)}s)`);
+    return result;
+  } catch (originErr) {
+    logger.warn(`[Scraper:PVOil] [Tầng 0] Thất bại: ${originErr.message}`);
+  }
 
   let blockedByProtection = false;
 

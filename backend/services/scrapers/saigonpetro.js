@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -60,26 +60,37 @@ async function scrapeViaHttp() {
     const apiRes = await fetch(apiUrl, { headers: HEADERS });
     if (!apiRes.ok) throw new Error(`API HTTP ${apiRes.status}`);
     const pricesHtml = await apiRes.text();
-    const $p = cheerio.load(pricesHtml);
+    // SaigonPetro API trả về HTML fragment (chỉ <thead>+<tbody>) không có <table>
+    // Cheerio sẽ drop <tbody> nếu không có <table> bọc ngoài → phải wrap
+    const $p = cheerio.load(`<table>${pricesHtml}</table>`);
 
     const results = [];
     $p('tbody tr').each((_, row) => {
       const cols = $p(row).find('td');
-      if (cols.length >= 3) {
+      // Bỏ qua row "Không tìm thấy kết quả" hoặc colspan
+      if (cols.length >= 3 && !$p(cols[0]).attr('colspan')) {
         const name = cols.eq(1).text().trim();
-        const rawPrice = cols.eq(2).text().trim().replace(',', '.').replace(/\s*đ/, '');
+        // Giá nằm ở cột 3, dạng "23.750 đ" — dấu chấm là phân cách nghìn
+        const rawPrice = cols.eq(2).text().trim();
         if (name) results.push({ name, rawPrice });
       }
     });
 
-    // Lấy ngày giá từ HTML trang chính
+    // Lấy ngày từ API response trước ("Kể từ 15 giờ 00 ngày 29 tháng 04 năm 2026")
+    const apiText = $p.root().text();
+    const apiDateMatch = apiText.match(/ngày\s*(\d{1,2})\s*tháng\s*(\d{1,2})\s*năm\s*(\d{4})/i);
+    const apiDate = apiDateMatch
+      ? `${apiDateMatch[1].padStart(2,'0')}/${apiDateMatch[2].padStart(2,'0')}/${apiDateMatch[3]}`
+      : null;
+
+    // Fallback từ trang chính
     const fullText = $.root().text();
     const contextualDate = fullText.match(/(?:Kể\s*Từ|Kể\s*từ)[^\n]{0,120}?(\d{1,2}\/\d{1,2}\/\d{4})/i);
     const dateCandidates = Array.from(fullText.matchAll(/(\d{1,2}\/\d{1,2}\/\d{4})/g)).map(m => m[1]);
 
     return {
       priceRows: results,
-      contextualDateTxt: contextualDate ? contextualDate[1] : null,
+      contextualDateTxt: apiDate || (contextualDate ? contextualDate[1] : null),
       dateCandidates,
     };
   } finally {

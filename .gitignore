@@ -29,3 +29,8 @@ Thumbs.db
 # Demo Website
 websites/
 answer.md
+
+# Scripts va tools noi bo (khong commit)
+scripts/
+tools/
+backend/tools/debug/

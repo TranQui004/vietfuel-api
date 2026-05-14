@@ -2,7 +2,7 @@
 
 ## Overview
 
-VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distributors. It applies an **"HTTP-first, browser-fallback"** strategy: lightweight HTTP fetch is always tried first, Playwright headless browser is only used as a last resort, significantly reducing RAM usage.
+VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distributors. The system uses a **HTTP-only architecture** — all scrapers operate via `node-fetch + cheerio` with **zero Playwright or headless browser dependencies**. This reduces RAM usage from ~200MB/scraper to ~0MB and shrinks the Docker image from ~2GB to ~50MB.
 
 ---
 
@@ -10,18 +10,21 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 
 | Source | Primary Strategy | Fallback |
 | :--- | :--- | :--- |
-| **Petrolimex** | Playwright (popup click) | Retry x4 |
+| **Petrolimex** | **Tier 0**: VIEApps CMS REST API `/~apis/portals/cms.item/search` (JSON, no auth required) | Tier 1: GXHN HTTP → Tier 2: WebGia HTTP |
 | KV2 / Saigon / VungTau Petrolimex | Mirror sync from Petrolimex | — |
-| **PVOil** | **Tier 0**: HTTP fetch origin IP `103.21.120.100` + `Host` header (Cloudflare bypass) | Tier 1: Playwright stealth → Tier 2: GiaXangHomNay text |
-| **Mipec** | Playwright + news article fallback | GiaXangHomNay |
-| **COMECO** | **Tier 1**: HTTP fetch + cheerio static HTML parse | Playwright |
-| **Saigon Petro** | **Tier 1**: HTTP fetch → extract `data-list` → call dynamic `/load-time` API | Playwright |
-| **Petro Times** | **Tier 1**: HTTP fetch directly to internal API `/site/get-petro` | Playwright |
-| WebGia | HTTP Fetch / Playwright | — |
-| GiaXangHomNay | Playwright | — |
+| **PVOil** | **Tier 0**: HTTP fetch origin IP `103.21.120.100` + `Host` header (Cloudflare bypass) | Tier 1: HTTP direct → Tier 2: GXHN HTTP fallback |
+| **Mipec** | HTTP fetch + cheerio SSR parse from mipec.com.vn | GXHN HTTP fallback (date) |
+| **COMECO** | HTTP fetch + cheerio static HTML parse | — |
+| **Saigon Petro** | HTTP fetch → extract `data-list` → call dynamic `/load-time` API | — |
+| **Petro Times** | HTTP fetch directly to internal API `/site/get-petro` | — |
+| **WebGia** | HTTP fetch + cheerio parse (unique `<th>` structure) | — |
+| **GiaXangHomNay** | HTTP fetch + cheerio SSR parse | — |
 
-> **Technique credit**: The PVOil Cloudflare bypass via origin IP and the HTTP-first strategy for COMECO, SaigonPetro, and Petrotimes were inspired by the blog post
-> [_"Building a Low-RAM Vietfuel API"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) by **toidicakhia**.
+> **Technique credits**:
+> - PVOil Cloudflare bypass via origin IP and HTTP-first strategy inspired by:
+>   [_"Building a Low-RAM Vietfuel API"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) — **toidicakhia**
+> - Petrolimex REST API endpoint discovered by:
+>   [`petro_price.sh` gist](https://gist.github.com/nguynkhn/acc6431ea769da507c2aa3758891f264) — **@nguynkhn**
 
 **Price Date**: All `priceDate` values are normalized to **ISO 8601 (YYYY-MM-DD)**. The response also includes `priceDateDisplay` (DD/MM/YYYY) for UI rendering.
 
@@ -72,11 +75,27 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 
 ---
 
+## API Playground (`/playground`)
+
+A custom API testing interface, fully replacing Swagger UI:
+
+| Feature | Description |
+| :--- | :--- |
+| **Endpoint sidebar** | 11 endpoints grouped: Aggregated / Single Source / Province / System |
+| **Request builder** | Auto-populated URL bar + params dropdown (63 provinces) |
+| **Live JSON viewer** | Syntax highlighting + status badge + latency + response size |
+| **Code snippets** | Auto-generates cURL / JavaScript / Python from current config |
+| **No dependencies** | Pure Vanilla JS — no framework overhead, ultra-fast load |
+
+> Access at: `http://localhost:3000/playground`
+
+---
+
 ## Design Principles
 
 | Principle | Description |
 | :--- | :--- |
-| **HTTP-First** | Lightweight HTTP fetch before Playwright. Playwright is the last resort. |
+| **HTTP-Only** | All scrapers use lightweight HTTP fetch + cheerio — no headless browser at any tier. |
 | **Cache-First** | All requests served from RAM; scrapers run in background. |
 | **Resilience** | Source errors do not crash the API; stale data is served with a warning flag. |
 | **No Source Spam** | Adaptive cron aligned with the government price adjustment schedule. |

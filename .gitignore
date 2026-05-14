@@ -14,9 +14,9 @@ logs/
 **/logs/
 
 # Debug artifacts
+backend/tools/debug/
 backend/tools/debug/*.html
 backend/tools/debug/*.log
-backend/tools/debug/output/
 
 # OS
 .DS_Store
@@ -26,11 +26,19 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Demo Website
+# Demo Website (không commit lên main repo)
 websites/
+
+# Các file trả lời/note cá nhân
 answer.md
 
-# Scripts va tools noi bo (khong commit)
+# Scripts và tools nội bộ (không commit)
 scripts/
-tools/
-backend/tools/debug/
+backend/tools/
+
+# File test tạm
+backend/test_fetch.js
+backend/tests/*.snap
+
+# Package lock (tuỳ chọn — comment ra nếu muốn lock version)
+# package-lock.json

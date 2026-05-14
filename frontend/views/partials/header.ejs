@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css?v=1.4.0" />
+  <% if (typeof bodyClass !== 'undefined' && bodyClass === 'playground-page') { %>
+  <link rel="stylesheet" href="/css/playground.css?v=1.0.0" />
+  <% } %>
   <!-- Lucide Icons — served locally to bypass CSP -->
   <script src="/js/vendor/lucide.min.js" defer></script>
 </head>
@@ -31,6 +34,7 @@
         <a href="/" class="nav-link <%= (typeof activeMenu !== 'undefined' && activeMenu === 'home') ? 'nav-active' : '' %>" data-vi="Trang chủ" data-en="Home">Trang chủ</a>
         <a href="/endpoints" class="nav-link <%= (typeof activeMenu !== 'undefined' && activeMenu === 'endpoints') ? 'nav-active' : '' %>" data-vi="API Reference" data-en="API Reference">API Reference</a>
         <a href="/live" class="nav-link <%= (typeof activeMenu !== 'undefined' && activeMenu === 'live') ? 'nav-active' : '' %>" data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/playground" class="nav-link <%= (typeof activeMenu !== 'undefined' && activeMenu === 'playground') ? 'nav-active' : '' %>" data-vi="API Playground" data-en="API Playground">API Playground</a>
       </nav>
 
       <div class="header-actions">

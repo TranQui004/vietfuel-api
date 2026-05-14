@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  vietfuel-api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: vietfuel-api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./cache.json:/app/cache.json
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: always

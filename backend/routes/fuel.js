@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -73,8 +73,25 @@ router.use(generalLimiter);
  * ========================================================================== */
 
 /**
- * [GET] /api/fuel-prices
- * Gộp toàn bộ dữ liệu từ tất cả nguồn thành 1 JSON nhóm theo sản phẩm.
+ * @swagger
+ * /api/fuel-prices:
+ *   get:
+ *     summary: Lấy giá xăng dầu tổng hợp từ tất cả các nguồn
+ *     description: Trả về danh sách giá xăng dầu mới nhất từ 11 nhà phân phối, được chuẩn hóa và nhóm theo sản phẩm.
+ *     responses:
+ *       200:
+ *         description: Trả về dữ liệu JSON thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 status:
+ *                   type: string
+ *                 data:
+ *                   type: array
  */
 router.get('/fuel-prices', (req, res) => {
   const defaultData = buildDefaultPrices();

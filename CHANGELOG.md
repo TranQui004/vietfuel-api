@@ -5,6 +5,59 @@
 
 ---
 
+## [Unreleased] — 2026-05-14 (latest)
+
+### 🏓 API Playground — Thay thế Swagger UI
+
+- **Xóa `swagger-ui-express` & `swagger-jsdoc`** (35 packages) — giảm bundle và tăng tốc khởi động.
+- **Triển khai `/playground`** — trang test API tùy chỉnh dành riêng cho VietFuel:
+  - Sidebar endpoint (11 endpoints) phân nhóm: Tổng hợp / Nguồn đơn lẻ / Địa lý / Hệ thống.
+  - Request builder với params dropdown (63 tỉnh/thành).
+  - Live JSON response với syntax highlight (keys xanh, strings lục, numbers đỏ) + status badge + latency + size.
+  - Code snippets: cURL / JavaScript / Python với nút copy.
+- **Cập nhật nav/footer/hero**: Thay thế mọi tham chiếu “Swagger UI” → “API Playground”.
+- **Dọn dẹp debug files**: Xóa `utils/swagger.js` và các file `tools/probe_*.js`, `tools/debug_*.js`.
+
+---
+
+## [Unreleased] — 2026-05-14
+
+### 🚀 Loại bỏ hoàn toàn Playwright — Kiến trúc HTTP-only
+
+Đây là thay đổi kiến trúc lớn nhất kể từ phiên bản 1.0: **toàn bộ hệ thống scraper hiện hoạt động 100% bằng HTTP thuần**, không còn bất kỳ phụ thuộc nào vào Playwright hay Chromium headless.
+
+#### 🙏 Nguồn tham khảo kỹ thuật
+
+Các phương pháp dưới đây được tham khảo và mở rộng từ hai nguồn cộng đồng xuất sắc:
+- **Blog**: [_"Xây dựng Vietfuel API phiên bản ít RAM"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) — **toidicakhia** [@toidicakhia](https://github.com/toidicakhia)
+- **Gist**: [`petro_price.sh`](https://gist.github.com/nguynkhn/acc6431ea769da507c2aa3758891f264) — **@nguynkhn** (phát hiện Petrolimex REST API endpoint)
+
+#### 🔄 Petrolimex — Tiếp cận mới qua REST API nội bộ
+
+| Trước | Sau |
+|---|---|
+| Playwright → click popup → DOM extraction | **VIEApps CMS REST API** (JSON trực tiếp từ server) |
+
+- **Tier 0** *(mới)*: `https://portals.petrolimex.com.vn/~apis/portals/cms.item/search?x-request=<base64>` — trả về JSON gồm `Zone1Price`, `Zone2Price`, `LastModified` chính xác 100%. Không cần auth.
+- **Tier 1** *(fallback)*: GiaXangHomNay SSR parse
+- **Tier 2** *(fallback)*: WebGia SSR parse
+
+#### 🔄 Các scraper khác — HTTP-only
+
+| Scraper | Thay đổi |
+|---|---|
+| **Mipec** | `node-fetch + cheerio` parse bảng SSR từ mipec.com.vn (bỏ Playwright) |
+| **WebGia** | `node-fetch + cheerio`, sửa parser theo cấu trúc `<th>` đặc biệt của site |
+| **GiaXangHomNay** | HTTP fetch (không thay đổi) |
+| **PVOil** | Tầng 1+2 chuyển từ Playwright → `node-fetch + cheerio` |
+
+#### 📦 Dependencies
+
+- **Xóa**: `playwright` (giảm ~300MB+ Docker image)
+- **Dockerfile**: Đổi từ `mcr.microsoft.com/playwright:v1.49.0-noble` (~2GB) → `node:22-alpine` (~50MB)
+
+---
+
 ## [Unreleased] — 2026-05-04
 
 ### 🙏 Lời cảm ơn đặc biệt

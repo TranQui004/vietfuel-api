@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -71,12 +71,13 @@ app.set('views', path.join(__dirname, '..', 'frontend', 'views'));
 app.use(express.static(path.join(__dirname, '..', 'frontend'), { index: false }));
 
 // [TRANG GIAO DIỆN] Các route render EJS.
-app.get('/',           (req, res) => res.render('index'));
-app.get('/endpoints',  (req, res) => res.render('endpoints'));
-app.get('/live',       (req, res) => res.render('live'));
-app.get('/disclaimer', (req, res) => res.render('disclaimer'));
-app.get('/privacy',    (req, res) => res.render('privacy'));
-app.get('/terms',      (req, res) => res.render('terms'));
+app.get('/',            (req, res) => res.render('index'));
+app.get('/endpoints',   (req, res) => res.render('endpoints'));
+app.get('/live',        (req, res) => res.render('live'));
+app.get('/playground',  (req, res) => res.render('playground'));
+app.get('/disclaimer',  (req, res) => res.render('disclaimer'));
+app.get('/privacy',     (req, res) => res.render('privacy'));
+app.get('/terms',       (req, res) => res.render('terms'));
 
 /* ==========================================================================
  * [XỬ LÝ LỖI] Bộ bắt lỗi toàn cục.

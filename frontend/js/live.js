@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -602,13 +602,36 @@ function refreshLucideIcons() {
 
 // ── CẬP NHẬT THANH THỐNG KÊ ─────────────────────────────────────────────────
 
+/**
+ * Định dạng "Kỳ điều chỉnh": lấy giờ từ scrapedAt (thời điểm giá có hiệu lực)
+ * hoặc dùng 15:00 mặc định (khung giờ Nhà nước thường công bố) + ngày từ priceDate.
+ * Kết quả: "15:00, ngày 07/05"
+ */
+function formatPriceAdjustmentPeriod(priceDate, scrapedAt, lang) {
+  // Lấy ngày niêm yết
+  let dayPart = '—';
+  if (priceDate) {
+    // priceDate dạng YYYY-MM-DD
+    const parts = priceDate.split('-');
+    if (parts.length === 3) dayPart = `${parts[2]}/${parts[1]}`;
+  }
+
+  // Giờ: cố định 15:00 (khung giờ Bộ Công Thương thường công bố)
+  const timePart = '15:00';
+
+  if (lang === 'vi') return `${timePart}, ngày ${dayPart}`;
+  return `${timePart}, ${dayPart}`;
+}
+
 function updateStats(meta, lang) {
   if (!meta) return;
 
   const { priceDateDisplay, priceDate, scrapedAt, dataSources, sourceCount } = meta;
-  const displayDate = priceDateDisplay || (priceDate ? formatDate(priceDate) : '—');
 
-  if (UI.statPriceDate) UI.statPriceDate.textContent = displayDate;
+  // [STAT 1] Kỳ điều chỉnh: "15:00, ngày DD/MM"
+  if (UI.statPriceDate) {
+    UI.statPriceDate.textContent = formatPriceAdjustmentPeriod(priceDate, scrapedAt, lang);
+  }
   if (UI.statUpdatedAt) {
     UI.statUpdatedAt.textContent = scrapedAt ? formatTime(scrapedAt) : '—';
   }
@@ -670,10 +693,12 @@ function updateStatusMeta(meta, lang) {
   const stalePart = isStale ? (lang === 'vi' ? ' <span style="color:var(--status-warn); font-weight: 500;">[Cache Cũ - Lỗi Kết Nối Nguồn]</span>' : ' <span style="color:var(--status-warn); font-weight: 500;">[Stale Cache]</span>') : '';
 
   if (UI.text) {
+    // Định dạng kỳ điều chỉnh: "15:00, ngày DD/MM"
+    const adjustmentPeriod = formatPriceAdjustmentPeriod(priceDate, scrapedAt, lang);
     if (lang === 'vi') {
-      UI.text.innerHTML = `${totalItems} sản phẩm${locationPart} · Niêm yết: ${displayDate || '—'} · Cập nhật: ${formatDate(scrapedAt)}${sourcePart}${stalePart}`;
+      UI.text.innerHTML = `${totalItems} sản phẩm${locationPart} · Kỳ điều chỉnh: ${adjustmentPeriod} · Cào lúc: ${formatTime(scrapedAt)}${sourcePart}${stalePart}`;
     } else {
-      UI.text.innerHTML = `${totalItems} products${locationPart} · Price date: ${displayDate || '—'} · Updated: ${formatDate(scrapedAt)}${sourcePart}${stalePart}`;
+      UI.text.innerHTML = `${totalItems} products${locationPart} · Adjustment period: ${adjustmentPeriod} · Scraped: ${formatTime(scrapedAt)}${sourcePart}${stalePart}`;
     }
   }
 }

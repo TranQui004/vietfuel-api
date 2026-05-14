@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán lẻ tại Việt Nam từ 11 nguồn phân phối chính thức. Hệ thống áp dụng chiến lược **"HTTP-first, browser-fallback"** để tối ưu RAM và độ ổn định: ưu tiên thu thập qua HTTP thuần, chỉ dùng Playwright headless browser khi thực sự cần thiết.
+VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán lẻ tại Việt Nam từ 11 nguồn phân phối chính thức. Hệ thống áp dụng kiến trúc **HTTP-only** — toàn bộ scraper hoạt động bằng `node-fetch + cheerio`, **không sử dụng Playwright hay bất kỳ headless browser nào**. Giúp giảm mức tiêu thụ RAM từ ~200MB/scraper xuống ~0MB và Docker image từ ~2GB xuống ~50MB.
 
 ---
 
@@ -10,18 +10,21 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 
 | Nguồn | Chiến lược chính | Fallback |
 | :--- | :--- | :--- |
-| **Petrolimex** | Playwright (popup click) | Retry x4 |
+| **Petrolimex** | **Tier 0**: VIEApps CMS REST API `/~apis/portals/cms.item/search` (JSON, không cần auth) | Tier 1: GXHN HTTP → Tier 2: WebGia HTTP |
 | KV2 / Saigon / VungTau Petrolimex | Đồng bộ mirror từ Petrolimex | — |
-| **PVOil** | **Tầng 0**: HTTP fetch IP origin `103.21.120.100` + header `Host` (bypass Cloudflare) | Tầng 1: Playwright stealth → Tầng 2: GiaXangHomNay |
-| **Mipec** | Playwright + fallback bài viết tin tức | GiaXangHomNay |
-| **COMECO** | **Tầng 1**: HTTP fetch + cheerio parse HTML tĩnh | Playwright |
-| **Saigon Petro** | **Tầng 1**: HTTP fetch → trích xuất `data-list` → gọi API `/load-time` động | Playwright |
-| **Petro Times** | **Tầng 1**: HTTP fetch trực tiếp API nội bộ `/site/get-petro` | Playwright |
-| WebGia | HTTP Fetch / Playwright | — |
-| GiaXangHomNay | Playwright | — |
+| **PVOil** | **Tier 0**: HTTP fetch IP origin `103.21.120.100` + header `Host` (bypass Cloudflare) | Tier 1: HTTP direct → Tier 2: GXHN HTTP fallback |
+| **Mipec** | HTTP fetch + cheerio parse bảng SSR mipec.com.vn | GXHN HTTP fallback ngày |
+| **COMECO** | HTTP fetch + cheerio parse HTML tĩnh | — |
+| **Saigon Petro** | HTTP fetch → trích xuất `data-list` → gọi API `/load-time` động | — |
+| **Petro Times** | HTTP fetch API nội bộ `/site/get-petro` | — |
+| **WebGia** | HTTP fetch + cheerio parse cấu trúc `<th>` đặc biệt | — |
+| **GiaXangHomNay** | HTTP fetch + cheerio parse bảng SSR | — |
 
-> **Ghi công kỹ thuật**: Kỹ thuật bypass Cloudflare PVOil qua IP origin và chiến lược HTTP-first cho COMECO, SaigonPetro, Petrotimes được tham khảo từ bài blog
-> [_"Xây dựng Vietfuel API phiên bản ít RAM"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) của tác giả **toidicakhia**.
+> **Ghi công kỹ thuật**:
+> - Kỹ thuật bypass Cloudflare PVOil qua IP origin và chiến lược HTTP-first tham khảo từ:
+>   [_"Xây dựng Vietfuel API phiên bản ít RAM"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) — **toidicakhia**
+> - Petrolimex REST API endpoint phát hiện bởi:
+>   [`petro_price.sh` gist](https://gist.github.com/nguynkhn/acc6431ea769da507c2aa3758891f264) — **@nguynkhn**
 
 **Ngày niêm yết**: Tất cả `priceDate` được chuẩn hoá về **ISO 8601 (YYYY-MM-DD)**. Response bổ sung `priceDateDisplay` (DD/MM/YYYY) cho hiển thị UI.
 
@@ -72,11 +75,27 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 
 ---
 
+## API Playground (`/playground`)
+
+Trang kiểm thử API tùy chỉnh, thay thế hoàn toàn Swagger UI:
+
+| Tính năng | Mô tả |
+| :--- | :--- |
+| **Endpoint sidebar** | 11 endpoints phân nhóm: Tổng hợp / Nguồn đơn lẻ / Địa lý / Hệ thống |
+| **Request builder** | URL bar tự động + params dropdown (63 tỉnh/thành) |
+| **Live JSON viewer** | Syntax highlighting + status badge + latency + response size |
+| **Code snippets** | Tự động tạo cURL / JavaScript / Python từ config hiện tại |
+| **No dependencies** | Vanilla JS thuần — không framework, load cực nhanh |
+
+> Truy cập tại: `http://localhost:3000/playground`
+
+---
+
 ## Nguyên tắc thiết kế
 
 | Nguyên tắc | Mô tả kỹ thuật |
 | :--- | :--- |
-| **HTTP-First** | Ưu tiên HTTP fetch nhẹ trước, Playwright chỉ là lớp fallback cuối. |
+| **HTTP-Only** | Toàn bộ scraper dùng HTTP fetch + cheerio — không có headless browser ở bất kỳ tầng nào. |
 | **Cache-First** | Mỗi request ưu tiên phục vụ từ RAM; scraper chạy nền. |
 | **Khả năng phục hồi** | Lỗi nguồn không làm sập API; dữ liệu cũ vẫn phục vụ với cờ cảnh báo. |
 | **Không spam nguồn** | Lịch cào thích ứng theo từng giai đoạn điều hành giá. |

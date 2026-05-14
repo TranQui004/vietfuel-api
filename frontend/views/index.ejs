@@ -35,6 +35,11 @@
               </a>
               <a href="/live" class="btn btn-ghost hero-btn" data-vi="Xem giá thực tế" data-en="View Live Prices">Xem
                 giá thực tế</a>
+              <a href="/playground" class="btn btn-ghost hero-btn"
+                 data-vi="API Playground" data-en="API Playground"
+                 style="font-family: var(--font-mono, monospace); font-size: 0.8em; opacity: 0.75;">
+                API Playground
+              </a>
             </div>
 
             <!-- Trust Bar -->
@@ -123,7 +128,7 @@
             <a href="/endpoints" class="about-cta" data-vi="Xem API Reference →" data-en="View API Reference →">Xem API
               Reference →</a>
           </div>
-          <!-- Right: Tech Specs (starts at the same height as the title above) -->
+          <!-- Right: Tech Specs -->
           <dl class="about-specs">
             <div class="spec-row">
               <dt class="spec-key">Format</dt>
@@ -135,15 +140,19 @@
             </div>
             <div class="spec-row">
               <dt class="spec-key">Refresh</dt>
-              <dd class="spec-val">Adaptive (15m-6h)</dd>
+              <dd class="spec-val">Adaptive (15m–6h)</dd>
             </div>
             <div class="spec-row">
               <dt class="spec-key">Latency</dt>
-              <dd class="spec-val">~50–100ms</dd>
+              <dd class="spec-val">&lt;100ms (RAM cache)</dd>
             </div>
             <div class="spec-row">
               <dt class="spec-key">Sources</dt>
               <dd class="spec-val">11 Scraper Nodes</dd>
+            </div>
+            <div class="spec-row">
+              <dt class="spec-key">Architecture</dt>
+              <dd class="spec-val spec-good">HTTP-only (no browser)</dd>
             </div>
             <div class="spec-row">
               <dt class="spec-key">License</dt>

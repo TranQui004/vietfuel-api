@@ -1,0 +1,207 @@
+<%- include('partials/header', { title: 'API Playground — VietFuelAPI', activeMenu: 'playground', bodyClass: 'playground-page' }) %>
+
+<main class="main-content">
+  <div class="pg-hero">
+    <div class="container">
+      <div class="pg-hero-inner">
+        <div class="pg-hero-badge">
+          <span class="live-dot active"></span>
+          <span data-vi="API đang hoạt động" data-en="API is operational">API đang hoạt động</span>
+        </div>
+        <h1 class="pg-hero-title" data-vi="API Playground" data-en="API Playground">API Playground</h1>
+        <p class="pg-hero-sub" data-vi="Thử nghiệm tất cả endpoints của VietFuelAPI ngay trên trình duyệt — không cần cài đặt." data-en="Test all VietFuelAPI endpoints directly in your browser — no setup required.">
+          Thử nghiệm tất cả endpoints của VietFuelAPI ngay trên trình duyệt — không cần cài đặt.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container pg-layout">
+
+    <!-- ── SIDEBAR: Endpoint List ─────────────────────── -->
+    <aside class="pg-sidebar" id="pgSidebar">
+      <div class="pg-sidebar-header">
+        <span class="pg-sidebar-title" data-vi="Endpoints" data-en="Endpoints">Endpoints</span>
+        <span class="pg-sidebar-count" id="pgEndpointCount">6</span>
+      </div>
+
+      <nav class="pg-endpoint-nav" id="pgEndpointNav">
+
+        <div class="pg-ep-group-label" data-vi="TỔNG HỢP" data-en="UNIFIED">TỔNG HỢP</div>
+
+        <button class="pg-ep-btn active" data-ep="unified">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices</span>
+          <span class="pg-ep-desc" data-vi="Tất cả nguồn" data-en="All sources">Tất cả nguồn</span>
+        </button>
+
+        <div class="pg-ep-group-label" data-vi="NGUỒN ĐƠN LẺ" data-en="SINGLE SOURCE">NGUỒN ĐƠN LẺ</div>
+
+        <button class="pg-ep-btn" data-ep="petrolimex">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/petrolimex</span>
+          <span class="pg-ep-desc">Petrolimex</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="pvoil">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/pvoil</span>
+          <span class="pg-ep-desc">PVOil</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="mipec">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/mipec</span>
+          <span class="pg-ep-desc">Mipec</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="saigonpetro">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/saigonpetro</span>
+          <span class="pg-ep-desc">SaigonPetro</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="comeco">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/comeco</span>
+          <span class="pg-ep-desc">Comeco</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="petrotimes">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/petrotimes</span>
+          <span class="pg-ep-desc">Petrotimes</span>
+        </button>
+
+        <div class="pg-ep-group-label" data-vi="ĐỊA LÝ" data-en="GEOGRAPHIC">ĐỊA LÝ</div>
+
+        <button class="pg-ep-btn" data-ep="province">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/fuel-prices/province/:slug</span>
+          <span class="pg-ep-desc" data-vi="Theo tỉnh thành" data-en="By province">Theo tỉnh thành</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="provinces">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/provinces</span>
+          <span class="pg-ep-desc" data-vi="Danh sách 63 tỉnh" data-en="63 provinces list">Danh sách 63 tỉnh</span>
+        </button>
+
+        <div class="pg-ep-group-label" data-vi="HỆ THỐNG" data-en="SYSTEM">HỆ THỐNG</div>
+
+        <button class="pg-ep-btn" data-ep="health">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/health</span>
+          <span class="pg-ep-desc" data-vi="Trạng thái API" data-en="API status">Trạng thái API</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="sources">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/sources</span>
+          <span class="pg-ep-desc" data-vi="Danh sách nguồn" data-en="Source list">Danh sách nguồn</span>
+        </button>
+
+      </nav>
+    </aside>
+
+    <!-- ── MAIN PANEL ────────────────────────────────── -->
+    <section class="pg-main">
+
+      <!-- Request Builder -->
+      <div class="pg-card pg-request-card">
+        <div class="pg-card-header">
+          <span class="pg-card-title" data-vi="Cấu hình request" data-en="Request Builder">Cấu hình request</span>
+          <div class="pg-base-url-chip">
+            <span class="pg-base-label">BASE</span>
+            <span class="pg-base-value" id="pgBaseUrl">http://localhost:3000</span>
+          </div>
+        </div>
+
+        <div class="pg-request-row">
+          <span class="pg-method-badge">GET</span>
+          <div class="pg-url-wrap">
+            <input type="text" id="pgUrlInput" class="pg-url-input" value="/api/fuel-prices" spellcheck="false" autocomplete="off" />
+          </div>
+          <button class="pg-send-btn" id="pgSendBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span data-vi="Gửi" data-en="Send">Gửi</span>
+          </button>
+        </div>
+
+        <!-- Params panel -->
+        <div class="pg-params-panel" id="pgParamsPanel" style="display:none">
+          <div class="pg-params-inner" id="pgParamsInner"></div>
+        </div>
+
+        <!-- Endpoint description -->
+        <div class="pg-ep-info" id="pgEpInfo">
+          <div class="pg-ep-info-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span id="pgEpInfoText" data-vi="Lấy giá xăng dầu tổng hợp từ tất cả 11 nguồn, chuẩn hóa về 1 schema duy nhất." data-en="Get unified fuel prices from all 11 sources, normalized to a single schema.">Lấy giá xăng dầu tổng hợp từ tất cả 11 nguồn, chuẩn hóa về 1 schema duy nhất.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Response Panel -->
+      <div class="pg-card pg-response-card">
+        <div class="pg-card-header">
+          <span class="pg-card-title" data-vi="Phản hồi" data-en="Response">Phản hồi</span>
+          <div class="pg-response-meta" id="pgResponseMeta" style="display:none">
+            <span class="pg-status-badge" id="pgStatusBadge"></span>
+            <span class="pg-response-time" id="pgResponseTime"></span>
+            <span class="pg-response-size" id="pgResponseSize"></span>
+          </div>
+          <div class="pg-response-actions">
+            <button class="pg-action-btn" id="pgCopyBtn" title="Copy JSON" style="display:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-vi="Copy" data-en="Copy">Copy</span>
+            </button>
+            <button class="pg-action-btn" id="pgCollapseBtn" title="Collapse all" style="display:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="21" y2="3"/><line x1="3" y1="21" x2="14" y2="10"/></svg>
+              <span data-vi="Thu gọn" data-en="Collapse">Thu gọn</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pg-response-body" id="pgResponseBody">
+          <div class="pg-empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.25">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            <p data-vi="Chọn một endpoint và nhấn Gửi để xem phản hồi." data-en="Select an endpoint and press Send to view the response.">Chọn một endpoint và nhấn Gửi để xem phản hồi.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code snippets -->
+      <div class="pg-card pg-snippet-card">
+        <div class="pg-card-header">
+          <span class="pg-card-title" data-vi="Code mẫu" data-en="Code Snippets">Code mẫu</span>
+          <div class="pg-snippet-tabs">
+            <button class="pg-tab active" data-tab="curl">cURL</button>
+            <button class="pg-tab" data-tab="js">JavaScript</button>
+            <button class="pg-tab" data-tab="python">Python</button>
+          </div>
+        </div>
+        <div class="pg-snippet-body">
+          <div class="pg-snippet-content active" id="snippet-curl">
+            <pre class="pg-snippet-pre" id="pgSnippetCurl"></pre>
+          </div>
+          <div class="pg-snippet-content" id="snippet-js">
+            <pre class="pg-snippet-pre" id="pgSnippetJs"></pre>
+          </div>
+          <div class="pg-snippet-content" id="snippet-python">
+            <pre class="pg-snippet-pre" id="pgSnippetPython"></pre>
+          </div>
+          <button class="pg-snippet-copy" id="pgSnippetCopyBtn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<%- include('partials/footer', { extraScripts: `<script src="/js/playground.js"></script>` }) %>

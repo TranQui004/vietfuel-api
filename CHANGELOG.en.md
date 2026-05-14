@@ -5,6 +5,59 @@
 
 ---
 
+## [Unreleased] — 2026-05-14 (latest)
+
+### 🏓 API Playground — Replaces Swagger UI
+
+- **Removed `swagger-ui-express` & `swagger-jsdoc`** (35 packages) — reduces bundle size and startup time.
+- **Launched `/playground`** — a custom API testing interface built for VietFuel:
+  - Endpoint sidebar (11 endpoints) grouped by: Aggregated / Single Source / Province / System.
+  - Request builder with params dropdown (63 provinces).
+  - Live JSON response with syntax highlighting + status badge + latency + size indicator.
+  - Code snippets: cURL / JavaScript / Python with copy button.
+- **Updated nav/footer/hero**: Replaced all "Swagger UI" references → "API Playground".
+- **Cleaned up debug files**: Removed `utils/swagger.js` and `tools/probe_*.js`, `tools/debug_*.js`.
+
+---
+
+## [Unreleased] — 2026-05-14
+
+### 🚀 Full Playwright Removal — HTTP-only Architecture
+
+This is the largest architectural change since v1.0: **all scrapers now run 100% on pure HTTP** — no Playwright, no Chromium, no headless browser dependencies.
+
+#### 🙏 Technical References
+
+The following techniques were referenced and adapted from two outstanding community sources:
+- **Blog**: [_"Building a Low-RAM Vietfuel API"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) — **toidicakhia** [@toidicakhia](https://github.com/toidicakhia)
+- **Gist**: [`petro_price.sh`](https://gist.github.com/nguynkhn/acc6431ea769da507c2aa3758891f264) — **@nguynkhn** (discovered the Petrolimex REST API endpoint)
+
+#### 🔄 Petrolimex — New approach via internal REST API
+
+| Before | After |
+|---|---|
+| Playwright → click popup → DOM extraction | **VIEApps CMS REST API** (direct JSON from server) |
+
+- **Tier 0** *(new)*: `https://portals.petrolimex.com.vn/~apis/portals/cms.item/search?x-request=<base64>` — returns JSON with `Zone1Price`, `Zone2Price`, `LastModified` — 100% accurate, no auth required.
+- **Tier 1** *(fallback)*: GiaXangHomNay SSR parse
+- **Tier 2** *(fallback)*: WebGia SSR parse
+
+#### 🔄 Other scrapers — HTTP-only
+
+| Scraper | Change |
+|---|---|
+| **Mipec** | `node-fetch + cheerio` SSR parse from mipec.com.vn (Playwright removed) |
+| **WebGia** | `node-fetch + cheerio`, fixed parser for site's unique `<th>` structure |
+| **GiaXangHomNay** | HTTP fetch (unchanged) |
+| **PVOil** | Tier 1+2 migrated from Playwright → `node-fetch + cheerio` |
+
+#### 📦 Dependencies
+
+- **Removed**: `playwright` (saves ~300MB+ from Docker image)
+- **Dockerfile**: Changed from `mcr.microsoft.com/playwright:v1.49.0-noble` (~2GB) → `node:22-alpine` (~50MB)
+
+---
+
 ## [Unreleased] — 2026-05-04
 
 ### 🙏 Special Thanks

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -171,9 +171,9 @@ async function fetchLiveData() {
     const total = json.meta?.totalItems || json.data.length;
 
     if (currentLang === 'vi') {
-      liveMetaText.textContent = `${total} loại nhiên liệu • Ngày niêm yết: ${priceDate || '—'} • Cập nhật lần cuối: ${formatDate(scrapedAt)}`;
+      liveMetaText.textContent = `${total} loại nhiên liệu • Kỳ điều chỉnh: ${priceDate ? priceDate.split('-').reverse().slice(0,2).join('/') : '—'} • Cào lúc: ${formatDate(scrapedAt)}`;
     } else {
-      liveMetaText.textContent = `${total} fuel types • Price date: ${priceDate || '—'} • Last updated: ${formatDate(scrapedAt)}`;
+      liveMetaText.textContent = `${total} fuel types • Adjustment: ${priceDate || '—'} • Scraped: ${formatDate(scrapedAt)}`;
     }
 
   } catch (err) {

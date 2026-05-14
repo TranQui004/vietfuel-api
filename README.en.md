@@ -76,9 +76,6 @@ cd vietfuel-api
 cd backend
 npm install
 
-# Install Playwright browser (required for scraping)
-npx playwright install chromium
-
 # Start development server
 npm run dev
 ```
@@ -136,6 +133,15 @@ pm2 restart vietfuel-api
 | `GET` | `/api/health` | Health status of all 11 data sources |
 | `GET` | `/api/sources` | Full list of 11 sources with cache status (transparency for developers) |
 
+### Web UI
+
+| URL | Description |
+| :--- | :--- |
+| `/` | Home page — API overview |
+| `/live` | Live Dashboard — real-time prices from all 11 sources |
+| `/endpoints` | API Reference — full documentation |
+| `/playground` | **API Playground** — test endpoints directly in the browser |
+
 ### Sample Response
 
 ```json
@@ -181,14 +187,15 @@ Vietnam's retail fuel prices are divided into two regions per current regulation
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Node.js, Express, express-rate-limit.
-- **Scraping**: Playwright (Chromium headless).
-- **Cache**: node-cache (In-memory) + disk persistence.
+- **Backend**: Node.js v22+, Express, express-rate-limit, helmet, compression.
+- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, no Playwright/headless browser**.
+- **Cache**: node-cache (In-memory) + disk persistence (`cache.json`).
 - **Scheduler**: node-cron — 3-mode adaptive schedule aligned with **Decree 80/2023/ND-CP**:
   - Mon–Wed: Every 4 hours (Checking)
   - Thu, 14:30–16:00: Every 15 minutes (Hunting — price adjustment window)
   - Fri–Sun: Every 6 hours (Maintenance)
-- **Frontend**: EJS Views and Static CSS/JS served directly by Express.
+- **Frontend**: EJS templates + Vanilla CSS/JS — served directly by Express (no separate JS framework).
+- **API Testing**: Custom API Playground at `/playground` (replaces Swagger UI).
 - **Logging**: Winston.
 
 ## 📁 Project Structure

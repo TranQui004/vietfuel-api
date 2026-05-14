@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -11,14 +11,12 @@
 /* ==========================================================================
  * [SCRAPER UTILITIES] - Các Hàm Xử Lý Bổ Trợ Chung
  *
- * Nhiệm vụ: Chứa logic cốt lõi tái sử dụng cao như việc bóc tách số tiền (parsePrice), 
- * chuẩn hoá ngày tháng (toISODate), loại bỏ dữ liệu trùng lặp (deduplicate) 
- * và khởi chạy cấu hình gốc headless trình duyệt Playwright (createBrowser).
+ * Nhiệm vụ: Chứa logic cốt lõi tái sử dụng cao như việc bóc tách số tiền (parsePrice),
+ * chuẩn hoá ngày tháng (toISODate), loại bỏ dữ liệu trùng lặp (deduplicate).
+ *
+ * Kỹ thuật: HTTP-first — không sử dụng Playwright hay bất kỳ headless browser nào.
+ * Tất cả scrapers dùng node-fetch + cheerio để parse HTML tĩnh (SSR).
  * ========================================================================== */
-
-const { chromium } = require('playwright');
-const config = require('../../config');
-const logger = require('../../utils/logger');
 
 // Bot User-Agent minh bạch — thông báo rõ danh tính cho quản trị viên nguồn.
 // Tâu nguyên tắc thu thập dữ liệu công khai theo lề phải của cộng đồng mã nguồn mở.
@@ -127,79 +125,6 @@ function pickMostLikelyPriceDate(candidates, options = {}) {
   return valid[0].iso;
  }
 
-/**
- * Tạo một Instance Context của Playwright Browser để bắt đầu trích xuất.
- * Tái sử dụng ngữ cảnh cấu hình giúp tối ưu CPU/RAM tránh tải tài nguyên thừa.
- */
-async function createBrowser() {
-  const browser = await chromium.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  });
-  const context = await browser.newContext({
-    // Sử dụng Bot UA rõ ràng theo mặc định — minh bạch cho quản trị viên nguồn.
-    // Chỉ các scraper có Cloudflare mới cần ghi đè bằng pickRandomUA() sau đó.
-    userAgent: BOT_UA,
-    locale: 'vi-VN',
-    extraHTTPHeaders: {
-      'Accept-Language': 'vi-VN,vi;q=0.9,en;q=0.8',
-      'X-Bot-Info': 'VietFuelBot non-profit; github.com/TranQui004/vietfuel-api',
-    },
-  });
-  // Chặn resource không cần thiết để tiết kiệm RAM và tăng tốc
-  await context.route(
-    '**/*.{png,jpg,jpeg,gif,webp,woff,woff2,ttf,eot,mp4,mp3,ico}',
-    (route) => route.abort()
-  );
-  return { browser, context };
-}
-
-/**
- * Tải và trích xuất nội dung từ trang giaxanghomnay.com (SSR nhẹ).
- * Chạy riêng biệt vì trang này có logic cào DOM riêng (tables và bodyText).
- */
-async function fetchGXHNPage(url) {
-  const { browser, context } = await createBrowser();
-  try {
-    const page = await context.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: config.scraper.timeout });
-    await page.waitForTimeout(1500);
-    const tables = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('table')).map((t) => t.innerText)
-    );
-    const bodyText = await page.evaluate(() => document.body.innerText || '');
-    return { tables, bodyText };
-  } finally {
-    await browser.close();
-  }
-}
-
-/**
- * Phân tích (Parse) chuỗi văn bản bảng giá được lấy từ giaxanghomnay.com
- */
-function parseGXHNTable(tableText, hasRegions = false) {
-  const lines = tableText.split('\n').map((l) => l.trim()).filter(Boolean);
-  const results = [];
-  for (const line of lines) {
-    const parts = line.split(/\t/).map((p) => p.trim());
-    if (parts.length < 2) continue;
-    const name = parts[0];
-    if (!/xăng|dầu|ron|do\b|diesel|hỏa|ko/i.test(name)) continue;
-
-    if (hasRegions && parts.length >= 4) {
-      const price = parsePrice(parts[parts.length - 1]);
-      if (price) results.push({ name, region2: price });
-    } else if (parts.length >= 4) {
-      const price = parsePrice(parts[parts.length - 1]);
-      if (price) results.push({ name, price });
-    } else if (parts.length >= 2) {
-      const price = parsePrice(parts[1]);
-      if (price) results.push({ name, price });
-    }
-  }
-  return results;
-}
-
 module.exports = {
   BOT_UA,
   parsePrice,
@@ -208,8 +133,5 @@ module.exports = {
   pickMostLikelyPriceDate,
   pickRandomUA,
   humanDelay,
-  createBrowser,
-  fetchGXHNPage,
-  parseGXHNTable,
 };
 

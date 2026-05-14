@@ -1,4 +1,10 @@
 {
+  "name": "vietfuel-api",
+  "version": "1.0.0",
+  "description": "Vietnam fuel price API aggregating 11 official distributors",
+  "scripts": {
+    "update-mockdata": "node scripts/update-mockdata.js"
+  },
   "dependencies": {
     "fs-extra": "^11.3.4",
     "lucide": "^1.8.0"

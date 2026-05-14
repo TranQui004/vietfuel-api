@@ -76,9 +76,6 @@ cd vietfuel-api
 cd backend
 npm install
 
-# Cài đặt Playwright browsers (cần cho scraping)
-npx playwright install chromium
-
 # Khởi chạy server (development)
 npm run dev
 ```
@@ -118,8 +115,8 @@ pm2 restart vietfuel-api
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
-| `GET` | `/api/fuel-prices` | **(Khuyên dùng)** Trả về dữ liệu gộp từ các nguồn chuẩn xác nhất (Mặc định) |
-| `GET` | `/api/fuel-prices/:source` | Nguồn cụ thể theo `id` (ví dụ: `petrolimex`, `pvoil`, `mipec`, `comeco`, `saigonpetro`, `petrotimes`, ...). Danh sách đầy đủ có trong `availableSources` khi gọi sai source |
+| `GET` | `/api/fuel-prices` | **(Khuyên dùng)** Trả về dữ liệu gộp từ các nguồn chuẩn xác nhất |
+| `GET` | `/api/fuel-prices/:source` | Nguồn cụ thể: `petrolimex`, `pvoil`, `mipec`, `comeco`, `saigonpetro`, `petrotimes`, `webgia`, `giaxanghomnay`, ... |
 
 ### Tỉnh thành (on-demand)
 
@@ -134,7 +131,16 @@ pm2 restart vietfuel-api
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
 | `GET` | `/api/health` | Trạng thái sức khoẻ toàn bộ 11 nguồn dữ liệu |
-| `GET` | `/api/sources` | Danh sách 11 nguồn dữ liệu kèm trạng thái cache (minh bạch cho developer) |
+| `GET` | `/api/sources` | Danh sách 11 nguồn dữ liệu kèm trạng thái cache |
+
+### Giao diện web
+
+| URL | Mô tả |
+| :--- | :--- |
+| `/` | Trang chủ — tổng quan API |
+| `/live` | Live Dashboard — xem giá thực tế 11 nguồn |
+| `/endpoints` | API Reference — tài liệu đầy đủ |
+| `/playground` | **API Playground** — test endpoint trực tiếp trên trình duyệt |
 
 ## 🗺️ Phân vùng giá xăng dầu
 
@@ -160,21 +166,22 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 
 ## 🛠️ Công nghệ sử dụng
 
-- **Backend**: Node.js, Express, express-rate-limit.
-- **Scraping**: Playwright (Chromium headless).
-- **Cache**: node-cache (In-memory) + disk persistence (cache.json).
+- **Backend**: Node.js v22+, Express, express-rate-limit, helmet, compression.
+- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, không Playwright/headless browser**.
+- **Cache**: node-cache (In-memory) + disk persistence (`cache.json`).
 - **Scheduler**: node-cron — lịch thích ứng 3 chế độ theo **Nghị định 80/2023/NĐ-CP**:
   - T2–T4: 4 tiếng/lần (Checking)
   - T5, 14:30–16:00: 15 phút/lần (Hunting — khung giờ điều chỉnh giá)
   - T6–CN: 6 tiếng/lần (Maintenance)
-- **Frontend**: Giao diện EJS và Static CSS/JS được serve trực tiếp bởi Express.
+- **Frontend**: EJS templates + Vanilla CSS/JS — serve trực tiếp bởi Express (không framework JS riêng).
+- **API Testing**: API Playground tùy chỉnh tại `/playground` (thay thế Swagger UI).
 - **Logging**: Winston.
 
 ## 📁 Cấu trúc dự án
 
 ```text
 ├── backend/
-│   ├── index.js              # Entry point Express + WebSocket + static serving
+│   ├── index.js              # Entry point Express + static serving
 │   ├── config/
 │   │   └── index.js          # Cấu hình chung (port, URLs, cron, cache TTL)
 │   ├── data/
@@ -182,55 +189,48 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 │   ├── routes/
 │   │   └── fuel.js           # Toàn bộ REST API endpoints
 │   ├── services/
-│   │   ├── scrapers/         # Mỗi file là một engine độc lập (Plug & Play)
-│   │   │   ├── utils.js          # Hàm core dùng chung (parse, cache, browser)
-│   │   │   ├── petrolimex.js     # Petrolimex (nguồn chính)
-│   │   │   ├── pvoil.js          # PVOil — chiến lược 3 tầng dự phòng
-│   │   │   ├── pvoil-parser.js   # Parser riêng cho PVOil
-│   │   │   ├── mipec.js          # Mipec
-│   │   │   ├── comeco.js         # COMECO
-│   │   │   ├── saigonpetro.js    # Saigon Petro
-│   │   │   ├── petrotimes.js     # Petro Times
-│   │   │   ├── webgia.js         # WebGia
-│   │   │   └── giaxanghomnay.js  # GiaXangHomNay
+│   │   ├── scrapers/         # Mỗi file là một engine HTTP-only độc lập
+│   │   │   ├── utils.js          # Hàm core dùng chung (parsePrice, UA pool, ...)
+│   │   │   ├── petrolimex.js     # Petrolimex — Tier 0: VIEApps REST API
+│   │   │   ├── pvoil.js          # PVOil — Tier 0: IP origin bypass Cloudflare
+│   │   │   ├── pvoil-parser.js   # Parser HTML/text cho PVOil
+│   │   │   ├── mipec.js          # Mipec — HTTP + cheerio
+│   │   │   ├── comeco.js         # COMECO — HTTP + cheerio
+│   │   │   ├── saigonpetro.js    # Saigon Petro — dynamic API
+│   │   │   ├── petrotimes.js     # Petro Times — internal API
+│   │   │   ├── webgia.js         # WebGia — HTTP + cheerio
+│   │   │   └── giaxanghomnay.js  # GiaXangHomNay — HTTP + cheerio
 │   │   ├── scraper.js        # Index tổng hợp — xuất tất cả scraper functions
 │   │   └── cache.js          # In-memory cache (node-cache) + disk fallback
 │   ├── workers/
-│   │   └── jobs.js           # Cron scheduler — chạy scrape mỗi 1 giờ
-│   ├── tools/
-│   │   └── debug/            # Script debug cục bộ (ngoài runtime chính)
+│   │   └── jobs.js           # Adaptive Cron scheduler (3 chế độ)
 │   ├── utils/
 │   │   ├── logger.js         # Winston logger
-│   │   ├── websocket.js      # WebSocket server (push dữ liệu realtime)
 │   │   └── fuel-helpers.js   # Helper tổng hợp: merge, normalize, sort
-│   ├── tests/
-│   │   ├── scrapers/         # Smoke tests cho từng scraper (8 file)
-│   │   ├── api/              # API integration tests
-│   │   ├── cache/            # Cache behavior tests
-│   │   ├── run-all.js        # Chạy toàn bộ test suite
-│   │   └── run-api.js        # Chạy riêng API tests
-│   └── cache.json            # Fallback cache file (disk persistence)
+│   └── tests/
+│       ├── scrapers/         # Smoke tests cho từng scraper
+│       ├── api/              # API integration tests
+│       └── run-all.js        # Chạy toàn bộ test suite
 ├── frontend/
 │   ├── views/                # EJS templates (serve bởi Express)
-│   │   ├── index.ejs         # Landing page (trang chủ)
+│   │   ├── index.ejs         # Trang chủ
 │   │   ├── live.ejs          # Live Data Dashboard
-│   │   ├── endpoints.ejs     # API Reference + Demo Terminal
-│   │   ├── disclaimer.ejs    # Tuyên bố miễn trừ
-│   │   ├── privacy.ejs       # Chính sách bảo mật
-│   │   ├── terms.ejs         # Điều khoản sử dụng
-│   │   └── partials/         # Header, Footer, Icon components
-│   ├── css/style.css         # Toàn bộ global CSS
-│   ├── brand/                # Logo, banner, branding assets
-│   └── js/                   # Frontend JS (lang, ui, live, playground...)
+│   │   ├── endpoints.ejs     # API Reference
+│   │   ├── playground.ejs    # API Playground (test endpoint tương tác)
+│   │   └── partials/         # Header, Footer components
+│   ├── css/
+│   │   ├── style.css         # Global CSS
+│   │   └── playground.css    # CSS riêng cho Playground
+│   ├── js/
+│   │   ├── live.js           # Live Data Dashboard logic
+│   │   ├── playground.js     # API Playground logic
+│   │   └── lang.js           # i18n (VI/EN)
+│   └── brand/                # Logo, banner assets
 ├── docs/
 │   ├── assets/               # Ảnh preview cho README
 │   ├── vi/                   # Tài liệu tiếng Việt
-│   │   ├── architecture.md   # Kiến trúc hệ thống
-│   │   ├── changelog.md      # Lịch sử thay đổi
-│   │   ├── community/        # Đóng góp, quy tắc, bảo mật, hỗ trợ
-│   │   ├── legal/            # Pháp lý (disclaimer, privacy, terms)
-│   │   └── guides/           # Quy ước comment, hướng dẫn nội bộ
-│   └── en/                   # Tài liệu tiếng Anh (song song)
+│   └── en/                   # Tài liệu tiếng Anh
+├── cache.json                # Disk persistence cache (root)
 └── ecosystem.config.js       # Cấu hình PM2 cho production
 ```
 

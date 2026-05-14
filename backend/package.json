@@ -33,7 +33,7 @@
     "helmet": "^8.1.0",
     "node-cache": "^5.1.2",
     "node-cron": "^4.2.1",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "winston": "^3.13.0",
     "ws": "^8.20.0"
   },

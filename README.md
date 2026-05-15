@@ -166,22 +166,22 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 
 ## 🛠️ Công nghệ sử dụng
 
-- **Backend**: Node.js v22+, Express, express-rate-limit, helmet, compression.
-- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, không Playwright/headless browser**.
-- **Cache**: node-cache (In-memory) + disk persistence (`cache.json`).
+- **Backend**: Node.js v22+, Hono, express-rate-limit, helmet, compression.
+- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, không Cheerio (No Headless Browser)/headless browser**.
+- **Cache**: Cloudflare KV (In-memory) + disk persistence (`cache.json`).
 - **Scheduler**: node-cron — lịch thích ứng 3 chế độ theo **Nghị định 80/2023/NĐ-CP**:
   - T2–T4: 4 tiếng/lần (Checking)
   - T5, 14:30–16:00: 15 phút/lần (Hunting — khung giờ điều chỉnh giá)
   - T6–CN: 6 tiếng/lần (Maintenance)
-- **Frontend**: EJS templates + Vanilla CSS/JS — serve trực tiếp bởi Express (không framework JS riêng).
-- **API Testing**: API Playground tùy chỉnh tại `/playground` (thay thế Swagger UI).
+- **Frontend**: EJS templates + Vanilla CSS/JS — serve trực tiếp bởi Hono (không framework JS riêng).
+- **API Testing**: API Playground tùy chỉnh tại `/playground` (thay thế Test API (Playground) UI).
 - **Logging**: Winston.
 
 ## 📁 Cấu trúc dự án
 
 ```text
 ├── backend/
-│   ├── index.js              # Entry point Express + static serving
+│   ├── index.js              # Entry point Hono + static serving
 │   ├── config/
 │   │   └── index.js          # Cấu hình chung (port, URLs, cron, cache TTL)
 │   ├── data/
@@ -201,7 +201,7 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 │   │   │   ├── webgia.js         # WebGia — HTTP + cheerio
 │   │   │   └── giaxanghomnay.js  # GiaXangHomNay — HTTP + cheerio
 │   │   ├── scraper.js        # Index tổng hợp — xuất tất cả scraper functions
-│   │   └── cache.js          # In-memory cache (node-cache) + disk fallback
+│   │   └── cache.js          # In-memory cache (Cloudflare KV) + disk fallback
 │   ├── workers/
 │   │   └── jobs.js           # Adaptive Cron scheduler (3 chế độ)
 │   ├── utils/
@@ -212,7 +212,7 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 │       ├── api/              # API integration tests
 │       └── run-all.js        # Chạy toàn bộ test suite
 ├── frontend/
-│   ├── views/                # EJS templates (serve bởi Express)
+│   ├── views/                # EJS templates (serve bởi Hono)
 │   │   ├── index.ejs         # Trang chủ
 │   │   ├── live.ejs          # Live Data Dashboard
 │   │   ├── endpoints.ejs     # API Reference

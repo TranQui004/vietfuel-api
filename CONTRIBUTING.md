@@ -1,5 +1,4 @@
 # Contributing to VietFuel API
-*(Scroll down for Vietnamese version / Kéo xuống dưới để xem bản tiếng Việt)*
 
 First of all, thank you for your interest in contributing to the **VietFuel API** project! This project aims to provide standard and accurate fuel prices from multiple distributors in Vietnam.
 

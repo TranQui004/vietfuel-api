@@ -1,0 +1,403 @@
+[
+  {
+    "id": "01",
+    "name": "Hà Nội",
+    "slug": "ha-noi",
+    "region": "1"
+  },
+  {
+    "id": "17",
+    "name": "Thái Nguyên",
+    "slug": "thai-nguyen",
+    "region": "1"
+  },
+  {
+    "id": "19",
+    "name": "Phú Thọ",
+    "slug": "phu-tho",
+    "region": "1"
+  },
+  {
+    "id": "26",
+    "name": "Vĩnh Phúc",
+    "slug": "vinh-phuc",
+    "region": "1"
+  },
+  {
+    "id": "27",
+    "name": "Bắc Ninh",
+    "slug": "bac-ninh",
+    "region": "1"
+  },
+  {
+    "id": "30",
+    "name": "Hải Dương",
+    "slug": "hai-duong",
+    "region": "1"
+  },
+  {
+    "id": "31",
+    "name": "Hải Phòng",
+    "slug": "hai-phong",
+    "region": "1"
+  },
+  {
+    "id": "33",
+    "name": "Hưng Yên",
+    "slug": "hung-yen",
+    "region": "1"
+  },
+  {
+    "id": "34",
+    "name": "Thái Bình",
+    "slug": "thai-binh",
+    "region": "1"
+  },
+  {
+    "id": "35",
+    "name": "Hà Nam",
+    "slug": "ha-nam",
+    "region": "1"
+  },
+  {
+    "id": "36",
+    "name": "Nam Định",
+    "slug": "nam-dinh",
+    "region": "1"
+  },
+  {
+    "id": "37",
+    "name": "Ninh Bình",
+    "slug": "ninh-binh",
+    "region": "1"
+  },
+  {
+    "id": "38",
+    "name": "Thanh Hóa",
+    "slug": "thanh-hoa",
+    "region": "1"
+  },
+  {
+    "id": "40",
+    "name": "Nghệ An",
+    "slug": "nghe-an",
+    "region": "1"
+  },
+  {
+    "id": "42",
+    "name": "Hà Tĩnh",
+    "slug": "ha-tinh",
+    "region": "1"
+  },
+  {
+    "id": "44",
+    "name": "Quảng Bình",
+    "slug": "quang-binh",
+    "region": "1"
+  },
+  {
+    "id": "45",
+    "name": "Quảng Trị",
+    "slug": "quang-tri",
+    "region": "1"
+  },
+  {
+    "id": "46",
+    "name": "Thừa Thiên - Huế",
+    "slug": "thua-thien-hue",
+    "region": "1"
+  },
+  {
+    "id": "48",
+    "name": "Đà Nẵng",
+    "slug": "da-nang",
+    "region": "1"
+  },
+  {
+    "id": "49",
+    "name": "Quảng Nam",
+    "slug": "quang-nam",
+    "region": "1"
+  },
+  {
+    "id": "51",
+    "name": "Quảng Ngãi",
+    "slug": "quang-ngai",
+    "region": "1"
+  },
+  {
+    "id": "52",
+    "name": "Bình Định",
+    "slug": "binh-dinh",
+    "region": "1"
+  },
+  {
+    "id": "54",
+    "name": "Phú Yên",
+    "slug": "phu-yen",
+    "region": "1"
+  },
+  {
+    "id": "56",
+    "name": "Khánh Hòa",
+    "slug": "khanh-hoa",
+    "region": "1"
+  },
+  {
+    "id": "58",
+    "name": "Ninh Thuận",
+    "slug": "ninh-thuan",
+    "region": "1"
+  },
+  {
+    "id": "70",
+    "name": "Bình Phước",
+    "slug": "binh-phuoc",
+    "region": "1"
+  },
+  {
+    "id": "72",
+    "name": "Tây Ninh",
+    "slug": "tay-ninh",
+    "region": "1"
+  },
+  {
+    "id": "74",
+    "name": "Bình Dương",
+    "slug": "binh-duong",
+    "region": "1"
+  },
+  {
+    "id": "75",
+    "name": "Đồng Nai",
+    "slug": "dong-nai",
+    "region": "1"
+  },
+  {
+    "id": "79",
+    "name": "TP. Hồ Chí Minh",
+    "slug": "ho-chi-minh",
+    "region": "1"
+  },
+  {
+    "id": "80",
+    "name": "Long An",
+    "slug": "long-an",
+    "region": "1"
+  },
+  {
+    "id": "82",
+    "name": "Tiền Giang",
+    "slug": "tien-giang",
+    "region": "1"
+  },
+  {
+    "id": "83",
+    "name": "Bến Tre",
+    "slug": "ben-tre",
+    "region": "1"
+  },
+  {
+    "id": "84",
+    "name": "Trà Vinh",
+    "slug": "tra-vinh",
+    "region": "1"
+  },
+  {
+    "id": "86",
+    "name": "Vĩnh Long",
+    "slug": "vinh-long",
+    "region": "1"
+  },
+  {
+    "id": "87",
+    "name": "Đồng Tháp",
+    "slug": "dong-thap",
+    "region": "1"
+  },
+  {
+    "id": "89",
+    "name": "An Giang",
+    "slug": "an-giang",
+    "region": "1"
+  },
+  {
+    "id": "92",
+    "name": "Cần Thơ",
+    "slug": "can-tho",
+    "region": "1"
+  },
+  {
+    "id": "93",
+    "name": "Hậu Giang",
+    "slug": "hau-giang",
+    "region": "1"
+  },
+  {
+    "id": "94",
+    "name": "Sóc Trăng",
+    "slug": "soc-trang",
+    "region": "1"
+  },
+  {
+    "id": "95",
+    "name": "Bạc Liêu",
+    "slug": "bac-lieu",
+    "region": "1"
+  },
+  {
+    "id": "96",
+    "name": "Cà Mau",
+    "slug": "ca-mau",
+    "region": "1"
+  },
+  {
+    "id": "18",
+    "name": "Hòa Bình",
+    "slug": "hoa-binh",
+    "region": "1"
+  },
+  {
+    "id": "24",
+    "name": "Bắc Giang",
+    "slug": "bac-giang",
+    "region": "1"
+  },
+  {
+    "id": "02",
+    "name": "Hà Giang",
+    "slug": "ha-giang",
+    "region": "2"
+  },
+  {
+    "id": "04",
+    "name": "Cao Bằng",
+    "slug": "cao-bang",
+    "region": "2"
+  },
+  {
+    "id": "06",
+    "name": "Bắc Kạn",
+    "slug": "bac-kan",
+    "region": "2"
+  },
+  {
+    "id": "08",
+    "name": "Tuyên Quang",
+    "slug": "tuyen-quang",
+    "region": "2"
+  },
+  {
+    "id": "10",
+    "name": "Lào Cai",
+    "slug": "lao-cai",
+    "region": "2"
+  },
+  {
+    "id": "11",
+    "name": "Điện Biên",
+    "slug": "dien-bien",
+    "region": "2"
+  },
+  {
+    "id": "12",
+    "name": "Lai Châu",
+    "slug": "lai-chau",
+    "region": "2"
+  },
+  {
+    "id": "14",
+    "name": "Sơn La",
+    "slug": "son-la",
+    "region": "2"
+  },
+  {
+    "id": "15",
+    "name": "Yên Bái",
+    "slug": "yen-bai",
+    "region": "2"
+  },
+  {
+    "id": "20",
+    "name": "Lạng Sơn",
+    "slug": "lang-son",
+    "region": "2"
+  },
+  {
+    "id": "62",
+    "name": "Kon Tum",
+    "slug": "kon-tum",
+    "region": "2"
+  },
+  {
+    "id": "64",
+    "name": "Gia Lai",
+    "slug": "gia-lai",
+    "region": "2"
+  },
+  {
+    "id": "66",
+    "name": "Đắk Lắk",
+    "slug": "dak-lak",
+    "region": "2"
+  },
+  {
+    "id": "67",
+    "name": "Đắk Nông",
+    "slug": "dak-nong",
+    "region": "2"
+  },
+  {
+    "id": "68",
+    "name": "Lâm Đồng",
+    "slug": "lam-dong",
+    "region": "2"
+  },
+  {
+    "id": "22",
+    "name": "Quảng Ninh",
+    "slug": "quang-ninh",
+    "region": "1",
+    "partialRegion": true,
+    "vung2Districts": [
+      "Vân Đồn",
+      "Cô Tô",
+      "Hải Hà"
+    ],
+    "note": "Các huyện Vân Đồn, Cô Tô, Hải Hà thuộc Vùng 2; các huyện còn lại Vùng 1"
+  },
+  {
+    "id": "60",
+    "name": "Bình Thuận",
+    "slug": "binh-thuan",
+    "region": "1",
+    "partialRegion": true,
+    "vung2Districts": [
+      "Phú Quý"
+    ],
+    "note": "Huyện đảo Phú Quý thuộc Vùng 2; các huyện còn lại Vùng 1"
+  },
+  {
+    "id": "77",
+    "name": "Bà Rịa - Vũng Tàu",
+    "slug": "ba-ria-vung-tau",
+    "region": "1",
+    "partialRegion": true,
+    "vung2Districts": [
+      "Côn Đảo"
+    ],
+    "note": "Huyện đảo Côn Đảo thuộc Vùng 2; các huyện còn lại Vùng 1"
+  },
+  {
+    "id": "91",
+    "name": "Kiên Giang",
+    "slug": "kien-giang",
+    "region": "1",
+    "partialRegion": true,
+    "vung2Districts": [
+      "Phú Quốc",
+      "Kiên Hải"
+    ],
+    "note": "TP. Phú Quốc và huyện Kiên Hải thuộc Vùng 2; các huyện còn lại Vùng 1"
+  }
+]

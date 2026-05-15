@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference — VietFuelAPI</title>
+  <meta name="description" content="Vietnam Fuel Price API" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css?v=1.4.0" />
+  
+  <!-- Lucide Icons — served locally to bypass CSP -->
+  <script src="/js/vendor/lucide.min.js" defer></script>
+</head>
+<body >
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/brand/VietFuelAPI_header.png" alt="VietFuelAPI Logo" class="logo-img" />
+        <span class="logo-text">VietFuel<span class="logo-accent">API</span></span>
+      </a>
+      <button class="mobile-toggle" id="mobileNavToggle" aria-label="Mở menu">
+        <div class="hamburger-icon" id="hamburgerIcon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+
+      <nav class="header-nav" id="headerNav" aria-label="Điều hướng chính">
+        <a href="/" class="nav-link " data-vi="Trang chủ" data-en="Home">Trang chủ</a>
+        <a href="/endpoints" class="nav-link nav-active" data-vi="API Reference" data-en="API Reference">API Reference</a>
+        <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/test-api" class="nav-link " data-vi="Test API" data-en="Test API">Test API</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener noreferrer" class="github-btn" aria-label="GitHub Repository">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+        <button class="lang-toggle" id="langToggle" aria-label="Chuyển ngôn ngữ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span id="langLabel">EN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+<main class="main-content">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-overline" data-vi="Tài liệu API" data-en="Documentation">Tài liệu API</p>
+      <h1 class="page-title">API REFERENCE</h1>
+      <p class="page-subtitle"
+         data-vi="Toàn bộ endpoint, cấu trúc dữ liệu và hướng dẫn tích hợp VietFuelAPI."
+         data-en="Comprehensive guide to all endpoints, data schemas, and integration for VietFuelAPI.">
+        Toàn bộ endpoint, cấu trúc dữ liệu và hướng dẫn tích hợp VietFuelAPI.
+      </p>
+    </div>
+  </div>
+
+  <div class="container content-area">
+    <div class="layout-two-col">
+
+      <!-- SIDEBAR TOC -->
+      <aside class="sidebar">
+        <nav class="toc" aria-label="Mục lục trang">
+          <p class="toc-title" data-vi="MỤC LỤC" data-en="CONTENTS">MỤC LỤC</p>
+          <ul class="toc-list">
+            <li class="toc-item"><a href="#baseurl" class="toc-link"><span class="toc-num">01</span> <span data-vi="Base URL" data-en="Base URL">Base URL</span></a></li>
+            <li class="toc-item"><a href="#default-endpoint" class="toc-link" style="color:var(--accent);font-weight:600;">
+              <span class="toc-num" style="display:inline-flex;align-items:center;">
+                <i data-lucide="star" width="12" height="12" style="color:var(--accent);"></i>
+              </span>
+              <span data-vi="Default Endpoint" data-en="Default Endpoint">Default Endpoint</span>
+            </a></li>
+            <li class="toc-item"><a href="#rate-limiting" class="toc-link"><span class="toc-num">02</span> <span data-vi="Giới hạn truy cập" data-en="Rate Limiting">Giới hạn truy cập</span></a></li>
+            <li class="toc-item"><a href="#endpoints-list" class="toc-link"><span class="toc-num">03</span> <span data-vi="Các Endpoint khác" data-en="Other Endpoints">Các Endpoint khác</span></a></li>
+            <li class="toc-item"><a href="#schema" class="toc-link"><span class="toc-num">04</span> <span data-vi="Cấu trúc dữ liệu" data-en="Data Schema">Cấu trúc dữ liệu</span></a></li>
+            <li class="toc-item"><a href="#regions" class="toc-link"><span class="toc-num">05</span> <span data-vi="Phân vùng giá" data-en="Price Regions">Phân vùng giá</span></a></li>
+            <li class="toc-item"><a href="#errors" class="toc-link"><span class="toc-num">06</span> <span data-vi="Mã lỗi" data-en="Error Codes">Mã lỗi</span></a></li>
+            <li class="toc-item"><a href="#demo" class="toc-link" style="color:var(--accent);">
+              <span class="toc-num" style="display:inline-flex;align-items:center;">
+                <i data-lucide="play" width="12" height="12" style="color:var(--accent);"></i>
+              </span>
+              <span data-vi="Demo Terminal" data-en="Terminal Demo">Demo Terminal</span>
+            </a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- CONTENT -->
+      <div class="main-doc">
+
+        <!-- 01 Base URL -->
+        <section id="baseurl" class="doc-section">
+          <h2 class="section-title"><span class="section-num">01</span> Base URL</h2>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">HTTP</span><button class="copy-btn" data-target="base-url-code">Copy</button></div>
+            <pre id="base-url-code"><code>http://localhost:3000</code></pre>
+          </div>
+        </section>
+
+        <!-- ★ DEFAULT ENDPOINT — FEATURED -->
+        <section id="default-endpoint" class="doc-section">
+          <h2 class="section-title" style="display:flex;align-items:center;gap:10px;">
+            <i data-lucide="star" width="18" height="18" style="color:var(--accent);flex-shrink:0;"></i>
+            <span data-vi="Default Endpoint — Khuyến nghị" data-en="Default Endpoint — Recommended">Default Endpoint <span style="color:var(--accent);">— Khuyến nghị</span></span>
+          </h2>
+          <p data-vi="Endpoint mặc định duy nhất để lấy giá xăng dầu. Kết quả được gom nhóm theo sản phẩm và gắn nhãn nguồn chi tiết để đối chiếu giữa các hãng."
+             data-en="Single default endpoint for fuel prices. Output is grouped by product with explicit source labels for cross-source comparison.">
+            Endpoint mặc định duy nhất để lấy giá xăng dầu. Một request, đầy đủ dữ liệu và có nhãn nguồn.
+          </p>
+
+          <!-- Hero card cho /api/fuel-prices -->
+          <div id="ep-default-feature" class="endpoint-card" style="border-color:var(--accent);border-width:2px;position:relative;">
+            <span class="unified-rec-badge"
+                  data-vi="KHUYẾN NGHỊ" data-en="RECOMMENDED">KHUYẾN NGHỊ</span>
+            <div class="endpoint-header">
+              <span class="method-badge method-get">GET</span>
+              <code class="endpoint-path">/api/fuel-prices</code>
+            </div>
+            <p class="endpoint-desc"
+               data-vi="Default: gom nhóm dữ liệu từ 11 nguồn (bao gồm mirror Petrolimex, COMECO, SaigonPetro, Petrotimes...) thành một cấu trúc chuẩn, có nhãn source cho từng mức giá."
+               data-en="Default: groups data from 11 sources (including Petrolimex mirrors, COMECO, SaigonPetro, Petrotimes...) into a single standardized schema with per-price source labels.">
+              <strong>Default Endpoint</strong>: dữ liệu đầy đủ từ <strong>11 nguồn</strong>, trả về theo dạng <code>data[] -> sources[]</code>.
+            </p>
+
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;">
+              <span class="ep-tag ep-tag-accent">
+                <i data-lucide="database" width="11" height="11"></i>
+                11 nguồn tích hợp
+              </span>
+              <span class="ep-tag ep-tag-indigo">
+                <i data-lucide="tag" width="11" height="11"></i>
+                Nhãn source từng giá
+              </span>
+              <span class="ep-tag ep-tag-emerald">
+                <i data-lucide="layers" width="11" height="11"></i>
+                Grouped theo mặt hàng
+              </span>
+              <span class="ep-tag ep-tag-blue">
+                <i data-lucide="zap" width="11" height="11"></i>
+                60 req/min
+              </span>
+            </div>
+
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep-default-js">Copy</button></div>
+              <pre id="ep-default-js"><code>const res = await fetch('http://localhost:3000/api/fuel-prices');
+const json = await res.json();
+
+console.log(json.meta.dataSources.length); // 11
+console.log(json.data[0].name);            // "Xăng RON 95-V"
+console.log(json.data[0].sources);         // [{ source, region1, region2, price }, ...]</code></pre>
+            </div>
+
+            <div class="code-block" style="margin-top:12px;">
+              <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" data-target="ep-default-py">Copy</button></div>
+              <pre id="ep-default-py"><code>import requests
+
+json = requests.get('http://localhost:3000/api/fuel-prices').json()
+print(json['meta']['dataSources'])
+print(json['data'][0]['name'])
+print(json['data'][0]['sources'])</code></pre>
+            </div>
+          </div>
+
+          <!-- Danh sách nguồn tích hợp -->
+          <h3 class="param-title" style="margin-top:var(--space-lg);" data-vi="DANH SÁCH NGUỒN TÍCH HỢP" data-en="INTEGRATED SOURCES">DANH SÁCH NGUỒN TÍCH HỢP</h3>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="KEY" data-en="KEY">KEY</th>
+                  <th data-vi="NGUỒN" data-en="SOURCE">NGUỒN</th>
+                  <th data-vi="URL" data-en="URL">URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>petrolimex</code></td><td>Petrolimex</td><td><a href="https://www.petrolimex.com.vn" target="_blank" rel="noopener">https://www.petrolimex.com.vn</a></td></tr>
+                <tr><td><code>kv2_petrolimex</code></td><td>Petrolimex KV2</td><td><a href="https://kv2.petrolimex.com.vn" target="_blank" rel="noopener">https://kv2.petrolimex.com.vn</a></td></tr>
+                <tr><td><code>saigon_petrolimex</code></td><td>Petrolimex SAI GON</td><td><a href="https://saigon.petrolimex.com.vn" target="_blank" rel="noopener">https://saigon.petrolimex.com.vn</a></td></tr>
+                <tr><td><code>vungtau_petrolimex</code></td><td>Petrolimex VUNG TAU</td><td><a href="https://vungtau.petrolimex.com.vn" target="_blank" rel="noopener">https://vungtau.petrolimex.com.vn</a></td></tr>
+                <tr><td><code>pvoil</code></td><td>PVOil</td><td><a href="https://www.pvoil.com.vn" target="_blank" rel="noopener">https://www.pvoil.com.vn</a></td></tr>
+                <tr><td><code>mipec</code></td><td>Mipec</td><td><a href="https://www.mipec.com.vn/pages/gia-xang-dau-ban-le" target="_blank" rel="noopener">https://www.mipec.com.vn/pages/gia-xang-dau-ban-le</a></td></tr>
+                <tr><td><code>comeco</code></td><td>COMECO</td><td><a href="https://comeco.vn" target="_blank" rel="noopener">https://comeco.vn</a></td></tr>
+                <tr><td><code>saigonpetro</code></td><td>Saigon Petro</td><td><a href="https://saigonpetro.com.vn/ban-le-xang-dau" target="_blank" rel="noopener">https://saigonpetro.com.vn/ban-le-xang-dau</a></td></tr>
+                <tr><td><code>petrotimes</code></td><td>Petro Times</td><td><a href="https://petrotimesgroup.com" target="_blank" rel="noopener">https://petrotimesgroup.com</a></td></tr>
+                <tr><td><code>webgia</code></td><td>WebGia (Mirror)</td><td><a href="https://webgia.com/gia-xang-dau/petrolimex/" target="_blank" rel="noopener">https://webgia.com/gia-xang-dau/petrolimex/</a></td></tr>
+                <tr><td><code>giaxanghomnay</code></td><td>GiaXangHomNay</td><td><a href="https://giaxanghomnay.com" target="_blank" rel="noopener">https://giaxanghomnay.com</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="source-cards" style="margin-top:var(--space-lg);">
+            <div class="source-card">
+              <div class="source-card-header">
+                <span class="source-key">petrolimex + mirrors</span>
+                <span class="source-badge source-badge-full">Vùng 1 &amp; 2</span>
+              </div>
+              <p data-vi="Nguồn lõi của hệ thống gồm Petrolimex và các mirror KV2/SAIGON/VUNGTAU để tăng độ ổn định khi một trang gặp lỗi tạm thời."
+                 data-en="Core system source includes Petrolimex and KV2/SAIGON/VUNGTAU mirrors for better resilience when one page is temporarily unavailable.">
+                Nguồn lõi của hệ thống gồm Petrolimex và các mirror KV2/SAIGON/VUNGTAU để tăng độ ổn định.
+              </p>
+            </div>
+
+            <div class="source-card">
+              <div class="source-card-header">
+                <span class="source-key">pvoil</span>
+                <span class="source-badge source-badge-single">Giá thống nhất</span>
+              </div>
+              <p data-vi="PVOil thường công bố theo một mức giá toàn quốc (không tách Vùng 1/2), kèm ngày giờ công bố."
+                 data-en="PVOil typically publishes one nationwide price level (no Region 1/2 split), with announcement date and time.">
+                PVOil thường công bố theo một mức giá toàn quốc (không tách Vùng 1/2), kèm ngày giờ công bố.
+              </p>
+            </div>
+
+            <div class="source-card">
+              <div class="source-card-header">
+                <span class="source-key">mipec · saigonpetro</span>
+                <span class="source-badge source-badge-full">Bổ sung đối chiếu</span>
+              </div>
+              <p data-vi="Nhóm nguồn bổ sung dùng để đối chiếu mức giá theo từng mặt hàng, đồng thời tăng độ phủ khi nguồn chính thiếu dữ liệu cục bộ."
+                 data-en="Supplementary sources used for cross-checking per-product prices and improving coverage when primary sources are missing localized data.">
+                Nhóm nguồn bổ sung dùng để đối chiếu mức giá theo từng mặt hàng và tăng độ phủ dữ liệu.
+              </p>
+            </div>
+
+            <div class="source-card">
+              <div class="source-card-header">
+                <span class="source-key">comeco · petrotimes · webgia</span>
+                <span class="source-badge" style="background:rgba(99,102,241,0.15);color:#818cf8;">Linked/Mirror</span>
+              </div>
+              <p data-vi="Nguồn linked/mirror giúp tăng khả năng phục hồi của hệ thống và đóng góp vào mảng dataSources trong Default Endpoint."
+                 data-en="Linked/mirror sources improve system resilience and contribute to the dataSources array in the Default Endpoint.">
+                Nguồn linked/mirror giúp tăng khả năng phục hồi của hệ thống và đóng góp vào mảng dataSources.
+              </p>
+            </div>
+
+            <div class="source-card">
+              <div class="source-card-header">
+                <span class="source-key">giaxanghomnay</span>
+                <span class="source-badge source-badge-full">63 Tỉnh thành</span>
+              </div>
+              <p data-vi="Nguồn tổng hợp mạnh cho quốc gia và tra cứu theo tỉnh thành, đặc biệt hữu ích cho endpoint /api/fuel-prices/province/:slug."
+                 data-en="Strong aggregation source for national and province-level lookups, especially useful for /api/fuel-prices/province/:slug.">
+                Nguồn tổng hợp mạnh cho quốc gia và tra cứu theo tỉnh thành, đặc biệt hữu ích cho endpoint theo tỉnh.
+              </p>
+            </div>
+          </div>
+
+          <div class="note-box mt-lg" style="background:var(--bg-elevated);border-left:3px solid var(--accent);padding:var(--space-md);border-radius:var(--radius-sm);font-size:0.95rem;">
+            <p style="margin:0;color:var(--text-secondary);"
+               data-vi="Dữ liệu từ 11 nguồn được làm mới tự động theo quy định (NĐ 80/2023). Endpoint mặc định /api/fuel-prices luôn là lựa chọn khuyến nghị để lấy bản tổng hợp mới nhất."
+               data-en="Data from 11 sources is refreshed adaptively (Decree 80/2023). The default endpoint /api/fuel-prices remains the recommended way to fetch the latest aggregated snapshot.">
+              Dữ liệu từ 11 nguồn được làm mới tự động theo quy định (NĐ 80/2023). Endpoint mặc định /api/fuel-prices luôn là lựa chọn khuyến nghị.
+            </p>
+            <p style="margin:10px 0 0;color:var(--text-secondary);">
+              <strong data-vi="Lưu ý pháp lý:" data-en="Legal Note:">Lưu ý pháp lý:</strong>
+              <span data-vi="Việc sử dụng dữ liệu phải tuân thủ" data-en="Use of this data must comply with our">Việc sử dụng dữ liệu phải tuân thủ</span>
+              <a href="/disclaimer" style="text-decoration:underline;">Tuyên bố miễn trừ trách nhiệm</a>.
+            </p>
+          </div>
+
+          <div class="note-box mt-lg" style="background:rgba(245,158,11,0.07);border-left:3px solid var(--accent);padding:var(--space-md);border-radius:var(--radius-sm);font-size:0.85rem;">
+            <p style="margin:0;color:var(--text-secondary);">
+              <strong>meta.primarySource</strong> luôn cho biết nguồn thực sự đang cung cấp data.
+              Nếu có <strong>warning</strong> trong response → Petrolimex đang down, hệ thống đã tự động chuyển sang nguồn dự phòng.
+            </p>
+          </div>
+        </section>
+
+        <!-- 02 Rate Limiting -->
+        <section id="rate-limiting" class="doc-section">
+          <h2 class="section-title"><span class="section-num">02</span> Rate Limiting</h2>
+          <p data-vi="API áp dụng giới hạn truy cập tự động theo IP để bảo vệ hệ thống."
+             data-en="The API applies automatic per-IP rate limiting to protect system stability.">
+            API áp dụng giới hạn truy cập tự động theo IP để bảo vệ hệ thống.
+          </p>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="NHÓM ENDPOINT" data-en="ENDPOINT GROUP">NHÓM ENDPOINT</th>
+                  <th data-vi="GIỚI HẠN" data-en="LIMIT">GIỚI HẠN</th>
+                  <th data-vi="GHI CHÚ" data-en="NOTE">GHI CHÚ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/api/fuel-prices</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 6px;border-radius:8px;">Default</span></td>
+                  <td><strong>60 req / phút</strong></td>
+                  <td data-vi="Endpoint mặc định tổng hợp — phục vụ từ RAM cache." data-en="Default aggregated endpoint — served from RAM cache.">Default, cache RAM</td>
+                </tr>
+                <tr>
+                  <td><code>/api/fuel-prices</code>, <code>/api/fuel-prices/:source</code>, <code>/api/provinces</code>, <code>/api/health</code></td>
+                  <td><strong>60 req / phút</strong></td>
+                  <td data-vi="Dữ liệu phục vụ từ RAM cache — độ trễ rất thấp." data-en="Served from RAM cache — very low latency.">Cache RAM, độ trễ thấp</td>
+                </tr>
+                <tr>
+                  <td><code>/api/fuel-prices/province/:slug</code></td>
+                  <td><strong>20 req / phút</strong></td>
+                  <td data-vi="On-demand scraping — lần đầu mất 5–10 giây, các lần sau phục vụ từ cache thích ứng." data-en="On-demand scraping — first request 5–10s, subsequent from adaptive cache.">On-demand scraping, cache thích ứng</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="note" style="margin-top: var(--space-sm);"
+             data-vi="Khi vượt giới hạn, API trả về HTTP 429 với thông báo lỗi song ngữ Việt/Anh."
+             data-en="When the limit is exceeded, the API returns HTTP 429 with a bilingual error message.">
+            Khi vượt giới hạn, API trả về HTTP 429 với thông báo lỗi.
+          </p>
+        </section>
+
+        <!-- 03 Other Endpoints -->
+        <section id="endpoints-list" class="doc-section">
+          <h2 class="section-title"><span class="section-num">03</span> <span data-vi="Các Endpoint" data-en="Endpoints">Các Endpoint</span></h2>
+          <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:var(--space-md);"
+              data-vi="Danh sách các API do hệ thống cung cấp. Click vào header để mở rộng/thu gọn."
+              data-en="List of available APIs. Click headers to toggle.">
+            Click vào thanh tiêu đề để mở rộng thẻ. Khuyến khích sử dụng <code>/api/fuel-prices</code> để có dữ liệu tổng hợp.
+          </p>
+
+          <!-- EP 1 — /api/fuel-prices (accordion, open by default) -->
+          <div id="ep-default" class="ep-accordion open">
+            <button class="ep-accordion-header" aria-expanded="true" aria-controls="ep-default-body">
+              <div class="ep-accordion-left">
+                <span class="method-badge method-get">GET</span>
+                <code class="endpoint-path">/api/fuel-prices</code>
+                <span class="ep-badge-recommended">
+                  <i data-lucide="star" width="10" height="10"></i>
+                  Khuyến nghị
+                </span>
+              </div>
+              <i data-lucide="chevron-down" width="18" height="18" class="ep-chevron"></i>
+            </button>
+            <div class="ep-accordion-body" id="ep-default-body">
+              <p class="endpoint-desc"
+                 data-vi="Default Endpoint: Lấy giá xăng dầu mới nhất, gộp và nhóm từ 11 nguồn độc lập."
+                 data-en="Default Endpoint: Get latest fuel prices, aggregated and grouped from 11 independent sources.">
+                Default Endpoint: Gom nhóm giá từ tất cả 11 nguồn, bao gồm 3 mirror Petrolimex, Comeco, SaigonPetro, Petrotimes, GiaXangHomNay và các nguồn quốc gia khác.
+              </p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep1-fetch">Copy</button></div>
+                <pre id="ep1-fetch"><code>const res = await fetch('http://localhost:3000/api/fuel-prices');
+const json = await res.json();
+console.log(json.data[0].name); // "Xăng RON 95-V"
+console.log(json.data[0].sources); // Array chứa giá của các hãng</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- EP 2 — /api/fuel-prices/:source (closed) -->
+          <div id="ep-source" class="ep-accordion">
+            <button class="ep-accordion-header" aria-expanded="false" aria-controls="ep-source-body">
+              <div class="ep-accordion-left">
+                <span class="method-badge method-get">GET</span>
+                <code class="endpoint-path">/api/fuel-prices/:source</code>
+              </div>
+              <i data-lucide="chevron-down" width="18" height="18" class="ep-chevron"></i>
+            </button>
+            <div class="ep-accordion-body" id="ep-source-body">
+              <p class="endpoint-desc"
+                 data-vi="Lấy giá từ nguồn cụ thể. Tham số :source là một trong: petrolimex, pvoil, mipec, comeco, saigonpetro, petrotimes..."
+                 data-en="Get prices from a specific source. :source must be one of: petrolimex, pvoil, mipec, comeco, saigonpetro, petrotimes...">
+                Lấy giá từ một nguồn cấp cụ thể (ví dụ: <code>petrolimex</code>, <code>pvoil</code>, <code>comeco</code>...).
+              </p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep2-fetch">Copy</button></div>
+                <pre id="ep2-fetch"><code>fetch('http://localhost:3000/api/fuel-prices/comeco')
+  .then(res => res.json())
+  .then(data => console.log(data));</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- EP 3 — /api/provinces (closed) -->
+          <div id="ep-provinces" class="ep-accordion">
+            <button class="ep-accordion-header" aria-expanded="false" aria-controls="ep-provinces-body">
+              <div class="ep-accordion-left">
+                <span class="method-badge method-get">GET</span>
+                <code class="endpoint-path">/api/provinces</code>
+              </div>
+              <i data-lucide="chevron-down" width="18" height="18" class="ep-chevron"></i>
+            </button>
+            <div class="ep-accordion-body" id="ep-provinces-body">
+              <p class="endpoint-desc"
+                 data-vi="Danh sách 63 tỉnh thành phố trực thuộc hệ thống giá xăng dầu Vùng 1 và Vùng 2. Mã slug dùng cho endpoint lấy giá theo tỉnh."
+                 data-en="List of 63 provinces mapped to Region 1 and Region 2. Emits slugs for the province price endpoint.">
+                Lấy danh sách 63 tỉnh thành &amp; mã slug tương ứng để tra cứu từng tỉnh.
+              </p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" data-target="ep3-py">Copy</button></div>
+                <pre id="ep3-py"><code>import requests
+data = requests.get('http://localhost:3000/api/provinces?region=2').json()
+print(data)</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- EP 4 — /api/fuel-prices/province/:slug (closed) -->
+          <div id="ep-province-price" class="ep-accordion">
+            <button class="ep-accordion-header" aria-expanded="false" aria-controls="ep-province-body">
+              <div class="ep-accordion-left">
+                <span class="method-badge method-get">GET</span>
+                <code class="endpoint-path">/api/fuel-prices/province/:slug</code>
+                <span class="ep-badge-slow">
+                  <i data-lucide="clock" width="10" height="10"></i>
+                  On-demand
+                </span>
+              </div>
+              <i data-lucide="chevron-down" width="18" height="18" class="ep-chevron"></i>
+            </button>
+            <div class="ep-accordion-body" id="ep-province-body">
+              <p class="endpoint-desc"
+                 data-vi="Giá xăng dầu tra cứu trực tiếp theo tỉnh thành (On-demand scrape). Hệ thống sẽ cache dữ liệu thích ứng."
+                 data-en="On-demand price scraping for a specific province. Subsequent calls are served from an adaptive cache.">
+                Giá xăng dầu chi tiết theo tỉnh thành (ví dụ: <code>ha-noi</code>, <code>ho-chi-minh</code>). Tự động xác định vùng!
+              </p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep4-fetch">Copy</button></div>
+                <pre id="ep4-fetch"><code>// Lấy giá khu vực Hà Nội
+const res = await fetch('http://localhost:3000/api/fuel-prices/province/ha-noi');
+const data = await res.json();</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- EP 5 — /api/health (closed) -->
+          <div id="ep-health" class="ep-accordion">
+            <button class="ep-accordion-header" aria-expanded="false" aria-controls="ep-health-body">
+              <div class="ep-accordion-left">
+                <span class="method-badge method-get">GET</span>
+                <code class="endpoint-path">/api/health</code>
+                <span class="ep-badge-info">
+                  <i data-lucide="activity" width="10" height="10"></i>
+                  Health Check
+                </span>
+              </div>
+              <i data-lucide="chevron-down" width="18" height="18" class="ep-chevron"></i>
+            </button>
+            <div class="ep-accordion-body" id="ep-health-body">
+              <p class="endpoint-desc"
+                 data-vi="Theo dõi trạng thái online của từng Scraper và thời gian làm mới cache."
+                 data-en="Monitor the online status of individual Scrapers and cache refresh states.">
+                Theo dõi sức khỏe các Scraper và Metadata hệ thống (Uptime).
+              </p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">cURL</span><button class="copy-btn" data-target="ep5-curl">Copy</button></div>
+                <pre id="ep5-curl"><code>curl http://localhost:3000/api/health</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 04 Data Schema -->
+        <section id="schema" class="doc-section">
+          <h2 class="section-title"><span class="section-num">04</span> <span data-vi="Cấu trúc dữ liệu" data-en="Data Schema">Cấu trúc dữ liệu</span></h2>
+
+          <!-- META OBJECT -->
+          <h3 class="param-title" data-vi="ĐỐI TƯỢNG META" data-en="META OBJECT">ĐỐI TƯỢNG META</h3>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="TRƯỜNG" data-en="FIELD">TRƯỜNG</th>
+                  <th data-vi="KIỂU" data-en="TYPE">KIỂU</th>
+                  <th data-vi="MÔ TẢ" data-en="DESCRIPTION">MÔ TẢ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>primarySource</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices/:source</span></td><td>String</td><td data-vi="Tên nguồn chính đang cung cấp dữ liệu" data-en="Primary source currently providing data">Nguồn dữ liệu chính</td></tr>
+                <tr><td><code>primarySourceUrl</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices/:source</span></td><td>String</td><td data-vi="URL của nguồn chính" data-en="URL of the primary source">URL nguồn chính</td></tr>
+                <tr><td><code>dataSources</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices</span></td><td>String[]</td><td data-vi="Danh sách tất cả các nguồn (hãng) đã đóng góp vào kết quả" data-en="All sources that contributed to the result">Các nguồn tổng hợp</td></tr>
+                <tr><td><code>source</code></td><td>String</td><td data-vi="Tên nguồn dữ liệu (ở API per-source hoặc bên trong mảng lồng)" data-en="Data source name">Tên nguồn</td></tr>
+                <tr><td><code>sourceUrl</code></td><td>String</td><td data-vi="URL gốc của nguồn dữ liệu" data-en="Official source URL">URL nguồn</td></tr>
+                <tr><td><code>scrapedAt</code></td><td>ISO 8601</td><td data-vi="Thời điểm hệ thống thu thập dữ liệu (UTC)" data-en="When data was collected (UTC)">Thời điểm thu thập</td></tr>
+                <tr><td><code>priceDate</code></td><td>YYYY-MM-DD</td><td data-vi="Ngày niêm yết giá từ nhà cung cấp — định dạng ISO 8601" data-en="Effective price date from provider — ISO 8601 format">Ngày niêm yết (ISO)</td></tr>
+                <tr><td><code>priceDateDisplay</code></td><td>DD/MM/YYYY</td><td data-vi="Ngày niêm yết định dạng hiển thị theo chuẩn Việt Nam" data-en="Price date in Vietnamese display format">Ngày niêm yết (hiển thị)</td></tr>
+                <tr><td><code>cacheHit</code></td><td>Boolean</td><td data-vi="true nếu dữ liệu được phục vụ từ bộ nhớ đệm" data-en="true if served from cache">Trạng thái cache</td></tr>
+                <tr><td><code>cacheTtlRemainingSeconds</code></td><td>Number</td><td data-vi="Số giây còn lại trước khi cache hết hạn" data-en="Seconds remaining before cache expires">Thời gian cache còn lại</td></tr>
+                <tr><td><code>totalItems</code></td><td>Number</td><td data-vi="Số lượng mặt hàng trả về trong mảng data" data-en="Number of items in the data array">Số mặt hàng</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FUEL OBJECT -->
+          <h3 class="param-title" data-vi="ĐỐI TƯỢNG NHIÊN LIỆU (MẢNG DATA)" data-en="FUEL OBJECT (DATA ARRAY)">ĐỐI TƯỢNG NHIÊN LIỆU (MẢNG DATA)</h3>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="TRƯỜNG" data-en="FIELD">TRƯỜNG</th>
+                  <th data-vi="KIỂU" data-en="TYPE">KIỂU</th>
+                  <th data-vi="MÔ TẢ" data-en="DESCRIPTION">MÔ TẢ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>name</code></td><td>String</td><td data-vi="Tên loại nhiên liệu hoặc mặt hàng (VD: Xăng RON 95-V)" data-en="Fuel product name (e.g., RON 95-V)">Tên nhiên liệu</td></tr>
+                <tr><td><code>unit</code></td><td>String</td><td data-vi="Đơn vị tính thống nhất: VND/lít hoặc VND/kg" data-en="Unified unit: VND/lít or VND/kg">Đơn vị tính</td></tr>
+                <tr><td><code>sources</code></td><td>Array</td><td data-vi="Mảng chứa thông tin giá từ các hãng bán lẻ đối với loại nhiên liệu này" data-en="Array of price data from different retailers for this fuel type">Mảng giá các hãng</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- SOURCE PRICE OBJECT -->
+          <h3 class="param-title" data-vi="ĐỐI TƯỢNG GIÁ TỪNG HÃNG (BÊN TRONG SOURCES)" data-en="SOURCE PRICE OBJECT (INSIDE SOURCES)">ĐỐI TƯỢNG GIÁ TỪNG HÃNG</h3>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="TRƯỜNG" data-en="FIELD">TRƯỜNG</th>
+                  <th data-vi="KIỂU" data-en="TYPE">KIỂU</th>
+                  <th data-vi="MÔ TẢ" data-en="DESCRIPTION">MÔ TẢ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>source</code></td><td>String</td><td data-vi="Định danh của hãng (VD: 'petrolimex', 'comeco')" data-en="Retailer identifier (e.g., 'petrolimex', 'comeco')">Tên hãng</td></tr>
+                <tr><td><code>region1</code></td><td>Number | null</td><td data-vi="Giá bán lẻ Vùng 1 (VNĐ). null nếu nguồn không phân vùng." data-en="Region 1 retail price (VND). null if source has no region split.">Giá Vùng 1 (VND)</td></tr>
+                <tr><td><code>region2</code></td><td>Number | null</td><td data-vi="Giá bán lẻ Vùng 2 (VNĐ). null nếu nguồn không phân vùng." data-en="Region 2 retail price (VND). null if source has no region split.">Giá Vùng 2 (VND)</td></tr>
+                <tr><td><code>price</code></td><td>Number | null</td><td data-vi="Giá thống nhất (chỉ có ở PVOil hoặc nguồn không phân vùng)." data-en="Unified price (PVOil or unregionalized sources only).">Giá thống nhất</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PROVINCE OBJECT -->
+          <h3 class="param-title" data-vi="ĐỐI TƯỢNG TỈNH THÀNH (/api/provinces)" data-en="PROVINCE OBJECT (/api/provinces)">ĐỐI TƯỢNG TỈNH THÀNH</h3>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="TRƯỜNG" data-en="FIELD">TRƯỜNG</th>
+                  <th data-vi="KIỂU" data-en="TYPE">KIỂU</th>
+                  <th data-vi="MÔ TẢ" data-en="DESCRIPTION">MÔ TẢ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>String</td><td data-vi="Mã tỉnh 2 chữ số theo chuẩn quốc gia (VD: '01', '79')" data-en="2-digit province code per national standard (e.g., '01', '79')">Mã tỉnh (2 chữ số)</td></tr>
+                <tr><td><code>name</code></td><td>String</td><td data-vi="Tên đầy đủ tỉnh/thành phố" data-en="Full province/city name">Tên tỉnh thành</td></tr>
+                <tr><td><code>slug</code></td><td>String</td><td data-vi="Định danh URL (dùng cho endpoint /province/:slug)" data-en="URL identifier (used in /province/:slug endpoint)">Slug URL</td></tr>
+                <tr><td><code>region</code></td><td>'1' | '2'</td><td data-vi="Vùng giá mặc định của tỉnh (toàn tỉnh)" data-en="Default price region for the province (province-wide)">Vùng giá</td></tr>
+                <tr><td><code>partialRegion</code></td><td>Boolean?</td><td data-vi="true nếu một số huyện thuộc Vùng 2 khác (chỉ có ở 4 tỉnh bán phần)" data-en="true if some districts have a different region (only 4 partial provinces)">Tỉnh bán phần</td></tr>
+                <tr><td><code>vung2Districts</code></td><td>String[]?</td><td data-vi="Danh sách tên huyện thuộc Vùng 2 (chỉ khi partialRegion = true)" data-en="List of district names in Region 2 (only when partialRegion = true)">Huyện Vùng 2</td></tr>
+                <tr><td><code>note</code></td><td>String?</td><td data-vi="Ghi chú phân vùng chi tiết (chỉ khi partialRegion = true)" data-en="Detailed region note (only when partialRegion = true)">Ghi chú</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Response Examples — accordion -->
+          <h3 class="param-title" data-vi="VÍ DỤ RESPONSE" data-en="RESPONSE EXAMPLES">VÍ DỤ RESPONSE</h3>
+
+          <!-- Default endpoint example -->
+          <div class="raw-accordion" id="exAccordion1">
+            <div class="raw-accordion-header" id="exAccordionToggle1" role="button" tabindex="0" aria-expanded="false" aria-controls="exAccordionBody1">
+              <span class="raw-accordion-title">
+                <i data-lucide="code-2" width="14" height="14"></i>
+                <span>Default Endpoint <code style="font-size:0.8em;">/api/fuel-prices</code></span>
+              </span>
+              <div style="display:flex;align-items:center;gap:var(--space-sm);">
+                <button class="copy-btn" data-target="ex-unified">Copy</button>
+                <i data-lucide="chevron-down" width="16" height="16" class="raw-accordion-chevron"></i>
+              </div>
+            </div>
+            <div class="raw-accordion-body" id="exAccordionBody1">
+              <div class="code-block" style="border:none;border-radius:0;margin:0;">
+                <pre class="raw-json-pre"><code id="ex-unified">{
+  "success": true,
+  "status": "ok",
+  "meta": {
+    "primarySource": "Petrolimex",
+    "primarySourceUrl": "https://www.petrolimex.com.vn",
+    "dataSources": [
+      "petrolimex", "kv2_petrolimex", "saigon_petrolimex",
+      "vungtau_petrolimex", "pvoil", "mipec", "comeco",
+      "saigonpetro", "petrotimes", "webgia", "giaxanghomnay"
+    ],
+    "scrapedAt": "2026-04-02T06:30:00.000Z",
+    "priceDate": "2026-03-27",
+    "priceDateDisplay": "27/03/2026",
+    "cacheHit": true,
+    "cacheTtlRemainingSeconds": 3240,
+    "totalItems": 7
+  },
+  "data": [
+    {
+      "name": "Xăng RON 95-V",
+      "unit": "VND/lít",
+      "sources": [
+        { "source": "petrolimex", "region1": 24730, "region2": 25220, "price": null },
+        { "source": "kv2_petrolimex", "region1": 24730, "region2": 25220, "price": null },
+        { "source": "comeco", "region1": 24730, "region2": 25220, "price": null }
+      ]
+    }
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Petrolimex / GiaXangHomNay example -->
+          <div class="raw-accordion" id="exAccordion2">
+            <div class="raw-accordion-header" id="exAccordionToggle2" role="button" tabindex="0" aria-expanded="false" aria-controls="exAccordionBody2">
+              <span class="raw-accordion-title">
+                <i data-lucide="code-2" width="14" height="14"></i>
+                <span>Petrolimex / GiaXangHomNay <span style="opacity:0.6;">(Vùng 1 &amp; 2)</span></span>
+              </span>
+              <div style="display:flex;align-items:center;gap:var(--space-sm);">
+                <button class="copy-btn" data-target="ex-national">Copy</button>
+                <i data-lucide="chevron-down" width="16" height="16" class="raw-accordion-chevron"></i>
+              </div>
+            </div>
+            <div class="raw-accordion-body" id="exAccordionBody2">
+              <div class="code-block" style="border:none;border-radius:0;margin:0;">
+                <pre class="raw-json-pre"><code id="ex-national">{
+  "success": true,
+  "status": "ok",
+  "meta": {
+    "source": "Petrolimex",
+    "sourceUrl": "https://www.petrolimex.com.vn",
+    "scrapedAt": "2026-03-31T16:04:30.000Z",
+    "priceDate": "2026-03-27",
+    "priceDateDisplay": "27/03/2026",
+    "cacheHit": true,
+    "cacheTtlRemainingSeconds": 3240,
+    "totalItems": 7
+  },
+  "data": [
+    { "name": "Xăng RON 95-V", "region1": 24730, "region2": 25220, "price": null, "unit": "VND/lít" },
+    { "name": "Xăng E5 RON 92-II", "region1": 23320, "region2": 23780, "price": null, "unit": "VND/lít" }
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- PVOil example -->
+          <div class="raw-accordion" id="exAccordion3">
+            <div class="raw-accordion-header" id="exAccordionToggle3" role="button" tabindex="0" aria-expanded="false" aria-controls="exAccordionBody3">
+              <span class="raw-accordion-title">
+                <i data-lucide="code-2" width="14" height="14"></i>
+                <span>PVOil <span style="opacity:0.6;">(Giá thống nhất)</span></span>
+              </span>
+              <div style="display:flex;align-items:center;gap:var(--space-sm);">
+                <button class="copy-btn" data-target="ex-pvoil">Copy</button>
+                <i data-lucide="chevron-down" width="16" height="16" class="raw-accordion-chevron"></i>
+              </div>
+            </div>
+            <div class="raw-accordion-body" id="exAccordionBody3">
+              <div class="code-block" style="border:none;border-radius:0;margin:0;">
+                <pre class="raw-json-pre"><code id="ex-pvoil">{
+  "meta": { "source": "PVOil", "totalItems": 5, "..." : "..." },
+  "data": [
+    { "name": "Xăng RON 95-III", "region1": null, "region2": null, "price": 24330, "unit": "VND/lít" }
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Provinces example -->
+          <div class="raw-accordion" id="exAccordion4">
+            <div class="raw-accordion-header" id="exAccordionToggle4" role="button" tabindex="0" aria-expanded="false" aria-controls="exAccordionBody4">
+              <span class="raw-accordion-title">
+                <i data-lucide="code-2" width="14" height="14"></i>
+                <span>Tỉnh thành <code style="font-size:0.8em;">/api/provinces</code></span>
+              </span>
+              <div style="display:flex;align-items:center;gap:var(--space-sm);">
+                <button class="copy-btn" data-target="ex-prov">Copy</button>
+                <i data-lucide="chevron-down" width="16" height="16" class="raw-accordion-chevron"></i>
+              </div>
+            </div>
+            <div class="raw-accordion-body" id="exAccordionBody4">
+              <div class="code-block" style="border:none;border-radius:0;margin:0;">
+                <pre class="raw-json-pre"><code id="ex-prov">{
+  "success": true,
+  "meta": { "total": 63, "region1Count": 48, "region2Count": 15, "filterApplied": null },
+  "data": [
+    { "id": "01", "name": "Hà Nội", "slug": "ha-noi", "region": "1" },
+    { "id": "91", "name": "Kiên Giang", "slug": "kien-giang", "region": "1",
+      "partialRegion": true,
+      "vung2Districts": ["Phú Quốc", "Kiên Hải"],
+      "note": "TP. Phú Quốc và huyện Kiên Hải thuộc Vùng 2"
+    }
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- 05 Price Regions -->
+        <section id="regions" class="doc-section">
+          <h2 class="section-title"><span class="section-num">05</span> <span data-vi="Phân vùng giá xăng dầu" data-en="Price Region Classification">Phân vùng giá xăng dầu</span></h2>
+          <p data-vi="Theo quy định hiện hành, giá xăng dầu bán lẻ tại Việt Nam được phân thành 2 vùng:"
+             data-en="Per current regulations, Vietnam's retail fuel prices are divided into 2 regions:">
+            Theo quy định, giá xăng dầu được chia thành 2 vùng tại Việt Nam:
+          </p>
+
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="VÙNG" data-en="REGION">VÙNG</th>
+                  <th data-vi="MÔ TẢ" data-en="DESCRIPTION">MÔ TẢ</th>
+                  <th data-vi="PHẠM VI" data-en="SCOPE">PHẠM VI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong data-vi="Vùng 1" data-en="Region 1">Vùng 1</strong></td>
+                  <td data-vi="Địa bàn gần kho đầu mối, hạ tầng thuận lợi. Giá tiêu chuẩn." data-en="Near depots and infrastructure hubs. Standard price.">Gần kho đầu mối. Giá tiêu chuẩn.</td>
+                  <td data-vi="48 tỉnh/thành (toàn tỉnh hoặc phần lớn)" data-en="48 provinces/cities (full or majority)">48 tỉnh thành</td>
+                </tr>
+                <tr>
+                  <td><strong data-vi="Vùng 2" data-en="Region 2">Vùng 2</strong></td>
+                  <td data-vi="Địa bàn xa cảng, vùng sâu, vùng xa, hải đảo. Giá cao hơn tối đa 2%." data-en="Remote areas, islands, mountainous regions. Up to +2% surcharge.">Vùng sâu, hải đảo. Tối đa +2%.</td>
+                  <td data-vi="15 tỉnh toàn tỉnh + 4 tỉnh bán phần (một số huyện)" data-en="15 full provinces + 4 partial provinces (specific districts)">15 tỉnh + 4 bán phần</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="note" style="margin-top:var(--space-sm);"
+             data-vi="4 tỉnh bán phần gồm: Quảng Ninh (huyện Vân Đồn, Cô Tô, Hải Hà), Bình Thuận (Phú Quý), Bà Rịa - Vũng Tàu (Côn Đảo), Kiên Giang (Phú Quốc, Kiên Hải). Endpoint /api/provinces trả về chi tiết vung2Districts cho từng tỉnh."
+             data-en="4 partial provinces: Quảng Ninh (Vân Đồn, Cô Tô, Hải Hà), Bình Thuận (Phú Quý), Bà Rịa-Vũng Tàu (Côn Đảo), Kiên Giang (Phú Quốc, Kiên Hải). See /api/provinces for vung2Districts details.">
+            4 tỉnh bán phần: Quảng Ninh, Bình Thuận, Bà Rịa-Vũng Tàu, Kiên Giang. Xem <code>/api/provinces</code> để biết chi tiết huyện Vùng 2.
+          </p>
+        </section>
+
+        <!-- 06 Error Codes -->
+        <section id="errors" class="doc-section">
+          <h2 class="section-title"><span class="section-num">06</span> <span data-vi="Mã lỗi" data-en="Error Codes">Mã lỗi</span></h2>
+          <div class="schema-table-wrap">
+            <table class="schema-table">
+              <thead>
+                <tr>
+                  <th data-vi="MÃ HTTP" data-en="HTTP CODE">MÃ HTTP</th>
+                  <th data-vi="STATUS KEY" data-en="STATUS KEY">STATUS KEY</th>
+                  <th data-vi="Ý NGHĨA" data-en="MEANING">Ý NGHĨA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="status-badge status-200">200</span></td>
+                  <td><code>ok</code></td>
+                  <td data-vi="Thành công. Dữ liệu trả về trong trường data." data-en="Success. Data returned in the data field.">Thành công</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-400">400</span></td>
+                  <td><code>invalid_source</code></td>
+                  <td data-vi="Nguồn dữ liệu không hợp lệ. Response bao gồm danh sách availableSources." data-en="Invalid data source. Response includes availableSources list.">Nguồn không hợp lệ</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-404">404</span></td>
+                  <td><code>not_found</code></td>
+                  <td data-vi="Slug tỉnh thành không tồn tại. Xem danh sách đúng tại /api/provinces." data-en="Province slug not found. Check /api/provinces for valid slugs.">Tỉnh thành không tồn tại</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-429">429</span></td>
+                  <td><code>rate_limited</code></td>
+                  <td data-vi="Vượt quá giới hạn truy cập (60 hoặc 20 req/phút)." data-en="Rate limit exceeded (60 or 20 req/min).">Vượt giới hạn truy cập</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-502">502</span></td>
+                  <td><code>scrape_error</code></td>
+                  <td data-vi="Không thể scrape dữ liệu tỉnh thành (chỉ ở endpoint province). Thử lại sau." data-en="Failed to scrape province data (province endpoint only). Retry later.">Lỗi scraping tỉnh thành</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-50x">503</span></td>
+                  <td><code>unavailable</code></td>
+                  <td data-vi="Dữ liệu chưa sẵn sàng — hệ thống đang khởi động lần đầu." data-en="Data not ready — system performing first-time update.">Dữ liệu chưa sẵn sàng</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block mt-lg">
+            <div class="code-header"><span class="code-lang">JSON — Error Response</span></div>
+            <pre><code>{
+  "success": false,
+  "status": "invalid_source",
+  "message": {
+    "vi": "Nguồn không hợp lệ. Xem danh sách đầy đủ trong availableSources.",
+    "en": "Invalid source. See full list in availableSources."
+  },
+  "availableSources": [
+    { "id": "petrolimex", "label": "Petrolimex", "url": "https://www.petrolimex.com.vn" }
+  ]
+}</code></pre>
+          </div>
+        </section>
+
+      </div><!-- /main-doc -->
+    </div><!-- /layout-two-col -->
+  </div>
+
+<!-- ══ SECTION 08: DEMO TERMINAL ══════════════════════════════ -->
+<section id="demo" class="demo-section">
+  <div class="container">
+    <div class="demo-header">
+      <span class="page-overline" data-vi="Mô phỏng tương tác" data-en="Interactive Demo">Mô phỏng tương tác</span>
+      <h2 class="demo-title" data-vi="Terminal Demo" data-en="Terminal Demo">Terminal Demo</h2>
+      <p class="demo-sub" data-vi="Xem thao tác gọi API thực tế — từ health check đến lấy giá tỉnh thành." data-en="Watch live API calls in action — from health check to per-province pricing.">Xem thao tác gọi API thực tế — từ health check đến lấy giá tỉnh thành.</p>
+    </div>
+
+    <div class="pg-pc-center">
+      <div class="pc-mockup pc-mockup--wide">
+        <!-- Titlebar -->
+        <div class="pc-titlebar">
+          <div class="pc-dots">
+            <span class="pc-dot pc-dot-red"></span>
+            <span class="pc-dot pc-dot-yellow"></span>
+            <span class="pc-dot pc-dot-green"></span>
+          </div>
+          <span class="pc-titlebar-label">bash — VietFuelAPI Terminal</span>
+          <div class="pc-titlebar-right"></div>
+        </div>
+        <!-- Terminal Body -->
+        <div class="pc-terminal pc-terminal--tall" id="pcTerminal" aria-live="polite">
+          <div class="pc-line" id="pcLine0"><span class="pc-prompt">$</span><span class="pc-cmd" id="pcCmd0"></span><span class="pc-cursor" id="pcCursor0">█</span></div>
+          <div class="pc-output" id="pcOutput0"><div class="pc-comment" id="pcComment0" style="display:none"># 200 OK — status: healthy</div><div class="pc-json-block" id="pcJsonBlock0"></div></div>
+          <div class="pc-line" id="pcLine1" style="display:none"><span class="pc-prompt">$</span><span class="pc-cmd" id="pcCmd1"></span><span class="pc-cursor" id="pcCursor1">█</span></div>
+          <div class="pc-output" id="pcOutput1"><div class="pc-comment" id="pcComment1" style="display:none"># 200 OK — Default endpoint grouped by sources</div><span class="pc-json-brace" id="pcBrace1open" style="display:none">{</span><div class="pc-json-block" id="pcJsonBlock1"></div><span class="pc-json-brace" id="pcBrace1close" style="display:none">}</span></div>
+          <div class="pc-line" id="pcLine2" style="display:none"><span class="pc-prompt">$</span><span class="pc-cmd" id="pcCmd2"></span><span class="pc-cursor" id="pcCursor2">█</span></div>
+          <div class="pc-output" id="pcOutput2"><div class="pc-comment" id="pcComment2" style="display:none"># 200 OK — COMECO snapshot</div><div class="pc-json-block" id="pcJsonBlock2"></div></div>
+          <div class="pc-line" id="pcLine3" style="display:none"><span class="pc-prompt">$</span><span class="pc-cmd" id="pcCmd3"></span><span class="pc-cursor" id="pcCursor3">█</span></div>
+          <div class="pc-output" id="pcOutput3"><div class="pc-comment" id="pcComment3" style="display:none"># 200 OK — Source: PVOil</div><span class="pc-json-brace" id="pcBrace3open" style="display:none">{</span><div class="pc-json-block" id="pcJsonBlock3"></div><span class="pc-json-brace" id="pcBrace3close" style="display:none">}</span></div>
+          <div class="pc-line" id="pcLine4" style="display:none"><span class="pc-prompt">$</span><span class="pc-cmd" id="pcCmd4"></span><span class="pc-cursor" id="pcCursor4">█</span></div>
+          <div class="pc-output" id="pcOutput4"><div class="pc-comment" id="pcComment4" style="display:none"># 200 OK — 63 tỉnh/thành phố</div><div class="pc-json-block" id="pcJsonBlock4"></div></div>
+          <div class="pc-line" id="pcLine5" style="display:none"><span class="pc-prompt">$</span><span class="pc-cmd" id="pcCmd5"></span><span class="pc-cursor" id="pcCursor5">█</span></div>
+          <div class="pc-output" id="pcOutput5"><div class="pc-comment" id="pcComment5" style="display:none"># 200 OK — TP. Hồ Chí Minh, vùng 1</div><span class="pc-json-brace" id="pcBrace5open" style="display:none">{</span><div class="pc-json-block" id="pcJsonBlock5"></div><span class="pc-json-brace" id="pcBrace5close" style="display:none">}</span></div>
+          <div class="pc-done-badge" id="pcDone" style="display:none">
+            <span class="pc-done-dot"></span>
+            <span class="pc-done-text">Session complete — VietFuelAPI v1.0.0 · 6 endpoints</span>
+          </div>
+        </div>
+        <svg class="pc-mouse-svg" id="pcMouse" viewBox="0 0 20 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M0 0 L0 20 L5 14 L8 21 L10.5 20 L7.5 13 L14 13 Z" fill="white" stroke="#222" stroke-width="1" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <!-- Controls -->
+      <div class="pc-controls">
+        <button class="pc-replay-btn" id="pcReplayBtn" aria-label="Chạy lại animation">
+          <i data-lucide="rotate-ccw" width="13" height="13"></i>
+          <span data-vi="Chạy lại" data-en="Replay">Chạy lại</span>
+        </button>
+        <div class="pc-status-bar">
+          <span class="pc-status-dot" id="pcStatusDot"></span>
+          <span class="pc-status-text" id="pcStatusText">Đang khởi động...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<style>
+/* ── Status Badges ────────────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.status-200 { background: rgba(16,185,129,0.15); color: #10b981; }
+.status-400 { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.status-404 { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.status-429 { background: rgba(99,102,241,0.15); color: #818cf8; }
+.status-502, .status-50x { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+/* ── Featured default endpoint card ──────────────────────── */
+#ep-default-feature { overflow: visible !important; }
+#ep-default-feature .unified-rec-badge {
+  position: absolute;
+  top: 0; right: 16px;
+  transform: translateY(-50%);
+  z-index: 6;
+  background: var(--accent);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 4px 12px rgba(245,158,11,0.35);
+}
+
+/* ── Endpoint tag pills ─────────────────────────────────── */
+.ep-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+}
+.ep-tag-accent  { background:rgba(245,158,11,0.12); color:var(--accent);  border-color:rgba(245,158,11,0.3); }
+.ep-tag-indigo  { background:rgba(99,102,241,0.12);  color:#818cf8;        border-color:rgba(99,102,241,0.3); }
+.ep-tag-emerald { background:rgba(52,211,153,0.12);  color:#34d399;        border-color:rgba(52,211,153,0.3); }
+.ep-tag-blue    { background:rgba(59,130,246,0.12);  color:#60a5fa;        border-color:rgba(59,130,246,0.3); }
+
+/* ── Endpoint Accordion (section 03 list) ─────────────────── */
+.ep-accordion {
+  border: 1px solid var(--bg-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  background: var(--bg-surface);
+  transition: border-color var(--transition), transform var(--transition);
+}
+.ep-accordion:hover { border-color: rgba(255,99,0,0.35); }
+
+.ep-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px var(--space-lg);
+  background: var(--bg-surface);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: var(--space-sm);
+  transition: background var(--transition);
+}
+.ep-accordion-header:hover { background: var(--bg-elevated); }
+
+.ep-accordion-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.ep-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 0.25s ease, color var(--transition);
+}
+.ep-accordion.open .ep-chevron { transform: rotate(180deg); }
+.ep-accordion.open .ep-chevron { color: var(--accent); }
+
+.ep-accordion-body {
+  display: none;
+  padding: var(--space-lg);
+  border-top: 1px solid var(--bg-border);
+  background: var(--bg-base);
+}
+.ep-accordion.open .ep-accordion-body { display: block; }
+
+/* Badge labels on endpoint rows */
+.ep-badge-recommended {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(245,158,11,0.12);
+  color: var(--accent);
+  border: 1px solid rgba(245,158,11,0.3);
+  letter-spacing: 0.02em;
+}
+.ep-badge-slow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(251,146,60,0.1);
+  color: #fb923c;
+  border: 1px solid rgba(251,146,60,0.3);
+}
+.ep-badge-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(52,211,153,0.1);
+  color: #34d399;
+  border: 1px solid rgba(52,211,153,0.3);
+}
+
+/* ── Lucide icons sizing ──────────────────────────────────── */
+.lucide-icon, i[data-lucide] {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Terminal done dot — use CSS circle instead of emoji */
+.pc-done-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--status-ok, #22c55e);
+  flex-shrink: 0;
+}
+</style>
+
+  <footer class="site-footer">
+  <div class="footer-huge-text">VIETFUEL API</div>
+  <canvas id="flickering-grid-footer"></canvas>
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Col 1: Brand -->
+      <div class="footer-logo-col">
+        <div class="footer-logo-container">
+          <img src="/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer Logo" class="footer-logo-img" />
+        </div>
+        <p class="footer-brand-desc" data-vi="VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa, có nhãn nguồn rõ ràng." data-en="VietFuelAPI provides real-time fuel price data. Aggregated from 11 sources via a standardized Default Endpoint with explicit source labels.">
+          VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa.
+        </p>
+      </div>
+
+      <!-- Col 2: Explorer -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="KHÁM PHÁ" data-en="EXPLORER">KHÁM PHÁ</p>
+        <ul class="footer-links">
+          <li><a href="/" data-vi="Trang chủ" data-en="Home">Trang chủ</a></li>
+          <li><a href="/live" data-vi="Dữ liệu thực tế" data-en="Live Tracker">Dữ liệu thực tế</a></li>
+          <li><a href="/endpoints#demo" data-vi="Demo Terminal" data-en="Terminal Demo">Demo Terminal</a></li>
+          <li><a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener">GitHub ↗</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Documentation -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="TÀI LIỆU" data-en="DOCUMENTATION">TÀI LIỆU</p>
+        <ul class="footer-links">
+          <li><a href="/endpoints" data-vi="API Reference" data-en="API Reference">API Reference</a></li>
+          <li><a href="/test-api" data-vi="Test API" data-en="Test API">Test API</a></li>
+          <li><a href="/endpoints#schema" data-vi="Cấu trúc dữ liệu" data-en="Data Schema">Cấu trúc dữ liệu</a></li>
+          <li><a href="/endpoints#errors" data-vi="Mã lỗi" data-en="Error Codes">Mã lỗi</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Legal -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="PHÁP LÝ" data-en="LEGAL">PHÁP LÝ</p>
+        <ul class="footer-links">
+          <li><a href="/disclaimer" data-vi="Tuyên bố miễn trừ" data-en="Disclaimer">Tuyên bố miễn trừ</a></li>
+          <li><a href="/privacy" data-vi="Chính sách bảo mật" data-en="Privacy Policy">Chính sách bảo mật</a></li>
+          <li><a href="/terms" data-vi="Điều khoản sử dụng" data-en="Terms of Service">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Centered Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-disclaimer-text" data-vi="Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo." data-en="Disclaimer: VietFuelAPI is an independent open-source project, not affiliated with Petrolimex or any government agency. Aggregated data from 11 sources is for reference only.">
+          Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo.
+        </p>
+        <div class="footer-copy">
+          <span class="copy-text">© 2026 VietFuelAPI. Built for developers.</span>
+          <span class="version-badge">v1.1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <button id="backToTop" class="back-to-top" aria-label="Lên đầu trang">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    <img src="/brand/backtotop.png" alt="Back to top" class="back-to-top-char" />
+  </button>
+
+  <script src="/js/lang.js"></script>
+  <script src="/js/ui.js"></script>
+  <script>
+    (function() {
+      const canvas = document.getElementById('flickering-grid-footer');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const config = {
+        squareSize: 4, gridGap: 12,
+        color: [255, 140, 0], // Orange
+        maxOpacity: 0.42, flickerChance: 0.045, transitionSpeed: 0.08
+      };
+      let cols, rows, squares = [];
+      function resize() {
+        const parent = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = parent.clientWidth * dpr;
+        canvas.height = parent.clientHeight * dpr;
+        ctx.scale(dpr, dpr);
+        const cellSize = config.squareSize + config.gridGap;
+        cols = Math.ceil(parent.clientWidth / cellSize);
+        rows = Math.ceil(parent.clientHeight / cellSize);
+        squares = Array.from({ length: cols * rows }, () => ({
+          curr: Math.random() * config.maxOpacity,
+          target: Math.random() * config.maxOpacity
+        }));
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cellSize = config.squareSize + config.gridGap;
+        for (let i = 0; i < squares.length; i++) {
+          let sq = squares[i];
+          if (Math.random() < config.flickerChance) sq.target = Math.random() * config.maxOpacity;
+          sq.curr += (sq.target - sq.curr) * config.transitionSpeed;
+          if (sq.curr < 0.01) continue;
+          const x = (i % cols) * cellSize;
+          const y = Math.floor(i / cols) * cellSize;
+          ctx.fillStyle = `rgba(${config.color[0]}, ${config.color[1]}, ${config.color[2]}, ${sq.curr})`;
+          ctx.fillRect(x, y, config.squareSize, config.squareSize);
+        }
+        requestAnimationFrame(animate);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(animate);
+    })();
+  </script>
+  
+<script src="/js/copy.js"></script>
+<script src="/js/test-api-anim.js"></script>
+<script>
+  // Accordion for endpoint cards
+  document.querySelectorAll('.ep-accordion-header').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var acc = btn.closest('.ep-accordion');
+      var isOpen = acc.classList.contains('open');
+      acc.classList.toggle('open', !isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+  });
+
+  // Raw JSON accordions in Schema section
+  document.querySelectorAll('[id^="exAccordionToggle"]').forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var accId = toggle.id.replace('Toggle', '');
+      var acc = document.getElementById(accId);
+      if (!acc) return;
+      acc.classList.toggle('open');
+      var expanded = acc.classList.contains('open');
+      toggle.setAttribute('aria-expanded', String(expanded));
+    });
+    toggle.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle.click(); }
+    });
+  });
+
+  // Demo terminal init via IntersectionObserver
+  (function() {
+    var started = false;
+    var section = document.getElementById('demo');
+    if (!section) return;
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting && !started) {
+          started = true;
+          if (typeof runAnimation === 'function') runAnimation();
+        }
+      });
+    }, { threshold: 0.25 });
+    io.observe(section);
+  })();
+</script>
+  <script>
+    // Initialize Lucide icons after all scripts loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
+

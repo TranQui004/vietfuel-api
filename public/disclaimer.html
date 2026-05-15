@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trang Pháp lý</title>
+  <meta name="description" content="Vietnam Fuel Price API" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css?v=1.4.0" />
+  
+  <!-- Lucide Icons — served locally to bypass CSP -->
+  <script src="/js/vendor/lucide.min.js" defer></script>
+</head>
+<body >
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/brand/VietFuelAPI_header.png" alt="VietFuelAPI Logo" class="logo-img" />
+        <span class="logo-text">VietFuel<span class="logo-accent">API</span></span>
+      </a>
+      <button class="mobile-toggle" id="mobileNavToggle" aria-label="Mở menu">
+        <div class="hamburger-icon" id="hamburgerIcon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+
+      <nav class="header-nav" id="headerNav" aria-label="Điều hướng chính">
+        <a href="/" class="nav-link " data-vi="Trang chủ" data-en="Home">Trang chủ</a>
+        <a href="/endpoints" class="nav-link " data-vi="API Reference" data-en="API Reference">API Reference</a>
+        <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/test-api" class="nav-link " data-vi="Test API" data-en="Test API">Test API</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener noreferrer" class="github-btn" aria-label="GitHub Repository">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+        <button class="lang-toggle" id="langToggle" aria-label="Chuyển ngôn ngữ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span id="langLabel">EN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+<main class="main-content">
+    <div class="container animate-fade-in" style="padding: 100px 20px;">
+  <div class="legal-card main-glass">
+    <div class="legal-header">
+      <div class="legal-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h1 class="legal-title" data-vi="Tuyên bố miễn trừ trách nhiệm" data-en="Disclaimer">Tuyên bố miễn trừ trách nhiệm</h1>
+      <p class="legal-date" data-vi="Cập nhật lần cuối: 26 tháng 4, 2026" data-en="Last Updated: April 26, 2026">Cập nhật lần cuối: 26 tháng 4, 2026</p>
+    </div>
+
+    <div class="legal-body content-glass">
+      <section class="legal-section">
+        <h2 data-vi="1. Tính chất của dữ liệu" data-en="1. Nature of Data">1. Tính chất của dữ liệu</h2>
+        <p data-vi="Toàn bộ thông tin giá xăng dầu được cung cấp bởi VietFuelAPI là kết quả của quá trình thu thập tự động từ 11 nguồn công khai và đã được chuẩn hóa qua Default Endpoint. Dữ liệu này chỉ mang tính chất <strong>tham khảo</strong> và cung cấp thông tin chung cho cộng đồng." data-en="All fuel price information provided by VietFuelAPI is automatically collected from 11 public sources and normalized through the Default Endpoint. This data is for <strong>reference</strong> and informational purposes only.">Toàn bộ thông tin giá xăng dầu được cung cấp bởi VietFuelAPI là kết quả của quá trình thu thập tự động từ 11 nguồn công khai và đã được chuẩn hóa qua Default Endpoint. Dữ liệu này chỉ mang tính chất <strong>tham khảo</strong> và cung cấp thông tin chung cho cộng đồng.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="2. Không đại diện chính thức" data-en="2. No Official Representation">2. Không đại diện chính thức</h2>
+        <p data-vi="VietFuelAPI là một dự án mã nguồn mở <strong>độc lập</strong>. Chúng tôi KHÔNG có bất kỳ mối liên hệ chính thức nào, KHÔNG được ủy quyền bởi và KHÔNG đại diện cho Tập đoàn Xăng dầu Việt Nam (Petrolimex), Tổng công ty Dầu Việt Nam (PVOil), Mipec hay bất kỳ công ty xăng dầu nào khác." data-en="VietFuelAPI is an independent <strong>open-source</strong> project. We have NO official affiliation with, are NOT authorized by, and do NOT represent Vietnam National Petroleum Group (Petrolimex), PETROVIETNAM OIL Corporation (PVOil), Mipec, or any other fuel company.">VietFuelAPI là một dự án mã nguồn mở <strong>độc lập</strong>. Chúng tôi KHÔNG có bất kỳ mối liên hệ chính thức nào, KHÔNG được ủy quyền bởi và KHÔNG đại diện cho Tập đoàn Xăng dầu Việt Nam (Petrolimex), Tổng công ty Dầu Việt Nam (PVOil), Mipec hay bất kỳ công ty xăng dầu nào khác.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="3. Độ chính xác và sẵn sàng" data-en="3. Accuracy and Availability">3. Độ chính xác và sẵn sàng</h2>
+        <p data-vi="Mặc dù chúng tôi cố gắng đảm bảo dữ liệu được cập nhật liên tục (theo lịch trình thích ứng), chúng tôi không đưa ra bất kỳ đảm bảo nào về tính chính xác, đầy đủ hoặc kịp thời của thông tin. Giá thực tế tại các trạm bán lẻ có thể thay đổi tùy theo thời điểm và khu vực địa lý mà API chưa kịp cập nhật." data-en="While we strive to ensure data is updated continuously (adaptively), we make no warranties regarding the accuracy, completeness, or timeliness of the information. Actual prices at retail stations may vary based on time and geographic region faster than the API can update.">Mặc dù chúng tôi cố gắng đảm bảo dữ liệu được cập nhật liên tục (theo lịch trình thích ứng), chúng tôi không đưa ra bất kỳ đảm bảo nào về tính chính xác, đầy đủ hoặc kịp thời của thông tin. Giá thực tế tại các trạm bán lẻ có thể thay đổi tùy theo thời điểm và khu vực địa lý mà API chưa kịp cập nhật.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="4. Giới hạn trách nhiệm" data-en="4. Limitation of Liability">4. Giới hạn trách nhiệm</h2>
+        <p data-vi="Trong mọi trường hợp, VietFuelAPI và các nhà phát triển sẽ không chịu trách nhiệm cho bất kỳ tổn thất hoặc thiệt hại nào (bao gồm thiệt hại về kinh doanh, lỡ chuyến, v.v.) phát sinh từ việc sử dụng hoặc tin tưởng vào thông tin từ dịch vụ này." data-en="In no event shall VietFuelAPI or its developers be liable for any loss or damage (including business loss, delays, etc.) arising from the use of or reliance on information from this service.">Trong mọi trường hợp, VietFuelAPI và các nhà phát triển sẽ không chịu trách nhiệm cho bất kỳ tổn thất hoặc thiệt hại nào (bao gồm thiệt hại về kinh doanh, lỡ chuyến, v.v.) phát sinh từ việc sử dụng hoặc tin tưởng vào thông tin từ dịch vụ này.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="5. Trách nhiệm người tích hợp" data-en="5. Third-Party Integration">5. Trách nhiệm người tích hợp</h2>
+        <p data-vi="Nếu bạn tích hợp VietFuelAPI vào ứng dụng hoặc dịch vụ của mình, bạn có trách nhiệm thông báo đầy đủ các điều khoản miễn trừ trách nhiệm này cho người dùng cuối của bạn. Chúng tôi khuyến khích luôn kiểm tra nguồn gốc dữ liệu từ Petrolimex hoặc PVOil để có thông tin chính xác nhất." data-en="If you integrate VietFuelAPI into your application or service, you are responsible for fully informing your end-users of these disclaimer terms. We encourage always checking the original data from Petrolimex or PVOil for the most accurate information.">Nếu bạn tích hợp VietFuelAPI vào ứng dụng hoặc dịch vụ của mình, bạn có trách nhiệm thông báo đầy đủ các điều khoản miễn trừ trách nhiệm này cho người dùng cuối của bạn. Chúng tôi khuyến khích luôn kiểm tra nguồn gốc dữ liệu từ Petrolimex hoặc PVOil để có thông tin chính xác nhất.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="6. Thu thập dữ liệu công khai (Web Scraping)" data-en="6. Public Data Collection (Web Scraping)">6. Thu thập dữ liệu công khai (Web Scraping)</h2>
+        <p data-vi="VietFuelAPI trích xuất dữ liệu giá xăng dầu từ các trang web thông tin công khai được các doanh nghiệp xăng dầu phát hành theo hình thức thông tin công khai dành cho người tiêu dùng. Quá trình thu thập được thực hiện theo các nguyên tắc sau:" data-en="VietFuelAPI extracts fuel price data from publicly accessible information pages published by fuel enterprises as consumer-facing public information. The collection process follows these principles:">VietFuelAPI trích xuất dữ liệu giá xăng dầu từ các trang web thông tin công khai được các doanh nghiệp xăng dầu phát hành theo hình thức thông tin công khai dành cho người tiêu dùng. Quá trình thu thập được thực hiện theo các nguyên tắc sau:</p>
+        <ul data-vi="<li>Chỉ truy cập dữ liệu <strong>công khai</strong>, không vượt qua cơ chế xác thực hay bảo mật nào.</li><li>Tần suất thu thập hợp lý: <strong>Adaptive Cron</strong> — căn chỉnh theo Nghị định 80/2023/NĐ-CP để không gây tải bất thường lên máy chủ nguồn.</li><li>Không lưu trữ, phân phối lại nội dung gốc dưới bất kỳ hình thức nào ngoài dữ liệu giá đã được chuẩn hóa.</li><li>Dữ liệu thu thập chỉ bao gồm <strong>thông tin giá</strong> — phi thương mại và được cung cấp miễn phí.</li>" data-en="<li>Only accessing <strong>publicly available</strong> data — no authentication or security mechanisms are bypassed.</li><li>Reasonable scraping frequency: <strong>Adaptive Cron</strong> — aligned with Decree 80/2023/ND-CP to avoid abnormal load on source servers.</li><li>No original content is stored or redistributed in any form beyond normalized pricing data.</li><li>Collected data includes only <strong>pricing information</strong> — non-commercial and provided free of charge.</li>">
+          <li>Chỉ truy cập dữ liệu <strong>công khai</strong>, không vượt qua cơ chế xác thực hay bảo mật nào.</li>
+          <li>Tần suất thu thập hợp lý: <strong>Adaptive Cron</strong> — căn chỉnh theo Nghị định 80/2023/NĐ-CP để không gây tải bất thường lên máy chủ nguồn.</li>
+          <li>Không lưu trữ, phân phối lại nội dung gốc dưới bất kỳ hình thức nào ngoài dữ liệu giá đã được chuẩn hóa.</li>
+          <li>Dữ liệu thu thập chỉ bao gồm <strong>thông tin giá</strong> — phi thương mại và được cung cấp miễn phí.</li>
+        </ul>
+        <p data-vi="Nếu đại diện của bất kỳ doanh nghiệp nào có yêu cầu ngừng thu thập dữ liệu từ trang web của họ, chúng tôi sẽ tuân thủ ngay lập tức và xóa nguồn đó khỏi hệ thống trong vòng 48 giờ." data-en="If a representative of any enterprise requests that we stop collecting data from their website, we will comply immediately and remove that source from the system within 48 hours.">Nếu đại diện của bất kỳ doanh nghiệp nào có yêu cầu ngừng thu thập dữ liệu từ trang web của họ, chúng tôi sẽ tuân thủ ngay lập tức và xóa nguồn đó khỏi hệ thống trong vòng 48 giờ.</p>
+      </section>
+    </div>
+
+    <div class="legal-footer">
+      <div class="legal-nav-box">
+        <p class="legal-nav-title" data-vi="Điều hướng nhanh mục Pháp lý" data-en="Quick legal navigation">Điều hướng nhanh mục Pháp lý</p>
+        <div class="legal-nav-links">
+          <a href="/disclaimer" class="legal-nav-link legal-nav-current" aria-current="page" data-vi="Miễn trừ" data-en="Disclaimer">Miễn trừ</a>
+          <a href="/privacy" class="legal-nav-link" data-vi="Bảo mật" data-en="Privacy">Bảo mật</a>
+          <a href="/terms" class="legal-nav-link" data-vi="Điều khoản" data-en="Terms">Điều khoản</a>
+        </div>
+      </div>
+
+      <div class="legal-footer-actions">
+        <a href="/" class="btn btn-ghost" data-vi="Quay lại Trang chủ" data-en="Back to Home">Quay lại Trang chủ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-huge-text">VIETFUEL API</div>
+  <canvas id="flickering-grid-footer"></canvas>
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Col 1: Brand -->
+      <div class="footer-logo-col">
+        <div class="footer-logo-container">
+          <img src="/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer Logo" class="footer-logo-img" />
+        </div>
+        <p class="footer-brand-desc" data-vi="VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa, có nhãn nguồn rõ ràng." data-en="VietFuelAPI provides real-time fuel price data. Aggregated from 11 sources via a standardized Default Endpoint with explicit source labels.">
+          VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa.
+        </p>
+      </div>
+
+      <!-- Col 2: Explorer -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="KHÁM PHÁ" data-en="EXPLORER">KHÁM PHÁ</p>
+        <ul class="footer-links">
+          <li><a href="/" data-vi="Trang chủ" data-en="Home">Trang chủ</a></li>
+          <li><a href="/live" data-vi="Dữ liệu thực tế" data-en="Live Tracker">Dữ liệu thực tế</a></li>
+          <li><a href="/endpoints#demo" data-vi="Demo Terminal" data-en="Terminal Demo">Demo Terminal</a></li>
+          <li><a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener">GitHub ↗</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Documentation -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="TÀI LIỆU" data-en="DOCUMENTATION">TÀI LIỆU</p>
+        <ul class="footer-links">
+          <li><a href="/endpoints" data-vi="API Reference" data-en="API Reference">API Reference</a></li>
+          <li><a href="/test-api" data-vi="Test API" data-en="Test API">Test API</a></li>
+          <li><a href="/endpoints#schema" data-vi="Cấu trúc dữ liệu" data-en="Data Schema">Cấu trúc dữ liệu</a></li>
+          <li><a href="/endpoints#errors" data-vi="Mã lỗi" data-en="Error Codes">Mã lỗi</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Legal -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="PHÁP LÝ" data-en="LEGAL">PHÁP LÝ</p>
+        <ul class="footer-links">
+          <li><a href="/disclaimer" data-vi="Tuyên bố miễn trừ" data-en="Disclaimer">Tuyên bố miễn trừ</a></li>
+          <li><a href="/privacy" data-vi="Chính sách bảo mật" data-en="Privacy Policy">Chính sách bảo mật</a></li>
+          <li><a href="/terms" data-vi="Điều khoản sử dụng" data-en="Terms of Service">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Centered Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-disclaimer-text" data-vi="Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo." data-en="Disclaimer: VietFuelAPI is an independent open-source project, not affiliated with Petrolimex or any government agency. Aggregated data from 11 sources is for reference only.">
+          Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo.
+        </p>
+        <div class="footer-copy">
+          <span class="copy-text">© 2026 VietFuelAPI. Built for developers.</span>
+          <span class="version-badge">v1.1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <button id="backToTop" class="back-to-top" aria-label="Lên đầu trang">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    <img src="/brand/backtotop.png" alt="Back to top" class="back-to-top-char" />
+  </button>
+
+  <script src="/js/lang.js"></script>
+  <script src="/js/ui.js"></script>
+  <script>
+    (function() {
+      const canvas = document.getElementById('flickering-grid-footer');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const config = {
+        squareSize: 4, gridGap: 12,
+        color: [255, 140, 0], // Orange
+        maxOpacity: 0.42, flickerChance: 0.045, transitionSpeed: 0.08
+      };
+      let cols, rows, squares = [];
+      function resize() {
+        const parent = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = parent.clientWidth * dpr;
+        canvas.height = parent.clientHeight * dpr;
+        ctx.scale(dpr, dpr);
+        const cellSize = config.squareSize + config.gridGap;
+        cols = Math.ceil(parent.clientWidth / cellSize);
+        rows = Math.ceil(parent.clientHeight / cellSize);
+        squares = Array.from({ length: cols * rows }, () => ({
+          curr: Math.random() * config.maxOpacity,
+          target: Math.random() * config.maxOpacity
+        }));
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cellSize = config.squareSize + config.gridGap;
+        for (let i = 0; i < squares.length; i++) {
+          let sq = squares[i];
+          if (Math.random() < config.flickerChance) sq.target = Math.random() * config.maxOpacity;
+          sq.curr += (sq.target - sq.curr) * config.transitionSpeed;
+          if (sq.curr < 0.01) continue;
+          const x = (i % cols) * cellSize;
+          const y = Math.floor(i / cols) * cellSize;
+          ctx.fillStyle = `rgba(${config.color[0]}, ${config.color[1]}, ${config.color[2]}, ${sq.curr})`;
+          ctx.fillRect(x, y, config.squareSize, config.squareSize);
+        }
+        requestAnimationFrame(animate);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(animate);
+    })();
+  </script>
+  
+  <script>
+    // Initialize Lucide icons after all scripts loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

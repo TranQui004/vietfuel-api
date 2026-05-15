@@ -2,7 +2,7 @@
 
 ## Overview
 
-VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distributors. The system uses a **HTTP-only architecture** — all scrapers operate via `node-fetch + cheerio` with **zero Playwright or headless browser dependencies**. This reduces RAM usage from ~200MB/scraper to ~0MB and shrinks the Docker image from ~2GB to ~50MB.
+VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distributors. The system uses a **HTTP-only architecture** — all scrapers operate via `node-fetch + cheerio` with **zero Cheerio (No Headless Browser) or headless browser dependencies**. This reduces RAM usage from ~200MB/scraper to ~0MB and shrinks the Docker image from ~2GB to ~50MB.
 
 ---
 
@@ -34,8 +34,8 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 
 | Cache | Type | TTL | Populated |
 | :--- | :--- | :--- | :--- |
-| `memCache` (national) | In-memory (node-cache) | 0 (Never expires) | Bootstrap + Cron |
-| `provinceCache` | In-memory (node-cache) | 0 (Never expires) | On-demand |
+| `memCache` (national) | In-memory (Cloudflare KV) | 0 (Never expires) | Bootstrap + Cron |
+| `provinceCache` | In-memory (Cloudflare KV) | 0 (Never expires) | On-demand |
 | Disk persistence | `cache.json` | Survives restarts | Written after every update |
 
 **Stale Cache Fallback**: Auto-deletion is disabled (`stdTTL = 0`). If the crawler fails, the API returns stale data with `isStale: true` instead of a 503 error.
@@ -77,7 +77,7 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 
 ## API Playground (`/playground`)
 
-A custom API testing interface, fully replacing Swagger UI:
+A custom API testing interface, fully replacing Test API (Playground) UI:
 
 | Feature | Description |
 | :--- | :--- |

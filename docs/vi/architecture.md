@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán lẻ tại Việt Nam từ 11 nguồn phân phối chính thức. Hệ thống áp dụng kiến trúc **HTTP-only** — toàn bộ scraper hoạt động bằng `node-fetch + cheerio`, **không sử dụng Playwright hay bất kỳ headless browser nào**. Giúp giảm mức tiêu thụ RAM từ ~200MB/scraper xuống ~0MB và Docker image từ ~2GB xuống ~50MB.
+VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán lẻ tại Việt Nam từ 11 nguồn phân phối chính thức. Hệ thống áp dụng kiến trúc **HTTP-only** — toàn bộ scraper hoạt động bằng `node-fetch + cheerio`, **không sử dụng Cheerio (No Headless Browser) hay bất kỳ headless browser nào**. Giúp giảm mức tiêu thụ RAM từ ~200MB/scraper xuống ~0MB và Docker image từ ~2GB xuống ~50MB.
 
 ---
 
@@ -34,8 +34,8 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 
 | Cache | Loại | TTL | Khởi tạo |
 | :--- | :--- | :--- | :--- |
-| `memCache` (quốc gia) | In-memory (node-cache) | 0 (Không hết hạn) | Bootstrap + Cron |
-| `provinceCache` | In-memory (node-cache) | 0 (Không hết hạn) | On-demand |
+| `memCache` (quốc gia) | In-memory (Cloudflare KV) | 0 (Không hết hạn) | Bootstrap + Cron |
+| `provinceCache` | In-memory (Cloudflare KV) | 0 (Không hết hạn) | On-demand |
 | Disk persistence | `cache.json` | Persist qua restart | Ghi sau mỗi lần cập nhật |
 
 **Stale Cache Fallback**: Hệ thống vô hiệu hoá tự động xóa (`stdTTL = 0`). Nếu Crawler gặp sự cố, API vẫn trả về dữ liệu cũ kèm cờ `isStale: true`.
@@ -77,7 +77,7 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 
 ## API Playground (`/playground`)
 
-Trang kiểm thử API tùy chỉnh, thay thế hoàn toàn Swagger UI:
+Trang kiểm thử API tùy chỉnh, thay thế hoàn toàn Test API (Playground) UI:
 
 | Tính năng | Mô tả |
 | :--- | :--- |

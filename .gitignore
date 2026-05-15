@@ -3,6 +3,7 @@ node_modules/
 
 # Environment
 .env
+.wrangler/
 
 # Runtime cache (generated at startup)
 cache.json

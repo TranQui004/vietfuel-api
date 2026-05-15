@@ -39,29 +39,24 @@ import { isAntiBotPage,
  * Lấy văn bản một URL công khai qua HTTPS thuần (không headless).
  * Dùng BOT_UA rõ ràng  quản trị viên nguồn có thể nhận diện và liên hệ nếu cần.
  */
-function fetchPublicText(url, timeoutMs = 15000) {
-  return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      {
-        headers: {
-          'User-Agent': BOT_UA,
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          'X-Bot-Info': 'VietFuelBot non-profit; github.com/TranQui004/vietfuel-api',
-        },
-      },
-      (res) => {
-        const chunks = [];
-        res.on('data', (c) => chunks.push(c));
-        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+async function fetchPublicText(url, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': BOT_UA,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Cache-Control': 'no-cache',
+        'X-Bot-Info': 'VietFuelBot non-profit; github.com/TranQui004/vietfuel-api',
       }
-    );
-    req.setTimeout(timeoutMs, () => { req.destroy(); reject(new Error('HTTP fetch timeout')); });
-    req.on('error', reject);
-  });
+    });
+    return await res.text();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function scrapeFromOriginIP() {
@@ -76,15 +71,13 @@ async function scrapeFromOriginIP() {
   const PVOIL_API_PATH = '/api/oilprice/load-view';
   const targetUrl = `https://${PVOIL_ORIGIN_IP}${PVOIL_API_PATH}`;
 
-  // Bỏ qua kiểm tra SSL certificate vì dùng IP trực tiếp thay vì domain
-  const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-
+  // Bỏ qua kiểm tra SSL certificate vì dùng IP trực tiếp thay vì domain (chỉ hoạt động trên Node.js)
+  // Trong Cloudflare Workers, fetch IP HTTPS có thể fail do chứng chỉ.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   try {
     const res = await fetch(targetUrl, {
       signal: controller.signal,
-      agent: httpsAgent,
       headers: {
         'Host': 'www.pvoil.com.vn',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',

@@ -158,17 +158,30 @@ app.get('/api/fuel-prices/:source', async (c) => {
   let data = await getFuelPrices(kv, source);
   let stats = await getCacheStats(kv, source);
 
-  if (source === 'pvoil' && (!data || stats.isStale)) {
+  // Fallback on-demand cho TẤT CẢ các nguồn nếu cache trống hoặc quá hạn (rất hữu ích cho Local Dev không có cron)
+  if (!data || stats.isStale) {
     try {
-      const fresh = await scrapers.scrapePVOil();
-      await updateFuelPrices(kv, 'pvoil', fresh);
-      data = fresh;
-      stats = await getCacheStats(kv, 'pvoil');
+      let fresh;
+      if (source === 'petrolimex') fresh = await scrapers.scrapePetrolimex();
+      else if (source === 'pvoil') fresh = await scrapers.scrapePVOil();
+      else if (source === 'mipec') fresh = await scrapers.scrapeMipec();
+      else if (source === 'giaxanghomnay') fresh = await scrapers.scrapeGiaxanghomnay();
+      else if (source === 'saigonpetro') fresh = await scrapers.scrapeSaigonPetro();
+      else if (source === 'comeco') fresh = await scrapers.scrapeComeco();
+      else if (source === 'petrotimes') fresh = await scrapers.scrapePetrotimes();
+      else if (source === 'webgia') fresh = await scrapers.scrapeWebGia();
+      
+      if (fresh) {
+        await updateFuelPrices(kv, source, fresh);
+        data = fresh;
+        stats = await getCacheStats(kv, source);
+      }
     } catch (e) {
+      console.error(`[OnDemand] Lỗi scrape ${source}:`, e.message);
       const ageMs = stats.scrapedAt ? Date.now() - new Date(stats.scrapedAt).getTime() : Number.POSITIVE_INFINITY;
       if (ageMs > (6 * 60 * 60 * 1000)) {
         c.header('Cache-Control', 'no-store');
-        return c.json({ success: false, status: 'pvoil_stale_unavailable', message: { vi: 'Lỗi đồng bộ', en: 'Sync failed' } }, 503);
+        return c.json({ success: false, status: 'stale_unavailable', message: { vi: 'Lỗi đồng bộ dữ liệu', en: 'Sync failed' } }, 503);
       }
     }
   }

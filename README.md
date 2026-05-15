@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/brand/VietFuelAPI_header.png" alt="VietFuelAPI Banner" width="800">
+  <img src="public/brand/VietFuelAPI_header.png" alt="VietFuelAPI Banner" width="800">
 </p>
 
 <h1 align="center">VietFuelAPI</h1>
@@ -72,41 +72,30 @@ Hệ thống hỗ trợ tra cứu giá theo **63 tỉnh thành** với phân bi�
 git clone https://github.com/TranQui004/vietfuel-api.git
 cd vietfuel-api
 
-# Cài đặt dependencies backend
-cd backend
+# Cài đặt dependencies
 npm install
 
-# Khởi chạy server (development)
+# Khởi chạy server local (Wrangler dev)
 npm run dev
 ```
 
-Server mặc định tại: `http://localhost:3000`
+Server local mặc định tại: `http://localhost:8787`
 
-Giao diện web được phục vụ cùng cổng backend:
-- Trang chủ: `http://localhost:3000/`
-- Live Data: `http://localhost:3000/live`
+Các trang giao diện:
+- Trang chủ: `http://localhost:8787/`
+- Live Data: `http://localhost:8787/live`
+- Test API: `http://localhost:8787/test-api`
 
-Nếu chạy từ thư mục gốc project:
+### 🚀 Triển Khai Production (Cloudflare Workers)
 
-```bash
-npm --prefix backend run dev
-```
-
-### 🚀 Triển Khai Production (PM2)
-
-Dự án đã bao gồm file `ecosystem.config.js` để triển khai với [PM2](https://pm2.keymetrics.io/) – tiêu chuẩn vận hành Node.js trên Server thật:
+Dự án này sử dụng kiến trúc Serverless (Cloudflare Workers), giúp bạn không cần thuê VPS hay dùng PM2:
 
 ```bash
-# Cài PM2 toàn cục (nếu chưa có)
-npm install -g pm2
+# Đăng nhập vào tài khoản Cloudflare của bạn (nếu chưa)
+npx wrangler login
 
-# Khởi động với PM2
-pm2 start ecosystem.config.js --env production
-
-# Quản lý tiến trình
-pm2 status
-pm2 logs vietfuel-api
-pm2 restart vietfuel-api
+# Triển khai lên mạng lưới toàn cầu của Cloudflare
+npx wrangler deploy
 ```
 
 ## 📡 Danh sách Endpoint
@@ -140,7 +129,7 @@ pm2 restart vietfuel-api
 | `/` | Trang chủ — tổng quan API |
 | `/live` | Live Dashboard — xem giá thực tế 11 nguồn |
 | `/endpoints` | API Reference — tài liệu đầy đủ |
-| `/playground` | **API Playground** — test endpoint trực tiếp trên trình duyệt |
+| `/test-api` | **Test API** — test endpoint trực tiếp trên trình duyệt |
 
 ## 🗺️ Phân vùng giá xăng dầu
 
@@ -166,72 +155,46 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 
 ## 🛠️ Công nghệ sử dụng
 
-- **Backend**: Node.js v22+, Hono, express-rate-limit, helmet, compression.
-- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, không Cheerio (No Headless Browser)/headless browser**.
-- **Cache**: Cloudflare KV (In-memory) + disk persistence (`cache.json`).
-- **Scheduler**: node-cron — lịch thích ứng 3 chế độ theo **Nghị định 80/2023/NĐ-CP**:
+- **Backend (Serverless)**: Node.js v22+, Hono, Cloudflare Workers V8 runtime.
+- **Scraping**: `fetch` + `cheerio` — **HTTP-only, hoàn toàn không cần Headless Browser (Playwright)**.
+- **Cache**: Cloudflare KV (`FUEL_CACHE`).
+- **Scheduler**: Cloudflare Cron Triggers — lịch thích ứng theo **Nghị định 80/2023/NĐ-CP**:
   - T2–T4: 4 tiếng/lần (Checking)
-  - T5, 14:30–16:00: 15 phút/lần (Hunting — khung giờ điều chỉnh giá)
+  - T5, 07:30–09:00 UTC: 15 phút/lần (Hunting — khung giờ điều chỉnh giá VN)
   - T6–CN: 6 tiếng/lần (Maintenance)
-- **Frontend**: EJS templates + Vanilla CSS/JS — serve trực tiếp bởi Hono (không framework JS riêng).
-- **API Testing**: API Playground tùy chỉnh tại `/playground` (thay thế Test API (Playground) UI).
-- **Logging**: Winston.
+- **Frontend**: HTML/CSS/JS tĩnh — được phục vụ siêu tốc qua Cloudflare CDN, không cần framework.
+- **API Testing**: Giao diện Test API chuyên dụng tại `/test-api`.
 
 ## 📁 Cấu trúc dự án
 
 ```text
-├── backend/
-│   ├── index.js              # Entry point Hono + static serving
-│   ├── config/
-│   │   └── index.js          # Cấu hình chung (port, URLs, cron, cache TTL)
-│   ├── data/
-│   │   └── provinces.json    # Từ điển 63 tỉnh thành (slug, region, districts)
-│   ├── routes/
-│   │   └── fuel.js           # Toàn bộ REST API endpoints
-│   ├── services/
-│   │   ├── scrapers/         # Mỗi file là một engine HTTP-only độc lập
-│   │   │   ├── utils.js          # Hàm core dùng chung (parsePrice, UA pool, ...)
-│   │   │   ├── petrolimex.js     # Petrolimex — Tier 0: VIEApps REST API
-│   │   │   ├── pvoil.js          # PVOil — Tier 0: IP origin bypass Cloudflare
-│   │   │   ├── pvoil-parser.js   # Parser HTML/text cho PVOil
-│   │   │   ├── mipec.js          # Mipec — HTTP + cheerio
-│   │   │   ├── comeco.js         # COMECO — HTTP + cheerio
-│   │   │   ├── saigonpetro.js    # Saigon Petro — dynamic API
-│   │   │   ├── petrotimes.js     # Petro Times — internal API
-│   │   │   ├── webgia.js         # WebGia — HTTP + cheerio
-│   │   │   └── giaxanghomnay.js  # GiaXangHomNay — HTTP + cheerio
-│   │   ├── scraper.js        # Index tổng hợp — xuất tất cả scraper functions
-│   │   └── cache.js          # In-memory cache (Cloudflare KV) + disk fallback
-│   ├── workers/
-│   │   └── jobs.js           # Adaptive Cron scheduler (3 chế độ)
-│   ├── utils/
-│   │   ├── logger.js         # Winston logger
-│   │   └── fuel-helpers.js   # Helper tổng hợp: merge, normalize, sort
-│   └── tests/
-│       ├── scrapers/         # Smoke tests cho từng scraper
-│       ├── api/              # API integration tests
-│       └── run-all.js        # Chạy toàn bộ test suite
-├── frontend/
-│   ├── views/                # EJS templates (serve bởi Hono)
-│   │   ├── index.ejs         # Trang chủ
-│   │   ├── live.ejs          # Live Data Dashboard
-│   │   ├── endpoints.ejs     # API Reference
-│   │   ├── playground.ejs    # API Playground (test endpoint tương tác)
-│   │   └── partials/         # Header, Footer components
-│   ├── css/
-│   │   ├── style.css         # Global CSS
-│   │   └── playground.css    # CSS riêng cho Playground
-│   ├── js/
-│   │   ├── live.js           # Live Data Dashboard logic
-│   │   ├── playground.js     # API Playground logic
-│   │   └── lang.js           # i18n (VI/EN)
-│   └── brand/                # Logo, banner assets
-├── docs/
-│   ├── assets/               # Ảnh preview cho README
-│   ├── vi/                   # Tài liệu tiếng Việt
-│   └── en/                   # Tài liệu tiếng Anh
-├── cache.json                # Disk persistence cache (root)
-└── ecosystem.config.js       # Cấu hình PM2 cho production
+├── src/
+│   ├── index.js              # Entry point Hono + static serving & router
+│   ├── config.js             # Cấu hình nguồn và KV
+│   ├── scrapers/             # Thư mục chứa logic cào dữ liệu độc lập
+│   │   ├── petrolimex.js     # Petrolimex (Tier 0 REST API)
+│   │   ├── pvoil.js          # PVOil (Bypass CF)
+│   │   ├── mipec.js          # Mipec
+│   │   ├── comeco.js         # COMECO
+│   │   ├── saigonpetro.js    # Saigon Petro
+│   │   ├── petrotimes.js     # Petro Times
+│   │   ├── webgia.js         # WebGia
+│   │   └── giaxanghomnay.js  # GiaXangHomNay
+│   ├── scraper.js            # Unified scraper entry point
+│   └── utils/
+│       ├── fuel-helpers.js   # Normalize data & province info
+│       └── regions.json      # Mapping các vùng (Vùng 1, Vùng 2, partial)
+├── public/                   # Frontend assets (HTML, CSS, JS, Images)
+│   ├── index.html            # Trang chủ
+│   ├── live.html             # Dashboard dữ liệu trực tiếp
+│   ├── endpoints.html        # Tài liệu API Reference
+│   ├── test-api.html         # Công cụ Test API trực quan
+│   ├── css/                  # File giao diện
+│   ├── js/                   # JS tương tác giao diện
+│   └── brand/                # Logo & Banner
+├── docs/                     # Tài liệu kỹ thuật đa ngôn ngữ (VI/EN)
+├── wrangler.toml             # Cấu hình Cloudflare Workers & KV namespace
+└── package.json              # Dependency management
 ```
 
 ## 📚 Tài liệu chi tiết
@@ -251,14 +214,14 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 
 ### Tài nguyên nên push lên GitHub
 
-- Toàn bộ mã nguồn `backend/`, `frontend/`, `docs/`
+- Toàn bộ mã nguồn `src/`, `public/`, `docs/`
 - Các file markdown cộng đồng/pháp lý
-- Cấu hình chạy production (`ecosystem.config.js`)
+- Cấu hình chạy production (`wrangler.toml`)
 
 ### Tài nguyên không nên push
 
-- `node_modules/`, `logs/`, file dump debug, cache runtime
-- Mọi file chứa credential hoặc thông tin nhạy cảm (`.env`)
+- `node_modules/`, `.wrangler/`
+- Các file log, debug.
 
 ## ⚖️ Giấy phép
 
@@ -267,7 +230,7 @@ Phân phối dưới giấy phép **MIT**. Xem `LICENSE` để biết thêm chi 
 ---
 
 <p align="center">
-  <img src="frontend/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer" width="120">
+  <img src="public/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer" width="120">
 </p>
 
 <p align="center">

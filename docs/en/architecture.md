@@ -2,18 +2,19 @@
 
 ## Overview
 
-VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distributors. The system uses a **HTTP-only architecture** — all scrapers operate via `node-fetch + cheerio` with **zero Cheerio (No Headless Browser) or headless browser dependencies**. This reduces RAM usage from ~200MB/scraper to ~0MB and shrinks the Docker image from ~2GB to ~50MB.
+VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distributors. The system has been fully migrated to a **Serverless (Cloudflare Workers)** architecture powered by **Hono**.
+All scrapers operate via `fetch + cheerio` with **zero Headless Browser (Playwright) dependencies**. This completely eliminates VPS hosting costs ($0), accelerates response times (via Cloudflare's Edge Network), minimizes RAM consumption, and runs natively on the Cloudflare V8 runtime.
 
 ---
 
-## Scraper Service (`backend/services/scraper.js`)
+## Scraper Service (`src/scrapers/`)
 
 | Source | Primary Strategy | Fallback |
 | :--- | :--- | :--- |
-| **Petrolimex** | **Tier 0**: VIEApps CMS REST API `/~apis/portals/cms.item/search` (JSON, no auth required) | Tier 1: GXHN HTTP → Tier 2: WebGia HTTP |
+| **Petrolimex** | **Tier 0**: VIEApps CMS REST API (JSON, no auth required) | Tier 1: GXHN HTTP → Tier 2: WebGia HTTP |
 | KV2 / Saigon / VungTau Petrolimex | Mirror sync from Petrolimex | — |
-| **PVOil** | **Tier 0**: HTTP fetch origin IP `103.21.120.100` + `Host` header (Cloudflare bypass) | Tier 1: HTTP direct → Tier 2: GXHN HTTP fallback |
-| **Mipec** | HTTP fetch + cheerio SSR parse from mipec.com.vn | GXHN HTTP fallback (date) |
+| **PVOil** | **Tier 0**: Bypass Cloudflare via Origin IP | Tier 1: HTTP direct → Tier 2: GXHN HTTP fallback |
+| **Mipec** | HTTP fetch + cheerio SSR parse from mipec.com.vn | GXHN HTTP fallback |
 | **COMECO** | HTTP fetch + cheerio static HTML parse | — |
 | **Saigon Petro** | HTTP fetch → extract `data-list` → call dynamic `/load-time` API | — |
 | **Petro Times** | HTTP fetch directly to internal API `/site/get-petro` | — |
@@ -21,7 +22,7 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 | **GiaXangHomNay** | HTTP fetch + cheerio SSR parse | — |
 
 > **Technique credits**:
-> - PVOil Cloudflare bypass via origin IP and HTTP-first strategy inspired by:
+> - PVOil Cloudflare bypass and HTTP-first strategy inspired by:
 >   [_"Building a Low-RAM Vietfuel API"_](https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram) — **toidicakhia**
 > - Petrolimex REST API endpoint discovered by:
 >   [`petro_price.sh` gist](https://gist.github.com/nguynkhn/acc6431ea769da507c2aa3758891f264) — **@nguynkhn**
@@ -30,37 +31,39 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 
 ---
 
-## Cache Service (`backend/services/cache.js`)
+## Cache Service (Cloudflare KV)
 
-| Cache | Type | TTL | Populated |
+The entire caching system is now managed by **Cloudflare KV Namespace** (`FUEL_CACHE`), ensuring global state synchronization with ultra-low latency.
+
+| Cache Type | Storage | TTL | Populated |
 | :--- | :--- | :--- | :--- |
-| `memCache` (national) | In-memory (Cloudflare KV) | 0 (Never expires) | Bootstrap + Cron |
-| `provinceCache` | In-memory (Cloudflare KV) | 0 (Never expires) | On-demand |
-| Disk persistence | `cache.json` | Survives restarts | Written after every update |
+| National Data (`prices:source`) | Cloudflare KV | 0 (Never expires) | Cron Trigger (Scheduled) or On-demand |
+| Province Data (`province:slug`) | Cloudflare KV | Custom (3600s) | On-demand (Upon request) |
+| Metadata & Stats | Cloudflare KV | 0 (Never expires) | Written alongside every update |
 
-**Stale Cache Fallback**: Auto-deletion is disabled (`stdTTL = 0`). If the crawler fails, the API returns stale data with `isStale: true` instead of a 503 error.
-
----
-
-## Rate Limiting
-
-- **National sources**: 60 req/min/IP
-- **Province endpoints**: 20 req/min/IP (heavier scraping)
-
-**HTTP Cache-Control headers**:
-- National: `Cache-Control: public, max-age=3600, stale-while-revalidate=60`
-- Province (cache hit): `Cache-Control: public, max-age=<ttl_remaining>`
-- Province (cache miss / error): `Cache-Control: no-store`
-- Province list: `Cache-Control: public, max-age=86400` (static, 24h)
+**Stale Cache Fallback**: Auto-deletion (TTL) is disabled for national data. If the crawler fails, the API returns stale data (Cache Hit) with `isStale: true` instead of crashing with a 503 error.
 
 ---
 
-## Adaptive Cron (Decree 80/2023/ND-CP)
+## Rate Limiting & Proxy
 
-| Mode | Schedule | Frequency | Reason |
+Running on Cloudflare Workers allows the system to inherit all security features of the Cloudflare network:
+- **Rate Limit**: Managed natively by Cloudflare WAF.
+- **Cache-Control headers**: Fine-tuned so Cloudflare CDN serves end users directly without waking up the Worker.
+  - National: `Cache-Control: public, max-age=3600, stale-while-revalidate=60`
+  - Province (cache hit): `Cache-Control: public, max-age=<ttl_remaining>`
+  - Province list: `Cache-Control: public, max-age=86400` (static, 24h)
+
+---
+
+## Adaptive Cron (Wrangler Triggers)
+
+Automated data scraping is executed via **Cloudflare Cron Triggers** (`wrangler.toml`), aligned with Decree 80/2023/ND-CP:
+
+| Mode | Schedule (UTC) | Frequency | Reason |
 | :--- | :--- | :--- | :--- |
 | **Checking** | Mon – Wed | Every 4 hours | Prices stable, conserve resources |
-| **Hunting** | Thu 14:30–16:00 | Every 15 minutes | MOIT price announcement window |
+| **Hunting** | Thu 07:30–09:00 (UTC) | Every 15 minutes | MOIT price announcement window (14:30 - 16:00 VN) |
 | **Maintenance** | Fri – Sun | Every 6 hours | Prices settled, reduce bandwidth |
 
 ---
@@ -75,32 +78,30 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 
 ---
 
-## API Playground (`/playground`)
+## Test API UI (`/test-api`)
 
-A custom API testing interface, fully replacing Test API (Playground) UI:
+A custom API testing interface, uniquely designed for VietFuel API:
 
 | Feature | Description |
 | :--- | :--- |
-| **Endpoint sidebar** | 11 endpoints grouped: Aggregated / Single Source / Province / System |
+| **Endpoint sidebar** | 11 endpoints grouped: Aggregated / Single Source / Geographic / System |
 | **Request builder** | Auto-populated URL bar + params dropdown (63 provinces) |
 | **Live JSON viewer** | Syntax highlighting + status badge + latency + response size |
 | **Code snippets** | Auto-generates cURL / JavaScript / Python from current config |
-| **No dependencies** | Pure Vanilla JS — no framework overhead, ultra-fast load |
+| **No dependencies** | Pure Vanilla JS — no framework overhead, ultra-fast load via Cloudflare CDN |
 
-> Access at: `http://localhost:3000/playground`
+> Access at: `/test-api`
 
 ---
 
-## Design Principles
+## Design Principles (V2 Serverless)
 
 | Principle | Description |
 | :--- | :--- |
-| **HTTP-Only** | All scrapers use lightweight HTTP fetch + cheerio — no headless browser at any tier. |
-| **Cache-First** | All requests served from RAM; scrapers run in background. |
-| **Resilience** | Source errors do not crash the API; stale data is served with a warning flag. |
-| **No Source Spam** | Adaptive cron aligned with the government price adjustment schedule. |
+| **Serverless Edge** | Runs 100% on Cloudflare Workers V8 Runtime, responding quickly worldwide. |
+| **Zero-VPS** | No server costs, no need to maintain PM2, OS, or Native libraries (Playwright). |
+| **Resilience** | Source errors do not crash the API; stale data is served with a warning flag via KV Cache. |
 | **Transparent Metadata** | Returns source, scrape time, TTL, stale/protection status, and tier. |
-| **CDN-Friendly** | Explicit `Cache-Control` headers enable efficient CDN/proxy caching. |
 
 ---
 

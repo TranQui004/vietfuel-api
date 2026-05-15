@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/brand/VietFuelAPI_header.png" alt="VietFuelAPI Banner" width="800">
+  <img src="public/brand/VietFuelAPI_header.png" alt="VietFuelAPI Banner" width="800">
 </p>
 
 <h1 align="center">VietFuelAPI</h1>
@@ -72,41 +72,30 @@ The API supports per-province price lookup across all **63 provinces**, with acc
 git clone https://github.com/TranQui004/vietfuel-api.git
 cd vietfuel-api
 
-# Install backend dependencies
-cd backend
+# Install dependencies
 npm install
 
-# Start development server
+# Start local server (Wrangler dev)
 npm run dev
 ```
 
-Default URL: `http://localhost:3000`
+Default local URL: `http://localhost:8787`
 
 Frontend pages are served on the same port:
-- Home: `http://localhost:3000/`
-- Live Data: `http://localhost:3000/live`
+- Home: `http://localhost:8787/`
+- Live Data: `http://localhost:8787/live`
+- Test API: `http://localhost:8787/test-api`
 
-If you run from repository root:
+### 🚀 Production Deployment (Cloudflare Workers)
 
-```bash
-npm --prefix backend run dev
-```
-
-### 🚀 Production Deployment (PM2)
-
-The project includes an `ecosystem.config.js` file for [PM2](https://pm2.keymetrics.io/) deployment — the standard for running Node.js in production:
+This project uses a Serverless architecture (Cloudflare Workers), eliminating the need for VPS hosting or PM2:
 
 ```bash
-# Install PM2 globally (if not already installed)
-npm install -g pm2
+# Log in to your Cloudflare account (if not already logged in)
+npx wrangler login
 
-# Start with PM2
-pm2 start ecosystem.config.js --env production
-
-# Manage the process
-pm2 status
-pm2 logs vietfuel-api
-pm2 restart vietfuel-api
+# Deploy to Cloudflare's global edge network
+npx wrangler deploy
 ```
 
 ## 📡 API Endpoints
@@ -140,7 +129,7 @@ pm2 restart vietfuel-api
 | `/` | Home page — API overview |
 | `/live` | Live Dashboard — real-time prices from all 11 sources |
 | `/endpoints` | API Reference — full documentation |
-| `/playground` | **API Playground** — test endpoints directly in the browser |
+| `/test-api` | **Test API** — test endpoints directly in the browser |
 
 ### Sample Response
 
@@ -187,79 +176,46 @@ Vietnam's retail fuel prices are divided into two regions per current regulation
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Node.js v22+, Express, express-rate-limit, helmet, compression.
-- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, no Playwright/headless browser**.
-- **Cache**: node-cache (In-memory) + disk persistence (`cache.json`).
-- **Scheduler**: node-cron — 3-mode adaptive schedule aligned with **Decree 80/2023/ND-CP**:
+- **Backend (Serverless)**: Node.js v22+, Hono, Cloudflare Workers V8 runtime.
+- **Scraping**: `fetch` + `cheerio` — **HTTP-only, no Playwright/headless browser**.
+- **Cache**: Cloudflare KV (`FUEL_CACHE`).
+- **Scheduler**: Cloudflare Cron Triggers — 3-mode adaptive schedule aligned with **Decree 80/2023/ND-CP**:
   - Mon–Wed: Every 4 hours (Checking)
-  - Thu, 14:30–16:00: Every 15 minutes (Hunting — price adjustment window)
+  - Thu, 07:30–09:00 UTC: Every 15 minutes (Hunting — price adjustment window VN time)
   - Fri–Sun: Every 6 hours (Maintenance)
-- **Frontend**: EJS templates + Vanilla CSS/JS — served directly by Express (no separate JS framework).
-- **API Testing**: Custom API Playground at `/playground` (replaces Swagger UI).
-- **Logging**: Winston.
+- **Frontend**: Static HTML/CSS/JS — served blazing fast via Cloudflare CDN (no JS framework).
+- **API Testing**: Custom Test API interface at `/test-api`.
 
 ## 📁 Project Structure
 
 ```text
-├── backend/
-│   ├── index.js              # Express entrypoint + WebSocket + static serving
-│   ├── config/
-│   │   └── index.js          # Shared config (port, URLs, cron, cache TTL)
-│   ├── data/
-│   │   └── provinces.json    # 63 provinces dataset (slug, region, districts)
-│   ├── routes/
-│   │   └── fuel.js           # All REST API endpoints
-│   ├── services/
-│   │   ├── scrapers/         # Each file is an independent engine (Plug & Play)
-│   │   │   ├── utils.js          # Shared core helpers (parse, cache, browser)
-│   │   │   ├── petrolimex.js     # Petrolimex (primary source)
-│   │   │   ├── pvoil.js          # PVOil — 3-tier fallback strategy
-│   │   │   ├── pvoil-parser.js   # Dedicated PVOil parser
-│   │   │   ├── mipec.js          # Mipec
-│   │   │   ├── comeco.js         # COMECO
-│   │   │   ├── saigonpetro.js    # Saigon Petro
-│   │   │   ├── petrotimes.js     # Petro Times
-│   │   │   ├── webgia.js         # WebGia
-│   │   │   └── giaxanghomnay.js  # GiaXangHomNay
-│   │   ├── scraper.js        # Index — exports all scraper functions
-│   │   └── cache.js          # In-memory cache (node-cache) + disk fallback
-│   ├── workers/
-│   │   └── jobs.js           # Cron scheduler — runs every 1 hour
-│   ├── tools/
-│   │   └── debug/            # Local debug scripts (not production runtime)
-│   ├── utils/
-│   │   ├── logger.js         # Winston structured logger
-│   │   ├── websocket.js      # WebSocket server (real-time push)
-│   │   └── fuel-helpers.js   # Merge, normalize, sort helpers
-│   ├── tests/
-│   │   ├── scrapers/         # Smoke tests per scraper (8 files)
-│   │   ├── api/              # API integration tests
-│   │   ├── cache/            # Cache behavior tests
-│   │   ├── run-all.js        # Full test suite runner
-│   │   └── run-api.js        # API-only test runner
-│   └── cache.json            # Disk-persisted fallback cache
-├── frontend/
-│   ├── views/                # EJS templates (served by Express)
-│   │   ├── index.ejs         # Landing page
-│   │   ├── live.ejs          # Live Data Dashboard
-│   │   ├── endpoints.ejs     # API Reference + Demo Terminal
-│   │   ├── disclaimer.ejs    # Disclaimer page
-│   │   ├── privacy.ejs       # Privacy Policy
-│   │   ├── terms.ejs         # Terms of Service
-│   │   └── partials/         # Header, Footer, Icon components
-│   ├── css/style.css         # Global stylesheet
-│   ├── brand/                # Logo, banner, branding assets
-│   └── js/                   # Frontend JS (lang, ui, live, playground...)
-├── docs/
-│   ├── assets/               # README preview images
-│   ├── vi/                   # Vietnamese documentation
-│   │   ├── architecture.md   # System architecture
-│   │   ├── changelog.md      # Version history
-│   │   ├── community/        # Contributing, conduct, security, support
-│   │   ├── legal/            # Legal (disclaimer, privacy, terms)
-│   │   └── guides/           # Comment conventions, internal guides
-│   └── en/                   # English documentation (parallel)
-└── ecosystem.config.js       # PM2 production deployment config
+├── src/
+│   ├── index.js              # Hono entrypoint + static serving & router
+│   ├── config.js             # Source & KV configuration
+│   ├── scrapers/             # Independent scraping logic
+│   │   ├── petrolimex.js     # Petrolimex (Tier 0 REST API)
+│   │   ├── pvoil.js          # PVOil (Bypass CF)
+│   │   ├── mipec.js          # Mipec
+│   │   ├── comeco.js         # COMECO
+│   │   ├── saigonpetro.js    # Saigon Petro
+│   │   ├── petrotimes.js     # Petro Times
+│   │   ├── webgia.js         # WebGia
+│   │   └── giaxanghomnay.js  # GiaXangHomNay
+│   ├── scraper.js            # Unified scraper entry point
+│   └── utils/
+│       ├── fuel-helpers.js   # Normalize data & province info
+│       └── regions.json      # Mapping for regions (Region 1, Region 2, partial)
+├── public/                   # Frontend assets (HTML, CSS, JS, Images)
+│   ├── index.html            # Landing page
+│   ├── live.html             # Live Data Dashboard
+│   ├── endpoints.html        # API Reference documentation
+│   ├── test-api.html         # Visual API testing tool
+│   ├── css/                  # Stylesheets
+│   ├── js/                   # Frontend JS logic
+│   └── brand/                # Logo & Banners
+├── docs/                     # Technical documentation (VI/EN)
+├── wrangler.toml             # Cloudflare Workers & KV config
+└── package.json              # Dependency management
 ```
 
 ## 📚 Detailed Docs
@@ -279,14 +235,14 @@ Vietnam's retail fuel prices are divided into two regions per current regulation
 
 ### What should be pushed to GitHub
 
-- Source code under `backend/`, `frontend/`, `docs/`
+- Source code under `src/`, `public/`, `docs/`
 - Community and legal markdown files
-- Production config files such as `ecosystem.config.js`
+- Production config files such as `wrangler.toml`
 
 ### What should not be pushed
 
-- `node_modules/`, `logs/`, debug dumps, runtime cache
-- Any credential or sensitive local configuration (`.env`)
+- `node_modules/`, `.wrangler/`
+- Any log files or debug dumps
 
 ## ⚖️ License
 
@@ -295,7 +251,7 @@ Distributed under the **MIT** license. See `LICENSE` for more details.
 ---
 
 <p align="center">
-  <img src="frontend/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer" width="120">
+  <img src="public/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer" width="120">
 </p>
 
 <p align="center">

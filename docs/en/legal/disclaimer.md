@@ -44,7 +44,7 @@ VietFuelAPI collects data through:
 
 - **Transparent Bot User-Agent**: `VietFuelBot/1.0 (Community non-profit; +https://github.com/TranQui004/vietfuel-api)` — allows source administrators to identify and contact us.
 - **Reasonable frequency**: Adaptive schedule aligned with Decree 80/2023/ND-CP (maximum every 15 minutes on Thursdays, every 4–6 hours on other days).
-- **No long-term storage**: Cache data is retained for a maximum of 60 minutes and refreshed periodically — no long-term history is stored.
+- **Historical Storage**: Price data from adjustment periods is stored locally in D1/SQLite for statistical and analytical purposes.
 
 ---
 

@@ -470,7 +470,7 @@ function renderCards(source, data, lang, locationLabel, meta) {
 
 // ── HIỂN THỊ BẢNG SO SÁNH (CHỈ CHO UNIFIED) ────────────────────────────────
 
-function renderComparisonTable(data, lang) {
+function renderComparisonTable(data, lang, meta) {
   UI.header.innerHTML = '';
   UI.body.innerHTML   = '';
   if (UI.table) delete UI.table.dataset.colHoverBound;
@@ -478,21 +478,8 @@ function renderComparisonTable(data, lang) {
   UI.error.style.display  = 'none';
   if (UI.table) UI.table.style.opacity = '1';
 
-  // [CỘT NGUỒN] Thu thập danh sách nguồn không trùng lặp.
-  const sourceNames = new Set();
-  data.forEach((item) => {
-    (item.sources || []).forEach((s) => {
-      if (s.source) sourceNames.add(s.source);
-    });
-  });
-  const sources = [...sourceNames].sort((a, b) => {
-    const ai = SOURCE_ORDER.indexOf(a);
-    const bi = SOURCE_ORDER.indexOf(b);
-    if (ai === -1 && bi === -1) return a.localeCompare(b);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
+  const activeSources = meta?.dataSources || [];
+  const sources = SOURCE_ORDER;
 
   // [HEADER] Dựng tiêu đề cột.
   const thProduct = document.createElement('th');
@@ -502,14 +489,15 @@ function renderComparisonTable(data, lang) {
   UI.header.appendChild(thProduct);
 
   sources.forEach((src) => {
-    const meta = getSourceMeta(src);
+    const isAvailable = activeSources.includes(src);
+    const srcMeta = getSourceMeta(src);
     const th = document.createElement('th');
     th.dataset.source = src;
     th.tabIndex = 0;
     th.innerHTML = `
-      <span class="source-col-header">
-        <span class="source-col-dot" style="--source-color:${meta.color};"></span>
-        <span class="source-col-label">${meta.label}</span>
+      <span class="source-col-header" style="${isAvailable ? '' : 'opacity: 0.5; cursor: not-allowed;'}">
+        <span class="source-col-dot" style="--source-color:${isAvailable ? srcMeta.color : '#64748b'};"></span>
+        <span class="source-col-label">${srcMeta.label}${isAvailable ? '' : ' (N/A)'}</span>
       </span>`;
     th.style.textAlign = 'right';
     UI.header.appendChild(th);
@@ -528,21 +516,26 @@ function renderComparisonTable(data, lang) {
   // [ROWS] Dựng từng dòng dữ liệu.
   data.forEach((item) => {
     const tr = document.createElement('tr');
-    const meta = getFuelMeta(item.name);
+    const fuelMeta = getFuelMeta(item.name);
 
     const tdName = document.createElement('td');
-    tdName.innerHTML = `<span class="fuel-name"><span class="fuel-name-icon"><i data-lucide="${meta.icon}" width="14" height="14"></i></span>${item.name}</span>`;
+    tdName.innerHTML = `<span class="fuel-name"><span class="fuel-name-icon"><i data-lucide="${fuelMeta.icon}" width="14" height="14"></i></span>${item.name}</span>`;
     tr.appendChild(tdName);
 
     if (sources.length > 0) {
       sources.forEach((srcName) => {
+        const isAvailable = activeSources.includes(srcName);
         const td   = document.createElement('td');
         td.className = 'price-cell';
         td.dataset.source = srcName;
         td.style.textAlign = 'right';
-        const srcData = (item.sources || []).find((s) => s.source === srcName);
-        const val = srcData ? (srcData.region1 ?? srcData.region2 ?? srcData.price) : null;
-        td.textContent = formatPrice(val);
+        if (!isAvailable) {
+          td.innerHTML = `<span style="color: #64748b; font-style: italic; opacity: 0.6;">N/A</span>`;
+        } else {
+          const srcData = (item.sources || []).find((s) => s.source === srcName);
+          const val = srcData ? (srcData.region1 ?? srcData.region2 ?? srcData.price) : null;
+          td.textContent = formatPrice(val);
+        }
         tr.appendChild(td);
       });
     } else {

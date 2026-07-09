@@ -12,13 +12,13 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 | :--- | :--- | :--- |
 | **Petrolimex** | **Tier 0**: VIEApps CMS REST API `/~apis/portals/cms.item/search` (JSON, không cần auth) | Tier 1: GXHN HTTP → Tier 2: WebGia HTTP |
 | KV2 / Saigon / VungTau Petrolimex | Đồng bộ mirror từ Petrolimex | — |
-| **PVOil** | **Tier 0**: HTTP fetch IP origin `103.21.120.100` + header `Host` (bypass Cloudflare) | Tier 1: HTTP direct → Tier 2: GXHN HTTP fallback |
-| **Mipec** | HTTP fetch + cheerio parse bảng SSR mipec.com.vn | GXHN HTTP fallback ngày |
-| **COMECO** | HTTP fetch + cheerio parse HTML tĩnh | — |
-| **Saigon Petro** | HTTP fetch → trích xuất `data-list` → gọi API `/load-time` động | — |
-| **Petro Times** | HTTP fetch API nội bộ `/site/get-petro` | — |
-| **WebGia** | HTTP fetch + cheerio parse cấu trúc `<th>` đặc biệt | — |
-| **GiaXangHomNay** | HTTP fetch + cheerio parse bảng SSR | — |
+| **PVOil** | **Tầng 0**: HTTP fetch IP origin `103.21.120.100` + header `Host` (bypass Cloudflare qua HTTPS client bỏ qua xác thực SSL) | Tầng 1: Playwright stealth → Tầng 2: GiaXangHomNay |
+| **Mipec** | Playwright + fallback bài viết tin tức | GiaXangHomNay |
+| **COMECO** | **Tầng 1**: HTTP fetch + cheerio parse HTML tĩnh | Playwright |
+| **Saigon Petro** | **Tầng 1**: HTTP fetch → trích xuất `data-list` → gọi API `/load-time` động | Playwright |
+| **Petro Times** | **Tầng 1**: HTTP fetch trực tiếp API nội bộ `/site/get-petro` | Playwright |
+| WebGia | HTTP Fetch / Playwright | — |
+| GiaXangHomNay | Playwright | — |
 
 > **Ghi công kỹ thuật**:
 > - Kỹ thuật bypass Cloudflare PVOil qua IP origin và chiến lược HTTP-first tham khảo từ:
@@ -39,6 +39,24 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 | Disk persistence | `cache.json` | Persist qua restart | Ghi sau mỗi lần cập nhật |
 
 **Stale Cache Fallback**: Hệ thống vô hiệu hoá tự động xóa (`stdTTL = 0`). Nếu Crawler gặp sự cố, API vẫn trả về dữ liệu cũ kèm cờ `isStale: true`.
+
+---
+
+## Dịch vụ Cơ sở dữ liệu (`backend/src/db/repository.js`)
+
+Lưu trữ lịch sử tất cả các kỳ điều hành giá xăng dầu:
+- **Hệ thống lưu trữ**: Sử dụng Cloudflare D1 trên môi trường serverless và SQLite (`better-sqlite3`) cục bộ khi chạy Node.js server.
+- **Tương thích câu lệnh**: Sử dụng chuẩn cú pháp `?` tham số của SQLite tương thích giữa Cloudflare D1 và driver `better-sqlite3`.
+- **Tự động dọn dẹp (Auto-Pruning)**: Tự động chạy cơ chế dọn dẹp các bản ghi lịch sử có tuổi đời lớn hơn 90 ngày sau khi cào và chèn dữ liệu mới thành công.
+
+---
+
+## CLI Console Dashboard (`backend/src/cli.js`)
+
+Giao diện tương tác trực tiếp qua terminal cho người vận hành (không cần trình duyệt):
+- **Khởi chạy**: Bằng lệnh `npm run cli`.
+- **Giao diện trực quan**: Định dạng màu sắc ANSI và bảng ASCII so sánh giá 11 nhà phân phối dạng ngang gọn gàng.
+- **Tính năng đầy đủ**: Xem giá trực tiếp, tra cứu lịch sử lọc theo tên sản phẩm, kiểm tra trạng thái crawlers / đường dẫn lưu trữ cơ sở dữ liệu, xóa cache và kích hoạt cào lực lượng (force refresh).
 
 ---
 

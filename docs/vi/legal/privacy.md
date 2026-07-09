@@ -30,7 +30,8 @@ Các log này **không được chia sẻ** với bên thứ ba và tự động
 Bot `VietFuelBot/1.0` thu thập dữ liệu từ các nguồn công khai. Chúng tôi cam kết:
 
 - **Không thu thập** bất kỳ thông tin nào ngoài dữ liệu giá xăng dầu công khai.
-- **Không lưu trữ** dữ liệu lịch sử dài hạn — cache chỉ giữ 60 phút.
+- **Không yêu cầu xác thực**: API mở công khai.
+- **Lưu trữ lịch sử**: Dữ liệu giá các kỳ điều chỉnh được lưu cục bộ trong D1/SQLite để thống kê, không lưu thông tin người truy cập.
 - **Không truy cập** các vùng dữ liệu yêu cầu đăng nhập hoặc không công khai.
 - **Tuân thủ robots.txt** của các trang nguồn.
 

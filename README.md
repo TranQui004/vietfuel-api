@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="frontend/brand/VietFuelAPI_header.png" alt="VietFuelAPI Banner" width="800">
+  <img src="public/brand/VietFuelAPI_header.png" alt="VietFuelAPI Banner" width="800">
 </p>
 
 <h1 align="center">VietFuelAPI</h1>
 
 <p align="center">
-  <strong>API giá xăng dầu Việt Nam thời gian thực — 11 Nguồn dữ liệu, 63 Tỉnh thành, Phân vùng 1 & 2 chuẩn xác.</strong>
+  <strong>API giá xăng dầu Việt Nam thời gian thực — 11 Nguồn dữ liệu, 63 Tỉnh thành, Phân vùng 1 &amp; 2 chuẩn xác.</strong>
 </p>
 
 <p align="center">
@@ -33,8 +33,9 @@ English version: [README.en.md](README.en.md)
 
 - [Giới thiệu](#-giới-thiệu)
 - [Tính năng nổi bật](#-tính-năng-nổi-bật)
-- [Bắt đầu nhanh](#-bắt-đầu-nhanh)
+- [Sử dụng API](#-sử-dụng-api)
 - [Danh sách Endpoint](#-danh-sách-endpoint)
+- [Chạy Local (cho Developer)](#-chạy-local-cho-developer)
 - [Phân vùng giá xăng dầu](#-phân-vùng-giá-xăng-dầu)
 - [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
 - [Cấu trúc dự án](#-cấu-trúc-dự-án)
@@ -55,59 +56,37 @@ Hệ thống hỗ trợ tra cứu giá theo **63 tỉnh thành** với phân bi�
 
 ## ✨ Tính năng nổi bật
 
-- 🚀 **Hiệu năng cực cao**: Dữ liệu phục vụ từ RAM (In-memory cache), độ trễ < 10ms.
+- 🚀 **Hiệu năng cực cao**: Dữ liệu phục vụ từ cache, độ trễ thấp.
 - 🔄 **Cập nhật tự động**: Adaptive Cron thông minh bắt nhịp chính xác chu kỳ điều chỉnh giá của nhà nước.
 - 🔗 **11 nguồn dữ liệu**: Tích hợp công nghệ Bot Stealth Fallback thông minh, vượt rào chống bot.
+- 📊 **Giao diện trực quan**: Hai trang Dashboard được thiết kế bằng [ApexCharts](https://apexcharts.com/).
+  - Bảng dữ liệu **Live** (`/`): Cập nhật tự động từng phút theo chế độ Dark/Light mode, hiển thị so sánh giá trên toàn quốc với hơn 63 tỉnh thành.
+  - Bảng **Thống kê tổng quan** (`/history`): Biểu đồ cột ghép (Grouped Column) so sánh giá Vùng 1 và Vùng 2, kết hợp bảng dữ liệu thị trường có tính năng **Lọc (Filter)** theo nguồn và **Sắp xếp (Sort)** cột thông minh.
+- 🖥️ **CLI Console Dashboard**: Tiện ích tương tác qua dòng lệnh (`npm run cli`) giúp quản trị viên tra cứu giá, xem lịch sử, kiểm tra sức khỏe hệ thống và dọn dẹp bộ nhớ đệm mà không cần trình duyệt.
 - 🗺️ **63 Tỉnh thành**: Tra cứu giá theo từng tỉnh/thành, bao gồm thông tin Vùng 1/2.
 - 🛡️ **Phân vùng chính xác**: Phân loại đúng 15 tỉnh Vùng 2 toàn tỉnh, 4 tỉnh bán phần (partial).
-
-- 🔒 **Rate Limiting**: Bảo vệ API khỏi lạm dụng (60 req/phút cho source quốc gia, 20 req/phút cho tỉnh thành).
-- 🌍 **Cache-Control chuẩn HTTP**: Hỗ trợ CDN caching, giúp người dùng cuối nhận data siêu nhanh.
 - 🔑 **Không cần Auth**: Mở cửa cho mọi nhà phát triển, hỗ trợ CORS đầy đủ.
 
-## 🚀 Bắt đầu nhanh
+## 🌐 Sử dụng API
+
+API được host sẵn tại địa chỉ công khai. Bạn có thể gọi trực tiếp mà không cần cài đặt bất kỳ thứ gì:
 
 ```bash
-# Clone repository
-git clone https://github.com/TranQui004/vietfuel-api.git
-cd vietfuel-api
+# Lấy giá xăng dầu tổng hợp (tất cả nguồn)
+curl https://vietfuel-api.tranqui.workers.dev/api/fuel-prices
 
-# Cài đặt dependencies backend
-cd backend
-npm install
+# Lấy giá từ nguồn cụ thể
+curl https://vietfuel-api.tranqui.workers.dev/api/fuel-prices/petrolimex
 
-# Khởi chạy server (development)
-npm run dev
+# Tra cứu giá theo tỉnh/thành
+curl https://vietfuel-api.tranqui.workers.dev/api/fuel-prices/province/ha-noi
 ```
 
-Server mặc định tại: `http://localhost:3000`
-
-Giao diện web được phục vụ cùng cổng backend:
-- Trang chủ: `http://localhost:3000/`
-- Live Data: `http://localhost:3000/live`
-
-Nếu chạy từ thư mục gốc project:
-
-```bash
-npm --prefix backend run dev
-```
-
-### 🚀 Triển Khai Production (PM2)
-
-Dự án đã bao gồm file `ecosystem.config.js` để triển khai với [PM2](https://pm2.keymetrics.io/) – tiêu chuẩn vận hành Node.js trên Server thật:
-
-```bash
-# Cài PM2 toàn cục (nếu chưa có)
-npm install -g pm2
-
-# Khởi động với PM2
-pm2 start ecosystem.config.js --env production
-
-# Quản lý tiến trình
-pm2 status
-pm2 logs vietfuel-api
-pm2 restart vietfuel-api
-```
+**Giao diện trực quan:**
+- 🏠 Trang chủ: `https://vietfuel-api.tranqui.workers.dev/`
+- 📊 Live Data: `https://vietfuel-api.tranqui.workers.dev/live`
+- 📈 Thống kê & Lịch sử: `https://vietfuel-api.tranqui.workers.dev/history`
+- 🔬 Test API: `https://vietfuel-api.tranqui.workers.dev/test-api`
 
 ## 📡 Danh sách Endpoint
 
@@ -115,8 +94,8 @@ pm2 restart vietfuel-api
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
-| `GET` | `/api/fuel-prices` | **(Khuyên dùng)** Trả về dữ liệu gộp từ các nguồn chuẩn xác nhất |
-| `GET` | `/api/fuel-prices/:source` | Nguồn cụ thể: `petrolimex`, `pvoil`, `mipec`, `comeco`, `saigonpetro`, `petrotimes`, `webgia`, `giaxanghomnay`, ... |
+| `GET` | `/api/fuel-prices` | **(Khuyên dùng)** Trả về dữ liệu gộp từ tất cả 11 nguồn |
+| `GET` | `/api/fuel-prices/:source` | Nguồn cụ thể: `petrolimex`, `kv2_petrolimex`, `saigon_petrolimex`, `vungtau_petrolimex`, `pvoil`, `mipec`, `comeco`, `saigonpetro`, `petrotimes`, `webgia`, `giaxanghomnay` |
 
 ### Tỉnh thành (on-demand)
 
@@ -126,21 +105,89 @@ pm2 restart vietfuel-api
 | `GET` | `/api/provinces?region=2` | Lọc chỉ tỉnh thuộc Vùng 2 |
 | `GET` | `/api/fuel-prices/province/:slug` | Giá xăng dầu theo tỉnh (VD: `/api/fuel-prices/province/ha-noi`) |
 
-### Hệ thống
+### Hệ thống & Lịch sử
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
 | `GET` | `/api/health` | Trạng thái sức khoẻ toàn bộ 11 nguồn dữ liệu |
 | `GET` | `/api/sources` | Danh sách 11 nguồn dữ liệu kèm trạng thái cache |
+| `GET` | `/api/history` | Lịch sử giá (hỗ trợ query `?limit=` và filter theo `/api/history/:fuel_name`) |
 
-### Giao diện web
+### Phản hồi mẫu
 
-| URL | Mô tả |
-| :--- | :--- |
-| `/` | Trang chủ — tổng quan API |
-| `/live` | Live Dashboard — xem giá thực tế 11 nguồn |
-| `/endpoints` | API Reference — tài liệu đầy đủ |
-| `/playground` | **API Playground** — test endpoint trực tiếp trên trình duyệt |
+```json
+{
+  "success": true,
+  "status": "ok",
+  "meta": {
+    "primarySource": "Petrolimex",
+    "priceDate": "2026-05-15",
+    "priceDateDisplay": "15/05/2026",
+    "sourceCount": 11,
+    "totalItems": 7
+  },
+  "data": [
+    { "name": "Xăng RON 95-V", "region1": 24730, "region2": 25220, "unit": "VND/lít" },
+    { "name": "Xăng RON 95-III", "region1": 24330, "region2": 24810, "unit": "VND/lít" }
+  ]
+}
+```
+
+## 💻 Chạy Local (cho Developer)
+
+Để chạy thử nghiệm dự án hoặc phát triển tính năng mới tại local:
+
+```bash
+git clone https://github.com/TranQui004/vietfuel-api.git
+cd petrolimex-fuel-api
+
+# Cài đặt thư viện
+npm install
+
+# Khởi chạy server local (Wrangler dev)
+npx wrangler dev
+```
+
+*Mở trình duyệt truy cập: `http://localhost:8787`*
+
+### 🖥️ Khởi chạy Console Dashboard (CLI)
+Sau khi khởi động server, bạn có thể khởi chạy giao diện tương tác CLI (không cần trình duyệt) bằng lệnh:
+```bash
+npm run cli
+```
+
+---
+
+## 💻 Tự vận hành (Self-Hosted)
+
+Dự án cung cấp mã nguồn mở hoàn toàn để bạn có thể tự vận hành (self-host) API của riêng mình nếu không muốn sử dụng public endpoint.
+
+### Tuỳ chọn 1: Cloudflare Workers (Khuyên dùng)
+Bạn có thể tự host API này trên Cloudflare Workers miễn phí (Free tier: 100,000 req/ngày):
+
+1. **Tạo tài khoản Cloudflare** tại [cloudflare.com](https://cloudflare.com) (miễn phí)
+2. **Tạo KV Namespace** trên Dashboard: Workers & Pages → KV → Create namespace đặt tên `FUEL_CACHE`
+3. **Tạo D1 Database** (Tuỳ chọn cho lịch sử giá): Workers & Pages → D1 → Create database đặt tên `vietfuel-history`
+4. **Sửa `wrangler.toml`**: Thay các ID tương ứng vừa tạo.
+5. **Deploy**:
+
+```bash
+npx wrangler login
+npx wrangler d1 execute vietfuel-history --file=./backend/src/db/schema.sql
+npx wrangler deploy
+```
+
+### Tuỳ chọn 2: Docker (Optional / Advanced)
+Nếu bạn có VPS riêng và không muốn phụ thuộc vào hệ sinh thái Cloudflare, bạn có thể chạy API qua Docker (sử dụng in-memory cache và SQLite thay thế).
+
+```bash
+git clone https://github.com/TranQui004/vietfuel-api.git
+cd vietfuel-api
+
+# Khởi chạy qua Docker Compose
+docker-compose up -d
+```
+*Lưu ý: Chế độ Docker sử dụng node-server.js thay vì Cloudflare Workers environment. API Lịch sử giá sẽ được ghi vào file cục bộ.*
 
 ## 🗺️ Phân vùng giá xăng dầu
 
@@ -166,99 +213,62 @@ Theo quy định, giá xăng dầu tại Việt Nam được phân thành 2 vùn
 
 ## 🛠️ Công nghệ sử dụng
 
-- **Backend**: Node.js v22+, Express, express-rate-limit, helmet, compression.
-- **Scraping**: `node-fetch` + `cheerio` — **HTTP-only, không Playwright/headless browser**.
-- **Cache**: node-cache (In-memory) + disk persistence (`cache.json`).
-- **Scheduler**: node-cron — lịch thích ứng 3 chế độ theo **Nghị định 80/2023/NĐ-CP**:
-  - T2–T4: 4 tiếng/lần (Checking)
-  - T5, 14:30–16:00: 15 phút/lần (Hunting — khung giờ điều chỉnh giá)
-  - T6–CN: 6 tiếng/lần (Maintenance)
-- **Frontend**: EJS templates + Vanilla CSS/JS — serve trực tiếp bởi Express (không framework JS riêng).
-- **API Testing**: API Playground tùy chỉnh tại `/playground` (thay thế Swagger UI).
-- **Logging**: Winston.
+- **Runtime**: Cloudflare Workers (V8 isolates) + Hono framework.
+- **Scraping**: `fetch` + `cheerio` — **HTTP-only, hoàn toàn không cần Headless Browser**.
+- **Cache**: Cloudflare KV (`FUEL_CACHE`) — dữ liệu được phục vụ từ edge gần người dùng nhất.
+- **Scheduler**: Cloudflare Cron Triggers — lịch thích ứng theo **Nghị định 80/2023/NĐ-CP**.
+- **Frontend**: HTML/CSS/JS tĩnh — phục vụ qua Cloudflare CDN, không cần framework JS.
 
 ## 📁 Cấu trúc dự án
 
 ```text
 ├── backend/
-│   ├── index.js              # Entry point Express + static serving
-│   ├── config/
-│   │   └── index.js          # Cấu hình chung (port, URLs, cron, cache TTL)
-│   ├── data/
-│   │   └── provinces.json    # Từ điển 63 tỉnh thành (slug, region, districts)
-│   ├── routes/
-│   │   └── fuel.js           # Toàn bộ REST API endpoints
-│   ├── services/
-│   │   ├── scrapers/         # Mỗi file là một engine HTTP-only độc lập
-│   │   │   ├── utils.js          # Hàm core dùng chung (parsePrice, UA pool, ...)
-│   │   │   ├── petrolimex.js     # Petrolimex — Tier 0: VIEApps REST API
-│   │   │   ├── pvoil.js          # PVOil — Tier 0: IP origin bypass Cloudflare
-│   │   │   ├── pvoil-parser.js   # Parser HTML/text cho PVOil
-│   │   │   ├── mipec.js          # Mipec — HTTP + cheerio
-│   │   │   ├── comeco.js         # COMECO — HTTP + cheerio
-│   │   │   ├── saigonpetro.js    # Saigon Petro — dynamic API
-│   │   │   ├── petrotimes.js     # Petro Times — internal API
-│   │   │   ├── webgia.js         # WebGia — HTTP + cheerio
-│   │   │   └── giaxanghomnay.js  # GiaXangHomNay — HTTP + cheerio
-│   │   ├── scraper.js        # Index tổng hợp — xuất tất cả scraper functions
-│   │   └── cache.js          # In-memory cache (node-cache) + disk fallback
-│   ├── workers/
-│   │   └── jobs.js           # Adaptive Cron scheduler (3 chế độ)
-│   ├── utils/
-│   │   ├── logger.js         # Winston logger
-│   │   └── fuel-helpers.js   # Helper tổng hợp: merge, normalize, sort
-│   └── tests/
-│       ├── scrapers/         # Smoke tests cho từng scraper
-│       ├── api/              # API integration tests
-│       └── run-all.js        # Chạy toàn bộ test suite
-├── frontend/
-│   ├── views/                # EJS templates (serve bởi Express)
-│   │   ├── index.ejs         # Trang chủ
-│   │   ├── live.ejs          # Live Data Dashboard
-│   │   ├── endpoints.ejs     # API Reference
-│   │   ├── playground.ejs    # API Playground (test endpoint tương tác)
-│   │   └── partials/         # Header, Footer components
-│   ├── css/
-│   │   ├── style.css         # Global CSS
-│   │   └── playground.css    # CSS riêng cho Playground
-│   ├── js/
-│   │   ├── live.js           # Live Data Dashboard logic
-│   │   ├── playground.js     # API Playground logic
-│   │   └── lang.js           # i18n (VI/EN)
-│   └── brand/                # Logo, banner assets
-├── docs/
-│   ├── assets/               # Ảnh preview cho README
-│   ├── vi/                   # Tài liệu tiếng Việt
-│   └── en/                   # Tài liệu tiếng Anh
-├── cache.json                # Disk persistence cache (root)
-└── ecosystem.config.js       # Cấu hình PM2 cho production
+│   └── src/
+│       ├── index.js              # Entry point Hono + router
+│       ├── scraper.js            # Unified scraper entry point
+│       ├── cache.js              # Cloudflare KV helpers
+│       ├── scrapers/             # Thư mục chứa logic cào dữ liệu độc lập
+│       │   ├── petrolimex.js     # Petrolimex (REST API nội bộ)
+│       │   ├── pvoil.js          # PVOil (Bypass Cloudflare)
+│       │   ├── mipec.js          # Mipec
+│       │   ├── comeco.js         # COMECO
+│       │   ├── saigonpetro.js    # Saigon Petro
+│       │   ├── petrotimes.js     # Petro Times
+│       │   ├── webgia.js         # WebGia (mirror Petrolimex)
+│       │   └── giaxanghomnay.js  # GiaXangHomNay (63 tỉnh)
+│       ├── db/
+│       │   ├── repository.js     # Lịch sử Giá (D1/SQLite)
+│       │   └── schema.sql        # Cấu trúc bảng lịch sử
+│       ├── data/
+│       │   └── provinces.json    # Dataset 63 tỉnh thành (slug, region, districts)
+│       └── utils/
+│           └── fuel-helpers.js   # Normalize, sort, build response
+├── public/                       # Frontend assets (HTML, CSS, JS, hình ảnh)
+│   ├── index.html                # Trang chủ
+│   ├── live.html                 # Dashboard dữ liệu trực tiếp
+│   ├── history.html              # Dashboard Thống kê & Lịch sử
+│   ├── endpoints.html            # Tài liệu API Reference
+│   ├── test-api.html             # Công cụ Test API trực quan
+│   ├── css/                      # Stylesheet
+│   ├── js/                       # JS tương tác giao diện (bao gồm history.js)
+│   └── brand/                    # Logo & Banner
+├── docs/                         # Tài liệu kỹ thuật đa ngôn ngữ (VI/EN)
+├── wrangler.toml                 # Cấu hình Cloudflare Workers (template)
+└── package.json
 ```
 
 ## 📚 Tài liệu chi tiết
 
 - [Kiến trúc hệ thống](docs/vi/architecture.md)
-- [Lịch sử cập nhật](docs/vi/changelog.md)
-- [Quy ước comment](docs/vi/guides/comment-style.md)
-- [Xem tài liệu API trực tuyến](http://localhost:3000)
+- [Lịch sử cập nhật](CHANGELOG.md)
+- [Quy ước comment code](docs/vi/guides/comment-style.md)
 
 ## 🤝 Pháp lý & Cộng đồng
 
-- [Chỉ mục pháp lý](docs/vi/legal/README.md)
 - [Hướng dẫn đóng góp (CONTRIBUTING.md)](CONTRIBUTING.md)
 - [Quy tắc ứng xử](docs/vi/community/code-of-conduct.md)
 - [Chính sách bảo mật](docs/vi/community/security.md)
 - [Hỗ trợ](docs/vi/community/support.md)
-
-### Tài nguyên nên push lên GitHub
-
-- Toàn bộ mã nguồn `backend/`, `frontend/`, `docs/`
-- Các file markdown cộng đồng/pháp lý
-- Cấu hình chạy production (`ecosystem.config.js`)
-
-### Tài nguyên không nên push
-
-- `node_modules/`, `logs/`, file dump debug, cache runtime
-- Mọi file chứa credential hoặc thông tin nhạy cảm (`.env`)
 
 ## ⚖️ Giấy phép
 
@@ -267,7 +277,7 @@ Phân phối dưới giấy phép **MIT**. Xem `LICENSE` để biết thêm chi 
 ---
 
 <p align="center">
-  <img src="frontend/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer" width="120">
+  <img src="public/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer" width="120">
 </p>
 
 <p align="center">

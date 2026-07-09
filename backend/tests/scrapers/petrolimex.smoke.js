@@ -1,22 +1,9 @@
-﻿/**
- * VietFuel API
- * Copyright (c) 2026 TranQui
- * Github: https://github.com/TranQui004
- *
- * Licensed under the MIT License.
- * See LICENSE file for details.
- */
-'use strict';
+import assert from 'assert';
+import { fileURLToPath } from 'url';
+import scrapers from '../../src/scraper.js';
+const { scrapePetrolimex } = scrapers;
 
-/* ==========================================================================
- * [TEST] - Smoke Test Petrolimex
- * Mục đích: Đảm bảo Scraper Petrolimex hoạt động và trả tự động dữ liệu chuẩn.
- * ========================================================================== */
-
-const assert = require('assert');
-const { scrapePetrolimex } = require('../../services/scraper');
-
-async function run() {
+export async function run() {
   const startedAt = Date.now();
   const result = await scrapePetrolimex();
 
@@ -33,9 +20,7 @@ async function run() {
   };
 }
 
-module.exports = { run };
-
-if (require.main === module) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   run()
     .then((summary) => {
       console.log(`[PASS] ${summary.name} - ${summary.count} items (${summary.durationMs}ms)`);

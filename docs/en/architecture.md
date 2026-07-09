@@ -12,13 +12,13 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 | :--- | :--- | :--- |
 | **Petrolimex** | **Tier 0**: VIEApps CMS REST API `/~apis/portals/cms.item/search` (JSON, no auth required) | Tier 1: GXHN HTTP → Tier 2: WebGia HTTP |
 | KV2 / Saigon / VungTau Petrolimex | Mirror sync from Petrolimex | — |
-| **PVOil** | **Tier 0**: HTTP fetch origin IP `103.21.120.100` + `Host` header (Cloudflare bypass) | Tier 1: HTTP direct → Tier 2: GXHN HTTP fallback |
-| **Mipec** | HTTP fetch + cheerio SSR parse from mipec.com.vn | GXHN HTTP fallback (date) |
-| **COMECO** | HTTP fetch + cheerio static HTML parse | — |
-| **Saigon Petro** | HTTP fetch → extract `data-list` → call dynamic `/load-time` API | — |
-| **Petro Times** | HTTP fetch directly to internal API `/site/get-petro` | — |
-| **WebGia** | HTTP fetch + cheerio parse (unique `<th>` structure) | — |
-| **GiaXangHomNay** | HTTP fetch + cheerio SSR parse | — |
+| **PVOil** | **Tier 0**: HTTP fetch origin IP `103.21.120.100` + `Host` header (Cloudflare bypass via HTTPS client with disabled SSL verification) | Tier 1: Playwright stealth → Tier 2: GiaXangHomNay text |
+| **Mipec** | Playwright + news article fallback | GiaXangHomNay |
+| **COMECO** | **Tier 1**: HTTP fetch + cheerio static HTML parse | Playwright |
+| **Saigon Petro** | **Tier 1**: HTTP fetch → extract `data-list` → call dynamic `/load-time` API | Playwright |
+| **Petro Times** | **Tier 1**: HTTP fetch directly to internal API `/site/get-petro` | Playwright |
+| WebGia | HTTP Fetch / Playwright | — |
+| GiaXangHomNay | Playwright | — |
 
 > **Technique credits**:
 > - PVOil Cloudflare bypass via origin IP and HTTP-first strategy inspired by:
@@ -39,6 +39,24 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 | Disk persistence | `cache.json` | Survives restarts | Written after every update |
 
 **Stale Cache Fallback**: Auto-deletion is disabled (`stdTTL = 0`). If the crawler fails, the API returns stale data with `isStale: true` instead of a 503 error.
+
+---
+
+## Database Service (`backend/src/db/repository.js`)
+
+Stores historical fuel price adjustments:
+- **Storage Engine**: Utilizes Cloudflare D1 in serverless production, and local SQLite (`better-sqlite3`) for local Node.js server runs.
+- **Parameter Compatibility**: Standardized SQL statements using standard `?` positional parameters to ensure cross-platform compatibility between D1 and `better-sqlite3`.
+- **Auto-Pruning**: Automatically prunes historical records older than 90 days after every successful scraping insert operation.
+
+---
+
+## CLI Console Dashboard (`backend/src/cli.js`)
+
+An interactive terminal user interface (TUI) for administrators without web browser access:
+- **Execution**: Run with command `npm run cli`.
+- **Rich Visualization**: Fully formatted using ANSI colors and a clean horizontal ASCII table comparing pricing from all 11 providers.
+- **Operator Menu**: Inspect live prices, search price history logs, check health status (including storage file paths), clear cache namespace, and trigger force refresh scrapes.
 
 ---
 

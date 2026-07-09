@@ -29,8 +29,9 @@ These logs are **not shared** with third parties and are automatically deleted a
 
 The `VietFuelBot/1.0` bot collects data from public sources. We commit to:
 
-- **Not collecting** any information beyond publicly available fuel price data.
-- **Not storing** long-term historical data — cache is retained for a maximum of 60 minutes.
+- **No data collection** other than public fuel prices.
+- **No authentication required**: The API is fully public.
+- **Historical Storage**: Price data from adjustment periods is stored locally in D1/SQLite for statistical purposes; no user information is logged.
 - **Not accessing** areas requiring authentication or not publicly available.
 - **Respecting robots.txt** of source websites.
 

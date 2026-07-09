@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trang Pháp lý</title>
+  <meta name="description" content="Vietnam Fuel Price API" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css?v=1.4.0" />
+  
+  <!-- Lucide Icons — served locally to bypass CSP -->
+  <script src="/js/vendor/lucide.min.js" defer></script>
+</head>
+<body >
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/brand/VietFuelAPI_header.png" alt="VietFuelAPI Logo" class="logo-img" />
+        <span class="logo-text">VietFuel<span class="logo-accent">API</span></span>
+      </a>
+      <button class="mobile-toggle" id="mobileNavToggle" aria-label="Mở menu">
+        <div class="hamburger-icon" id="hamburgerIcon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+
+      <nav class="header-nav" id="headerNav" aria-label="Điều hướng chính">
+        <a href="/" class="nav-link " data-vi="Trang chủ" data-en="Home">Trang chủ</a>
+        <a href="/endpoints" class="nav-link " data-vi="API Reference" data-en="API Reference">API Reference</a>
+        <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/test-api" class="nav-link " data-vi="Test API" data-en="Test API">Test API</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener noreferrer" class="github-btn" aria-label="GitHub Repository">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+        <button class="lang-toggle" id="langToggle" aria-label="Chuyển ngôn ngữ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span id="langLabel">EN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+<main class="main-content">
+    <div class="container animate-fade-in" style="padding: 100px 20px;">
+  <div class="legal-card main-glass">
+    <div class="legal-header">
+      <div class="legal-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <h1 class="legal-title" data-vi="Điều khoản sử dụng" data-en="Terms of Service">Điều khoản sử dụng</h1>
+      <p class="legal-date" data-vi="Cập nhật lần cuối: 26 tháng 4, 2026" data-en="Last Updated: April 26, 2026">Cập nhật lần cuối: 26 tháng 4, 2026</p>
+    </div>
+
+    <div class="legal-body content-glass">
+      <section class="legal-section">
+        <h2 data-vi="1. Chấp thuận điều khoản" data-en="1. Terms Acceptance">1. Chấp thuận điều khoản</h2>
+        <p data-vi="Bằng cách truy cập vào trang web này hoặc sử dụng dữ liệu từ VietFuelAPI, bạn đồng ý tuân thủ các điều khoản này. Nếu bạn không đồng ý, vui lòng ngừng sử dụng dịch vụ ngay lập tức." data-en="By accessing this website or using data from VietFuelAPI, you agree to comply with these terms. If you do not agree, please stop using the service immediately.">Bằng cách truy cập vào trang web này hoặc sử dụng dữ liệu từ VietFuelAPI, bạn đồng ý tuân thủ các điều khoản này. Nếu bạn không đồng ý, vui lòng ngừng sử dụng dịch vụ ngay lập tức.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="2. Quyền sở hữu trí tuệ" data-en="2. Intellectual Property">2. Quyền sở hữu trí tuệ</h2>
+        <p data-vi="Mã nguồn của VietFuelAPI được phát hành theo giấy phép <strong>MIT</strong>. Tuy nhiên, toàn bộ tên thương hiệu và logo từ các nguồn dữ liệu được tích hợp (11 nguồn) là tài sản của các đơn vị quản lý tương ứng, và chỉ được sử dụng cho mục đích nhận diện nguồn dữ liệu." data-en="The source code for VietFuelAPI is released under the <strong>MIT</strong> license. However, all brand names and logos from the integrated data sources (11 sources) remain the property of their respective owners and are used solely for source identification.">Mã nguồn của VietFuelAPI được phát hành theo giấy phép <strong>MIT</strong>. Tuy nhiên, toàn bộ tên thương hiệu và logo từ các nguồn dữ liệu được tích hợp (11 nguồn) là tài sản của các đơn vị quản lý tương ứng, và chỉ được sử dụng cho mục đích nhận diện nguồn dữ liệu.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="3. Giới hạn sử dụng & Tấn công" data-en="3. Usage & Abuse Policy">3. Giới hạn sử dụng & Tấn công</h2>
+        <p data-vi="Chúng tôi cung cấp API cho cộng đồng nhưng có các quy định nghiêm ngặt để bảo vệ hệ thống:" data-en="We provide this API to the community with strict rules to protect service stability:">Chúng tôi cung cấp API cho cộng đồng nhưng có các quy định nghiêm ngặt để bảo vệ hệ thống:</p>
+        <ul data-vi="<li>Không được thực hiện các hành vi gây quá tải hoặc tấn công <strong>DDoS</strong>.</li><li>Tôn trọng giới hạn tốc độ: 60 request/phút cho endpoint quốc gia và 20 request/phút cho endpoint tỉnh thành (mỗi IP).</li><li>Không được sử dụng dữ liệu để lừa đảo hoặc vi phạm pháp luật hiện hành.</li>" data-en="<li>You must not perform actions aimed at overloading or attacking the service with <strong>DDoS</strong>.</li><li>Respect rate limits: 60 requests/minute for national endpoints and 20 requests/minute for province endpoints (per IP).</li><li>Using the data for fraudulent purposes or in violation of applicable laws is strictly prohibited.</li>">
+          <li>Không được thực hiện các hành vi gây quá tải hoặc tấn công <strong>DDoS</strong>.</li>
+          <li>Tôn trọng giới hạn tốc độ: 60 request/phút cho endpoint quốc gia và 20 request/phút cho endpoint tỉnh thành (mỗi IP).</li>
+          <li>Không được sử dụng dữ liệu để lừa đảo hoặc vi phạm pháp luật hiện hành.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="4. Trách nhiệm người tích hợp" data-en="4. Integrator Responsibility">4. Trách nhiệm người tích hợp</h2>
+        <p data-vi="Nếu bạn tích hợp VietFuelAPI vào ứng dụng thương mại hoặc dịch vụ của mình, bạn có trách nhiệm thông báo đầy đủ các điều khoản miễn trừ trách nhiệm của chúng tôi cho người dùng cuối của bạn." data-en="If you integrate VietFuelAPI into your commercial application or service, you are responsible for fully informing your end-users of our disclaimer terms.">Nếu bạn tích hợp VietFuelAPI vào ứng dụng thương mại hoặc dịch vụ của mình, bạn có trách nhiệm thông báo đầy đủ các điều khoản miễn trừ trách nhiệm của chúng tôi cho người dùng cuối của bạn.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="5. Thay đổi Điều khoản" data-en="5. Service Changes">5. Thay đổi Điều khoản</h2>
+        <p data-vi="VietFuelAPI có quyền thay đổi các điều khoản này bất cứ lúc nào mà không cần thông báo trước. Việc tiếp tục sử dụng API sau các thay đổi được coi là chấp nhận điều khoản mới nhất." data-en="VietFuelAPI reserves the right to change these terms at any time without prior notice. Continued use of the API following changes constitutes acceptance of the latest terms.">VietFuelAPI có quyền thay đổi các điều khoản này bất cứ lúc nào mà không cần thông báo trước. Việc tiếp tục sử dụng API sau các thay đổi được coi là chấp nhận điều khoản mới nhất.</p>
+      </section>
+
+      <section class="legal-section">
+        <h2 data-vi="6. Miễn trừ Bảo hành dịch vụ" data-en="6. Service Warranty Disclaimer">6. Miễn trừ Bảo hành dịch vụ</h2>
+        <p data-vi="VietFuelAPI được cung cấp theo nguyên tắc &quot;nguyên trạng&quot; (as-is). Chúng tôi không đảm bảo tính liên tục của dịch vụ, đặc biệt trong trường hợp nguồn dữ liệu gốc thay đổi cấu trúc trang web, triển khai biện pháp chặn truy cập hoặc ngừng cung cấp thông tin công khai. Hệ thống có thể tạm thời phục vụ dữ liệu cũ (Stale Cache) và sẽ thông báo rõ ràng thông qua cờ <strong>isStale</strong> trong phản hồi API." data-en="VietFuelAPI is provided on an &quot;as-is&quot; basis. We do not guarantee service continuity, especially in cases where the original data source changes its website structure, implements access blocking measures, or stops providing public information. The system may temporarily serve stale data and will clearly indicate this through the <strong>isStale</strong> flag in API responses.">VietFuelAPI được cung cấp theo nguyên tắc "nguyên trạng" (as-is). Chúng tôi không đảm bảo tính liên tục của dịch vụ, đặc biệt trong trường hợp nguồn dữ liệu gốc thay đổi cấu trúc trang web, triển khai biện pháp chặn truy cập hoặc ngừng cung cấp thông tin công khai. Hệ thống có thể tạm thời phục vụ dữ liệu cũ (Stale Cache) và sẽ thông báo rõ ràng thông qua cờ <strong>isStale</strong> trong phản hồi API.</p>
+      </section>
+    </div>
+
+    <div class="legal-footer">
+      <div class="legal-nav-box">
+        <p class="legal-nav-title" data-vi="Điều hướng nhanh mục Pháp lý" data-en="Quick legal navigation">Điều hướng nhanh mục Pháp lý</p>
+        <div class="legal-nav-links">
+          <a href="/disclaimer" class="legal-nav-link" data-vi="Miễn trừ" data-en="Disclaimer">Miễn trừ</a>
+          <a href="/privacy" class="legal-nav-link" data-vi="Bảo mật" data-en="Privacy">Bảo mật</a>
+          <a href="/terms" class="legal-nav-link legal-nav-current" aria-current="page" data-vi="Điều khoản" data-en="Terms">Điều khoản</a>
+        </div>
+      </div>
+
+      <div class="legal-footer-actions">
+        <a href="/" class="btn btn-ghost" data-vi="Quay lại Trang chủ" data-en="Back to Home">Quay lại Trang chủ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-huge-text">VIETFUEL API</div>
+  <canvas id="flickering-grid-footer"></canvas>
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Col 1: Brand -->
+      <div class="footer-logo-col">
+        <div class="footer-logo-container">
+          <img src="/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer Logo" class="footer-logo-img" />
+        </div>
+        <p class="footer-brand-desc" data-vi="VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa, có nhãn nguồn rõ ràng." data-en="VietFuelAPI provides real-time fuel price data. Aggregated from 11 sources via a standardized Default Endpoint with explicit source labels.">
+          VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa.
+        </p>
+      </div>
+
+      <!-- Col 2: Explorer -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="KHÁM PHÁ" data-en="EXPLORER">KHÁM PHÁ</p>
+        <ul class="footer-links">
+          <li><a href="/" data-vi="Trang chủ" data-en="Home">Trang chủ</a></li>
+          <li><a href="/live" data-vi="Dữ liệu thực tế" data-en="Live Tracker">Dữ liệu thực tế</a></li>
+          <li><a href="/endpoints#demo" data-vi="Demo Terminal" data-en="Terminal Demo">Demo Terminal</a></li>
+          <li><a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener">GitHub ↗</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Documentation -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="TÀI LIỆU" data-en="DOCUMENTATION">TÀI LIỆU</p>
+        <ul class="footer-links">
+          <li><a href="/endpoints" data-vi="API Reference" data-en="API Reference">API Reference</a></li>
+          <li><a href="/test-api" data-vi="Test API" data-en="Test API">Test API</a></li>
+          <li><a href="/endpoints#schema" data-vi="Cấu trúc dữ liệu" data-en="Data Schema">Cấu trúc dữ liệu</a></li>
+          <li><a href="/endpoints#errors" data-vi="Mã lỗi" data-en="Error Codes">Mã lỗi</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Legal -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="PHÁP LÝ" data-en="LEGAL">PHÁP LÝ</p>
+        <ul class="footer-links">
+          <li><a href="/disclaimer" data-vi="Tuyên bố miễn trừ" data-en="Disclaimer">Tuyên bố miễn trừ</a></li>
+          <li><a href="/privacy" data-vi="Chính sách bảo mật" data-en="Privacy Policy">Chính sách bảo mật</a></li>
+          <li><a href="/terms" data-vi="Điều khoản sử dụng" data-en="Terms of Service">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Centered Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-disclaimer-text" data-vi="Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo." data-en="Disclaimer: VietFuelAPI is an independent open-source project, not affiliated with Petrolimex or any government agency. Aggregated data from 11 sources is for reference only.">
+          Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo.
+        </p>
+        <div class="footer-copy">
+          <span class="copy-text">© 2026 VietFuelAPI. Built for developers.</span>
+          <span class="version-badge">v1.1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <button id="backToTop" class="back-to-top" aria-label="Lên đầu trang">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    <img src="/brand/backtotop.png" alt="Back to top" class="back-to-top-char" />
+  </button>
+
+  <script src="/js/lang.js"></script>
+  <script src="/js/ui.js"></script>
+  <script>
+    (function() {
+      const canvas = document.getElementById('flickering-grid-footer');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const config = {
+        squareSize: 4, gridGap: 12,
+        color: [255, 140, 0], // Orange
+        maxOpacity: 0.42, flickerChance: 0.045, transitionSpeed: 0.08
+      };
+      let cols, rows, squares = [];
+      function resize() {
+        const parent = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = parent.clientWidth * dpr;
+        canvas.height = parent.clientHeight * dpr;
+        ctx.scale(dpr, dpr);
+        const cellSize = config.squareSize + config.gridGap;
+        cols = Math.ceil(parent.clientWidth / cellSize);
+        rows = Math.ceil(parent.clientHeight / cellSize);
+        squares = Array.from({ length: cols * rows }, () => ({
+          curr: Math.random() * config.maxOpacity,
+          target: Math.random() * config.maxOpacity
+        }));
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cellSize = config.squareSize + config.gridGap;
+        for (let i = 0; i < squares.length; i++) {
+          let sq = squares[i];
+          if (Math.random() < config.flickerChance) sq.target = Math.random() * config.maxOpacity;
+          sq.curr += (sq.target - sq.curr) * config.transitionSpeed;
+          if (sq.curr < 0.01) continue;
+          const x = (i % cols) * cellSize;
+          const y = Math.floor(i / cols) * cellSize;
+          ctx.fillStyle = `rgba(${config.color[0]}, ${config.color[1]}, ${config.color[2]}, ${sq.curr})`;
+          ctx.fillRect(x, y, config.squareSize, config.squareSize);
+        }
+        requestAnimationFrame(animate);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(animate);
+    })();
+  </script>
+  
+  <script>
+    // Initialize Lucide icons after all scripts loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

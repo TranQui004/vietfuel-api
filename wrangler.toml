@@ -1,0 +1,41 @@
+name = "vietfuel-api"
+main = "backend/src/index.js"
+compatibility_date = "2024-04-05"
+
+# Thư mục chứa frontend tĩnh (HTML/CSS/JS)
+[assets]
+directory = "public"
+
+# ── CLOUDFLARE KV ──────────────────────────────────────────────────────────────
+# Để sử dụng API này, bạn cần:
+# 1. Tạo KV Namespace trên Cloudflare Dashboard:
+#    Workers & Pages → KV → Create a namespace (ví dụ: "FUEL_CACHE")
+# 2. Thay "YOUR_KV_NAMESPACE_ID_HERE" bằng ID thực của namespace bạn vừa tạo.
+# 3. Chạy: npx wrangler kv:namespace create "FUEL_CACHE"
+#    rồi sao chép id được trả về vào đây.
+# ──────────────────────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "FUEL_CACHE"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+
+# ── CLOUDFLARE D1 (Lịch sử giá) ────────────────────────────────────────────────
+# 1. Tạo DB: npx wrangler d1 create vietfuel-history
+# 2. Cập nhật database_id bên dưới
+# 3. Chạy schema: npx wrangler d1 execute vietfuel-history --file=./backend/src/db/schema.sql
+# ──────────────────────────────────────────────────────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "vietfuel-history"
+database_id = "YOUR_D1_DATABASE_ID_HERE"
+
+# Lịch chạy Cron Job (Theo Nghị định 80/2023/NĐ-CP)
+# Giờ UTC (Cloudflare dùng UTC), giờ VN = UTC + 7
+# 1. Checking (T2-T4): Mỗi 4h
+# 2. Hunting (T5 07:30-09:00 UTC = 14:30-16:00 VN): Mỗi 15p
+# 3. Maintenance (T6-CN): Mỗi 6h
+[triggers]
+crons = [
+  "0 */4 * * 1-3",
+  "*/15 7-9 * * 4",
+  "0 */6 * * 5-0"
+]

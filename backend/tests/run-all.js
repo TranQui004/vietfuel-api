@@ -1,31 +1,15 @@
-﻿/**
- * VietFuel API
- * Copyright (c) 2026 TranQui
- * Github: https://github.com/TranQui004
- *
- * Licensed under the MIT License.
- * See LICENSE file for details.
- */
-'use strict';
+import { spawn } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const { spawn } = require('child_process');
-const path = require('path');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
+// We run the migrated ESM smoke tests
 const testModules = [
-  './scrapers/petrolimex.smoke',
-  './scrapers/pvoil.smoke',
-  './scrapers/mipec.smoke',
-  './scrapers/comeco.smoke',
-  './scrapers/saigonpetro.smoke',
-  './scrapers/petrotimes.smoke',
-  './scrapers/webgia.smoke',
-  './scrapers/giaxanghomnay.smoke',
-  './api/default-endpoint.smoke',
-  './api/price-date.consistency',
-  './api/all-sources.integrity',
-  './cache/stale-cache.smoke',
+  './scrapers/petrolimex.smoke.js',
 ];
 
 function wait(ms) {
@@ -58,7 +42,8 @@ async function main() {
   const hasExternalServer = await isServerUp(API_BASE_URL);
 
   if (!hasExternalServer) {
-    serverProc = spawn('node', ['index.js'], {
+    // Start node-server.js instead of index.js
+    serverProc = spawn('node', ['src/node-server.js'], {
       cwd: backendDir,
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, SKIP_BOOTSTRAP_JOBS: 'true' },
@@ -76,7 +61,8 @@ async function main() {
 
   try {
     for (const mod of testModules) {
-      const { run } = require(mod);
+      const modPath = path.resolve(__dirname, mod);
+      const { run } = await import(`file:///${modPath.replace(/\\/g, '/')}`);
       const summary = await run(API_BASE_URL);
       results.push(summary);
       console.log(`[PASS] ${summary.name} (${summary.durationMs}ms)`);

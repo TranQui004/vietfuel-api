@@ -1,12 +1,28 @@
 {
   "name": "vietfuel-api",
-  "version": "1.0.0",
-  "description": "Vietnam fuel price API aggregating 11 official distributors",
+  "version": "1.1.0",
+  "description": "Vietnam fuel price API aggregating 11 official distributors via Cloudflare Workers",
+  "main": "backend/src/index.js",
+  "type": "module",
   "scripts": {
-    "update-mockdata": "node scripts/update-mockdata.js"
+    "dev": "wrangler dev --config wrangler.local.toml",
+    "deploy": "wrangler deploy --config wrangler.local.toml",
+    "update-mockdata": "node scripts/update-mockdata.js",
+    "cli": "node backend/src/cli.js"
   },
   "dependencies": {
+    "@hono/node-server": "^2.0.3",
+    "better-sqlite3": "^12.10.0",
+    "cheerio": "^1.2.0",
     "fs-extra": "^11.3.4",
+    "hono": "^4.12.18",
     "lucide": "^1.8.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260511.1",
+    "wrangler": "^4.91.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

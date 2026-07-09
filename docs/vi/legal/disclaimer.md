@@ -44,7 +44,7 @@ VietFuelAPI thu thập dữ liệu theo phương thức:
 
 - **Bot User-Agent công khai**: `VietFuelBot/1.0 (Community non-profit; +https://github.com/TranQui004/vietfuel-api)` — cho phép quản trị viên nguồn nhận diện và liên hệ.
 - **Tần suất hợp lý**: Theo lịch adaptive căn chỉnh theo Nghị định 80/2023/NĐ-CP (tối đa 15 phút/lần vào Thứ Năm, 4–6 tiếng các ngày khác).
-- **Không lưu trữ**: Dữ liệu cache giữ tối đa 60 phút và được làm mới định kỳ — không lưu trữ lịch sử dài hạn.
+- **Lưu trữ lịch sử**: Dữ liệu giá các kỳ điều chỉnh được lưu cục bộ trong D1/SQLite để thống kê và phân tích.
 
 ---
 

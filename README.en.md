@@ -113,6 +113,15 @@ curl https://vietfuel-api.tranqui.workers.dev/api/fuel-prices/province/ha-noi
 | `GET` | `/api/sources` | Full list of 11 sources with cache status |
 | `GET` | `/api/history` | Price history (supports `?limit=` query and `/api/history/:fuel_name` filter) |
 
+### Web UI
+
+| URL | Description |
+| :--- | :--- |
+| `/` | Home page — API overview |
+| `/live` | Live Dashboard — real-time prices from all 11 sources |
+| `/endpoints` | API Reference — full documentation |
+| `/playground` | **API Playground** — test endpoints directly in the browser |
+
 ### Sample Response
 
 ```json

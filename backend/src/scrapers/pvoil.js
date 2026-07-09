@@ -29,7 +29,7 @@
  *         3/5 sáº£n pháº©m PVOil trÃ¹ng Petrolimex (RON95, E5, DO 0,05). Fallback cuá»‘i.
  */
 
-import https from 'https';
+import https from 'node:https';
 import * as cheerio from 'cheerio';
 import { parsePrice, deduplicate, pickRandomUA } from './utils.js';
 import {

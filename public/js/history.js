@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ib === -1) ib = 99;
         return ia - ib;
       }).forEach(item => {
-        categories.push(item.name.toUpperCase());
+        categories.push(formatFuelName(item.name));
         v1Data.push(item.region1);
         v2Data.push(item.region2);
       });

@@ -253,7 +253,7 @@ async function fetchLiveData(source = currentSource, silent = false) {
     if (!json.success || !json.data) throw new Error(json.message?.[lang] || 'API Error');
 
     renderCards(source, json.data, lang, null, json.meta);
-    if (source === 'unified') renderComparisonTable(json.data, lang);
+    if (source === 'unified') renderComparisonTable(json.data, lang, json.meta);
     updateStats(json.meta, lang);
     updateStatusMeta(json.meta, lang);
     if (UI.rawJsonCode) UI.rawJsonCode.textContent = JSON.stringify(json, null, 2);

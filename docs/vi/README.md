@@ -1,4 +1,4 @@
-﻿# Tài liệu tiếng Việt
+# Tài liệu tiếng Việt
 
 Đây là chỉ mục tài liệu tiếng Việt của VietFuelAPI.
 
@@ -10,7 +10,7 @@
 ## Kiến trúc và thay đổi
 
 - Kiến trúc hệ thống: [architecture.md](architecture.md)
-- Lịch sử cập nhật: [changelog.md](changelog.md)
+- Lịch sử cập nhật: [../../CHANGELOG.md](../../CHANGELOG.md)
 
 ## Cộng đồng
 
@@ -28,6 +28,5 @@
 - Quy ước comment: [guides/comment-style.md](guides/comment-style.md)
 
 ---
-**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
-*D? �n VietFuel API*
-
+**© 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+*Dự án VietFuel API*

@@ -32,8 +32,13 @@ export async function getFuelPrices(kv, source) {
   }
 }
 
+export async function deleteFuelPrices(kv, source) {
+  try {
+    if (KEYS[source]) await kv.delete(KEYS[source]);
+  } catch (e) { /* ignore */ }
+}
+
 export async function updateFuelPrices(kv, source, data) {
-  // Lưu vào KV (Lưu vĩnh viễn hoặc gán expiration)
   await kv.put(KEYS[source], JSON.stringify(data));
 }
 

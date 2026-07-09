@@ -17,13 +17,13 @@ RUN apk add --no-cache tzdata \
 WORKDIR /app
 
 # Copy package files trước (tận dụng Docker layer cache)
-COPY backend/package*.json ./
+COPY package*.json ./
 
-# Cài đặt production dependencies (không cần playwright browsers)
+# Cài đặt production dependencies (bao gồm @hono/node-server)
 RUN npm install --omit=dev
 
-# Sao chép toàn bộ mã nguồn backend
-COPY backend/ .
+# Sao chép toàn bộ mã nguồn
+COPY . .
 
 # Expose port (mặc định 3000)
 EXPOSE 3000
@@ -32,5 +32,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
   CMD wget -qO- http://localhost:3000/api/health || exit 1
 
-# Chạy ứng dụng
-CMD ["node", "index.js"]
+# Chạy ứng dụng qua Node Server
+CMD ["node", "backend/src/node-server.js"]

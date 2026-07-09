@@ -1,5 +1,8 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const vi = `# Kiến trúc hệ thống — VietFuel API
 
@@ -15,7 +18,7 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 | :--- | :--- | :--- |
 | **Petrolimex** | Playwright (popup click) | Retry x4 |
 | KV2 / Saigon / VungTau Petrolimex | Đồng bộ mirror từ Petrolimex | — |
-| **PVOil** | **Tầng 0**: HTTP fetch IP origin \`103.21.120.100\` + header \`Host\` (bypass Cloudflare) | Tầng 1: Playwright stealth → Tầng 2: GiaXangHomNay |
+| **PVOil** | **Tầng 0**: HTTP fetch IP origin \`103.21.120.100\` + header \`Host\` (bypass Cloudflare qua HTTPS client bỏ qua xác thực SSL) | Tầng 1: Playwright stealth → Tầng 2: GiaXangHomNay |
 | **Mipec** | Playwright + fallback bài viết tin tức | GiaXangHomNay |
 | **COMECO** | **Tầng 1**: HTTP fetch + cheerio parse HTML tĩnh | Playwright |
 | **Saigon Petro** | **Tầng 1**: HTTP fetch → trích xuất \`data-list\` → gọi API \`/load-time\` động | Playwright |
@@ -39,6 +42,24 @@ VietFuel API là hệ thống thu thập và phân phối giá xăng dầu bán 
 | Disk persistence | \`cache.json\` | Persist qua restart | Ghi sau mỗi lần cập nhật |
 
 **Stale Cache Fallback**: Hệ thống vô hiệu hoá tự động xóa (\`stdTTL = 0\`). Nếu Crawler gặp sự cố, API vẫn trả về dữ liệu cũ kèm cờ \`isStale: true\`.
+
+---
+
+## Dịch vụ Cơ sở dữ liệu (\`backend/src/db/repository.js\`)
+
+Lưu trữ lịch sử tất cả các kỳ điều hành giá xăng dầu:
+- **Hệ thống lưu trữ**: Sử dụng Cloudflare D1 trên môi trường serverless và SQLite (\`better-sqlite3\`) cục bộ khi chạy Node.js server.
+- **Tương thích câu lệnh**: Sử dụng chuẩn cú pháp \`?\` tham số của SQLite tương thích giữa Cloudflare D1 và driver \`better-sqlite3\`.
+- **Tự động dọn dẹp (Auto-Pruning)**: Tự động chạy cơ chế dọn dẹp các bản ghi lịch sử có tuổi đời lớn hơn 90 ngày sau khi cào và chèn dữ liệu mới thành công.
+
+---
+
+## CLI Console Dashboard (\`backend/src/cli.js\`)
+
+Giao diện tương tác trực tiếp qua terminal cho người vận hành (không cần trình duyệt):
+- **Khởi chạy**: Bằng lệnh \`npm run cli\`.
+- **Giao diện trực quan**: Định dạng màu sắc ANSI và bảng ASCII so sánh giá 11 nhà phân phối dạng ngang gọn gàng.
+- **Tính năng đầy đủ**: Xem giá trực tiếp, tra cứu lịch sử lọc theo tên sản phẩm, kiểm tra trạng thái crawlers / đường dẫn lưu trữ cơ sở dữ liệu, xóa cache và kích hoạt cào lực lượng (force refresh).
 
 ---
 
@@ -115,7 +136,7 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 | :--- | :--- | :--- |
 | **Petrolimex** | Playwright (popup click) | Retry x4 |
 | KV2 / Saigon / VungTau Petrolimex | Mirror sync from Petrolimex | — |
-| **PVOil** | **Tier 0**: HTTP fetch origin IP \`103.21.120.100\` + \`Host\` header (Cloudflare bypass) | Tier 1: Playwright stealth → Tier 2: GiaXangHomNay text |
+| **PVOil** | **Tier 0**: HTTP fetch origin IP \`103.21.120.100\` + \`Host\` header (Cloudflare bypass via HTTPS client with disabled SSL verification) | Tier 1: Playwright stealth → Tier 2: GiaXangHomNay text |
 | **Mipec** | Playwright + news article fallback | GiaXangHomNay |
 | **COMECO** | **Tier 1**: HTTP fetch + cheerio static HTML parse | Playwright |
 | **Saigon Petro** | **Tier 1**: HTTP fetch → extract \`data-list\` → call dynamic \`/load-time\` API | Playwright |
@@ -139,6 +160,24 @@ VietFuel API aggregates real-time fuel prices in Vietnam from 11 official distri
 | Disk persistence | \`cache.json\` | Survives restarts | Written after every update |
 
 **Stale Cache Fallback**: Auto-deletion is disabled (\`stdTTL = 0\`). If the crawler fails, the API returns stale data with \`isStale: true\` instead of a 503 error.
+
+---
+
+## Database Service (\`backend/src/db/repository.js\`)
+
+Stores historical fuel price adjustments:
+- **Storage Engine**: Utilizes Cloudflare D1 in serverless production, and local SQLite (\`better-sqlite3\`) for local Node.js server runs.
+- **Parameter Compatibility**: Standardized SQL statements using standard \`?\` positional parameters to ensure cross-platform compatibility between D1 and \`better-sqlite3\`.
+- **Auto-Pruning**: Automatically prunes historical records older than 90 days after every successful scraping insert operation.
+
+---
+
+## CLI Console Dashboard (\`backend/src/cli.js\`)
+
+An interactive terminal user interface (TUI) for administrators without web browser access:
+- **Execution**: Run with command \`npm run cli\`.
+- **Rich Visualization**: Fully formatted using ANSI colors and a clean horizontal ASCII table comparing pricing from all 11 providers.
+- **Operator Menu**: Inspect live prices, search price history logs, check health status (including storage file paths), clear cache namespace, and trigger force refresh scrapes.
 
 ---
 

@@ -32,6 +32,7 @@
         <a href="/" class="nav-link nav-active" data-vi="Trang chủ" data-en="Home">Trang chủ</a>
         <a href="/endpoints" class="nav-link " data-vi="API Reference" data-en="API Reference">API Reference</a>
         <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/history" class="nav-link " data-vi="Thống kê tổng quan" data-en="Statistics Overview">Thống kê tổng quan</a>
         <a href="/test-api" class="nav-link " data-vi="Test API" data-en="Test API">Test API</a>
       </nav>
 
@@ -103,7 +104,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Open Source
+                <span data-vi="Mã nguồn mở" data-en="Open Source">Open Source</span>
               </span>
               <span class="trust-dot">·</span>
               <span class="trust-item">
@@ -111,7 +112,7 @@
                   <rect x="3" y="11" width="18" height="11" rx="2" />
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                No Auth Required
+                <span data-vi="Không cần API Key" data-en="No Auth Required">No Auth Required</span>
               </span>
               <span class="trust-dot">·</span>
               <span class="trust-item">
@@ -122,7 +123,7 @@
                 RESTful JSON
               </span>
               <span class="trust-dot">·</span>
-              <span class="trust-item">MIT License</span>
+              <span class="trust-item" data-vi="Giấy phép MIT" data-en="MIT License">MIT License</span>
             </div>
           </div>
 
@@ -137,13 +138,13 @@
               <div class="terminal-title">bash — quickstart</div>
             </div>
             <div class="terminal-body" id="hero-code-block">
-              <div><span class="arg"># Lấy dữ liệu API ngay lập tức (cURL)</span></div>
+              <div><span class="arg" data-vi="# Lấy dữ liệu API ngay lập tức (cURL)" data-en="# Fetch API data immediately (cURL)"># Lấy dữ liệu API ngay lập tức (cURL)</span></div>
               <div><span class="cmd">curl</span> <span class="arg">-X</span> GET <span
-                  class="str">"http://localhost:3000/api/fuel-prices"</span> \</div>
+                  class="str">"https://vietfuel-api.tranqui.workers.dev/api/fuel-prices"</span> \</div>
               <div> <span class="arg">-H</span> <span class="str">"Accept: application/json"</span></div>
               <br>
-              <div><span class="arg"># Gắn thẳng vào giao diện của bạn (JS Fetch)</span></div>
-              <div><span class="cmd">fetch</span>(<span class="str">'http://localhost:3000/api/fuel-prices'</span>)
+              <div><span class="arg" data-vi="# Gắn thẳng vào giao diện của bạn (JS Fetch)" data-en="# Integrate directly into your app (JS Fetch)"># Gắn thẳng vào giao diện của bạn (JS Fetch)</span></div>
+              <div><span class="cmd">fetch</span>(<span class="str">'https://vietfuel-api.tranqui.workers.dev/api/fuel-prices'</span>)
               </div>
               <div> .<span class="cmd">then</span>(res => res.<span class="cmd">json</span>())</div>
               <div> .<span class="cmd">then</span>(data => {</div>
@@ -186,31 +187,31 @@
           <!-- Right: Tech Specs -->
           <dl class="about-specs">
             <div class="spec-row">
-              <dt class="spec-key">Format</dt>
+              <dt class="spec-key" data-vi="Định dạng" data-en="Format">Format</dt>
               <dd class="spec-val">JSON / REST</dd>
             </div>
             <div class="spec-row">
-              <dt class="spec-key">Auth</dt>
-              <dd class="spec-val spec-good">Not Required</dd>
+              <dt class="spec-key" data-vi="Xác thực" data-en="Auth">Auth</dt>
+              <dd class="spec-val spec-good" data-vi="Không yêu cầu" data-en="Not Required">Not Required</dd>
             </div>
             <div class="spec-row">
-              <dt class="spec-key">Refresh</dt>
-              <dd class="spec-val">Adaptive (15m–6h)</dd>
+              <dt class="spec-key" data-vi="Làm mới" data-en="Refresh">Refresh</dt>
+              <dd class="spec-val" data-vi="Linh hoạt (15p–6h)" data-en="Adaptive (15m–6h)">Adaptive (15m–6h)</dd>
             </div>
             <div class="spec-row">
-              <dt class="spec-key">Latency</dt>
-              <dd class="spec-val">&lt;100ms (RAM cache)</dd>
+              <dt class="spec-key" data-vi="Độ trễ" data-en="Latency">Latency</dt>
+              <dd class="spec-val" data-vi="&lt;100ms (RAM cache)" data-en="&lt;100ms (RAM cache)">&lt;100ms (RAM cache)</dd>
             </div>
             <div class="spec-row">
-              <dt class="spec-key">Sources</dt>
-              <dd class="spec-val">11 Scraper Nodes</dd>
+              <dt class="spec-key" data-vi="Nguồn cấp" data-en="Sources">Sources</dt>
+              <dd class="spec-val" data-vi="11 Scraper Nodes" data-en="11 Scraper Nodes">11 Scraper Nodes</dd>
             </div>
             <div class="spec-row">
-              <dt class="spec-key">Architecture</dt>
-              <dd class="spec-val spec-good">HTTP-only (no browser)</dd>
+              <dt class="spec-key" data-vi="Kiến trúc" data-en="Architecture">Architecture</dt>
+              <dd class="spec-val spec-good" data-vi="HTTP-only (không dùng trình duyệt)" data-en="HTTP-only (no browser)">HTTP-only (no browser)</dd>
             </div>
             <div class="spec-row">
-              <dt class="spec-key">License</dt>
+              <dt class="spec-key" data-vi="Giấy phép" data-en="License">License</dt>
               <dd class="spec-val">MIT Open Source</dd>
             </div>
           </dl>
@@ -246,7 +247,7 @@
                 class="bento-code">meta.primarySource</code> trong mỗi response xác nhận rõ nguồn đang cung cấp dữ liệu
               thực tế — không cần đoán mò.
             </p>
-            <div class="bento-tag">Reliability</div>
+            <div class="bento-tag" data-vi="Độ tin cậy" data-en="Reliability">Reliability</div>
           </div>
 
           <!-- Row 1, Col 3: Small cell -->
@@ -268,7 +269,7 @@
               data-en="Automatically classifies Region 1 & 2 for all 63 provinces, including 4 split provinces with district-level boundaries.">
               Tự động phân loại Vùng 1 &amp; 2 cho 63 tỉnh thành, kể cả 4 tỉnh "bán phần" có ranh giới huyện riêng biệt.
             </p>
-            <div class="bento-tag">Coverage</div>
+            <div class="bento-tag" data-vi="Độ phủ" data-en="Coverage">Coverage</div>
           </div>
 
           <!-- Row 2, Col 1: Small cell -->
@@ -287,7 +288,7 @@
               data-en="11 sources, 11 different HTML structures — all normalized to a single JSON schema. No need to handle individual parsers.">
               11 nguồn, 11 cấu trúc HTML khác nhau — toàn bộ chuẩn hóa về 1 JSON schema. Không cần xử lý parser riêng.
             </p>
-            <div class="bento-tag">DX</div>
+            <div class="bento-tag" data-vi="Trải nghiệm PT" data-en="DX">DX</div>
           </div>
 
           <!-- Row 2, Col 2-3: Large cell -->
@@ -307,7 +308,7 @@
               Default endpoint phục vụ dữ liệu trực tiếp từ RAM cache, không có cold start, độ trễ phản hồi trung bình
               dưới 100ms. Chỉ endpoint tra cứu tỉnh thành mới thực hiện scrape on-demand.
             </p>
-            <div class="bento-tag">Performance</div>
+            <div class="bento-tag" data-vi="Hiệu suất" data-en="Performance">Performance</div>
           </div>
 
         </div>

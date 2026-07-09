@@ -32,6 +32,7 @@
         <a href="/" class="nav-link " data-vi="Trang chủ" data-en="Home">Trang chủ</a>
         <a href="/endpoints" class="nav-link nav-active" data-vi="API Reference" data-en="API Reference">API Reference</a>
         <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/history" class="nav-link " data-vi="Thống kê tổng quan" data-en="Statistics Overview">Thống kê tổng quan</a>
         <a href="/test-api" class="nav-link " data-vi="Test API" data-en="Test API">Test API</a>
       </nav>
 
@@ -106,7 +107,7 @@
           <h2 class="section-title"><span class="section-num">01</span> Base URL</h2>
           <div class="code-block">
             <div class="code-header"><span class="code-lang">HTTP</span><button class="copy-btn" data-target="base-url-code">Copy</button></div>
-            <pre id="base-url-code"><code>http://localhost:3000</code></pre>
+            <pre id="base-url-code"><code>https://vietfuel-api.tranqui.workers.dev</code></pre>
           </div>
         </section>
 
@@ -156,7 +157,7 @@
 
             <div class="code-block">
               <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep-default-js">Copy</button></div>
-              <pre id="ep-default-js"><code>const res = await fetch('http://localhost:3000/api/fuel-prices');
+              <pre id="ep-default-js"><code>const res = await fetch('https://vietfuel-api.tranqui.workers.dev/api/fuel-prices');
 const json = await res.json();
 
 console.log(json.meta.dataSources.length); // 11
@@ -168,7 +169,7 @@ console.log(json.data[0].sources);         // [{ source, region1, region2, price
               <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" data-target="ep-default-py">Copy</button></div>
               <pre id="ep-default-py"><code>import requests
 
-json = requests.get('http://localhost:3000/api/fuel-prices').json()
+json = requests.get('https://vietfuel-api.tranqui.workers.dev/api/fuel-prices').json()
 print(json['meta']['dataSources'])
 print(json['data'][0]['name'])
 print(json['data'][0]['sources'])</code></pre>
@@ -291,35 +292,44 @@ print(json['data'][0]['sources'])</code></pre>
             <table class="schema-table">
               <thead>
                 <tr>
-                  <th data-vi="NHÓM ENDPOINT" data-en="ENDPOINT GROUP">NHÓM ENDPOINT</th>
+                  <th data-vi="ENDPOINT" data-en="ENDPOINT">ENDPOINT</th>
                   <th data-vi="GIỚI HẠN" data-en="LIMIT">GIỚI HẠN</th>
+                  <th data-vi="ĐẦU ĐẾM" data-en="COUNT BY">ĐẦU ĐẾM</th>
                   <th data-vi="GHI CHÚ" data-en="NOTE">GHI CHÚ</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><code>/api/fuel-prices</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 6px;border-radius:8px;">Default</span></td>
+                  <td><code>/api/*</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 6px;border-radius:8px;">Tất cả</span></td>
                   <td><strong>60 req / phút</strong></td>
-                  <td data-vi="Endpoint mặc định tổng hợp — phục vụ từ RAM cache." data-en="Default aggregated endpoint — served from RAM cache.">Default, cache RAM</td>
-                </tr>
-                <tr>
-                  <td><code>/api/fuel-prices</code>, <code>/api/fuel-prices/:source</code>, <code>/api/provinces</code>, <code>/api/health</code></td>
-                  <td><strong>60 req / phút</strong></td>
-                  <td data-vi="Dữ liệu phục vụ từ RAM cache — độ trễ rất thấp." data-en="Served from RAM cache — very low latency.">Cache RAM, độ trễ thấp</td>
+                  <td>IP Address</td>
+                  <td data-vi="KV-backed counter, tự reset sau 60 giây." data-en="KV-backed counter, auto-resets after 60s.">KV counter, auto-reset 60s</td>
                 </tr>
                 <tr>
                   <td><code>/api/fuel-prices/province/:slug</code></td>
-                  <td><strong>20 req / phút</strong></td>
-                  <td data-vi="On-demand scraping — lần đầu mất 5–10 giây, các lần sau phục vụ từ cache thích ứng." data-en="On-demand scraping — first request 5–10s, subsequent from adaptive cache.">On-demand scraping, cache thích ứng</td>
+                  <td><strong>60 req / phút</strong></td>
+                  <td>IP Address</td>
+                  <td data-vi="On-demand scrape — lần đầu mất 3–10 giây, các lần sau phục vụ từ cache." data-en="On-demand scraping — first request 3–10s, subsequent from cache.">On-demand scraping</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <p class="note" style="margin-top: var(--space-sm);"
-             data-vi="Khi vượt giới hạn, API trả về HTTP 429 với thông báo lỗi song ngữ Việt/Anh."
-             data-en="When the limit is exceeded, the API returns HTTP 429 with a bilingual error message.">
-            Khi vượt giới hạn, API trả về HTTP 429 với thông báo lỗi.
+             data-vi="Khi vượt giới hạn, API trả về HTTP 429 với Retry-After header (60 giây) và body JSON báo lỗi."
+             data-en="When exceeded, API returns HTTP 429 with Retry-After: 60 header and a JSON error body.">
+            Khi vượt giới hạn → HTTP <code>429</code> với <code>Retry-After: 60</code>.
           </p>
+          <div class="code-block mt-sm">
+            <div class="code-header"><span class="code-lang">JSON — 429 Response</span></div>
+            <pre><code>{
+  "success": false,
+  "error": {
+    "code": 429,
+    "message": "Too Many Requests — vượt giới hạn 60 req/phút."
+  }
+}</code></pre>
+          </div>
+
         </section>
 
         <!-- 03 Other Endpoints -->
@@ -352,7 +362,7 @@ print(json['data'][0]['sources'])</code></pre>
               </p>
               <div class="code-block">
                 <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep1-fetch">Copy</button></div>
-                <pre id="ep1-fetch"><code>const res = await fetch('http://localhost:3000/api/fuel-prices');
+                <pre id="ep1-fetch"><code>const res = await fetch('https://vietfuel-api.tranqui.workers.dev/api/fuel-prices');
 const json = await res.json();
 console.log(json.data[0].name); // "Xăng RON 95-V"
 console.log(json.data[0].sources); // Array chứa giá của các hãng</code></pre>
@@ -377,7 +387,7 @@ console.log(json.data[0].sources); // Array chứa giá của các hãng</code><
               </p>
               <div class="code-block">
                 <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep2-fetch">Copy</button></div>
-                <pre id="ep2-fetch"><code>fetch('http://localhost:3000/api/fuel-prices/comeco')
+                <pre id="ep2-fetch"><code>fetch('https://vietfuel-api.tranqui.workers.dev/api/fuel-prices/comeco')
   .then(res => res.json())
   .then(data => console.log(data));</code></pre>
               </div>
@@ -402,7 +412,7 @@ console.log(json.data[0].sources); // Array chứa giá của các hãng</code><
               <div class="code-block">
                 <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" data-target="ep3-py">Copy</button></div>
                 <pre id="ep3-py"><code>import requests
-data = requests.get('http://localhost:3000/api/provinces?region=2').json()
+data = requests.get('https://vietfuel-api.tranqui.workers.dev/api/provinces?region=2').json()
 print(data)</code></pre>
               </div>
             </div>
@@ -430,7 +440,7 @@ print(data)</code></pre>
               <div class="code-block">
                 <div class="code-header"><span class="code-lang">JavaScript (Fetch)</span><button class="copy-btn" data-target="ep4-fetch">Copy</button></div>
                 <pre id="ep4-fetch"><code>// Lấy giá khu vực Hà Nội
-const res = await fetch('http://localhost:3000/api/fuel-prices/province/ha-noi');
+const res = await fetch('https://vietfuel-api.tranqui.workers.dev/api/fuel-prices/province/ha-noi');
 const data = await res.json();</code></pre>
               </div>
             </div>
@@ -457,7 +467,33 @@ const data = await res.json();</code></pre>
               </p>
               <div class="code-block">
                 <div class="code-header"><span class="code-lang">cURL</span><button class="copy-btn" data-target="ep5-curl">Copy</button></div>
-                <pre id="ep5-curl"><code>curl http://localhost:3000/api/health</code></pre>
+                <pre id="ep5-curl"><code>curl https://vietfuel-api.tranqui.workers.dev/api/health</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- EP 6 — /api/history (closed) -->
+          <div id="ep-history" class="ep-accordion">
+            <button class="ep-accordion-header" aria-expanded="false" aria-controls="ep-history-body">
+              <div class="ep-accordion-left">
+                <span class="method-badge method-get">GET</span>
+                <code class="endpoint-path">/api/history</code>
+                <span class="ep-badge-info">
+                  <i data-lucide="database" width="10" height="10"></i>
+                  Database
+                </span>
+              </div>
+              <i data-lucide="chevron-down" width="18" height="18" class="ep-chevron"></i>
+            </button>
+            <div class="ep-accordion-body" id="ep-history-body">
+              <p class="endpoint-desc"
+                 data-vi="Lấy lịch sử biến động giá xăng dầu đã lưu trong hệ thống."
+                 data-en="Get historical fuel price fluctuations stored in the system database.">
+                Lấy lịch sử biến động giá xăng dầu đã được lưu trong cơ sở dữ liệu.
+              </p>
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">cURL</span><button class="copy-btn" data-target="ep6-curl">Copy</button></div>
+                <pre id="ep6-curl"><code>curl "https://vietfuel-api.tranqui.workers.dev/api/history?limit=10"</code></pre>
               </div>
             </div>
           </div>
@@ -482,6 +518,8 @@ const data = await res.json();</code></pre>
                 <tr><td><code>primarySource</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices/:source</span></td><td>String</td><td data-vi="Tên nguồn chính đang cung cấp dữ liệu" data-en="Primary source currently providing data">Nguồn dữ liệu chính</td></tr>
                 <tr><td><code>primarySourceUrl</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices/:source</span></td><td>String</td><td data-vi="URL của nguồn chính" data-en="URL of the primary source">URL nguồn chính</td></tr>
                 <tr><td><code>dataSources</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices</span></td><td>String[]</td><td data-vi="Danh sách tất cả các nguồn (hãng) đã đóng góp vào kết quả" data-en="All sources that contributed to the result">Các nguồn tổng hợp</td></tr>
+                <tr><td><code>sourceCount</code> <span style="font-size:0.7em;background:rgba(245,158,11,0.15);color:var(--accent);padding:1px 5px;border-radius:6px;">/api/fuel-prices</span></td><td>Number</td><td data-vi="Số nguồn thực tế đã đóng góp dữ liệu (tối đa 11)" data-en="Actual source count contributing data (max 11)">Số nguồn thực tế</td></tr>
+
                 <tr><td><code>source</code></td><td>String</td><td data-vi="Tên nguồn dữ liệu (ở API per-source hoặc bên trong mảng lồng)" data-en="Data source name">Tên nguồn</td></tr>
                 <tr><td><code>sourceUrl</code></td><td>String</td><td data-vi="URL gốc của nguồn dữ liệu" data-en="Official source URL">URL nguồn</td></tr>
                 <tr><td><code>scrapedAt</code></td><td>ISO 8601</td><td data-vi="Thời điểm hệ thống thu thập dữ liệu (UTC)" data-en="When data was collected (UTC)">Thời điểm thu thập</td></tr>

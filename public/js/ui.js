@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -206,4 +206,58 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('load', drawBeams);
     }
 });
+
+/* ── GITHUB STAR COUNT (Tất cả trang) ───────────────────── */
+/**
+ * Hiển thị số star GitHub trên tất cả nút .github-btn.
+ * - Cache trong sessionStorage 10 phút để không spam GitHub API.
+ * - Hiện badge ⭐ N ngay bên cạnh icon GitHub.
+ */
+(async function loadGithubStars() {
+  const REPO      = 'TranQui004/vietfuel-api';
+  const CACHE_KEY = 'gh-stars-vietfuel';
+  const CACHE_TTL = 10 * 60 * 1000; // 10 phút
+
+  let starCount = null;
+
+  // Thử lấy từ sessionStorage cache
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
+    if (cached && (Date.now() - cached.ts) < CACHE_TTL) {
+      starCount = cached.count;
+    }
+  } catch (_) {}
+
+  // Nếu chưa có cache, gọi GitHub public API (không cần token, rate: 60 req/h/IP)
+  if (starCount === null) {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO}`, {
+        headers: { 'Accept': 'application/vnd.github+json' },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        starCount = data.stargazers_count ?? 0;
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify({ count: starCount, ts: Date.now() }));
+        } catch (_) {}
+      }
+    } catch (_) {}
+  }
+
+  if (starCount === null) return; // Không hiển thị nếu thất bại
+
+  // Định dạng: >= 1000 → "1.2k"
+  const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+
+  // Inject badge vào tất cả .github-btn (tránh trùng lặp)
+  document.querySelectorAll('.github-btn').forEach((btn) => {
+    if (btn.querySelector('.gh-star-badge')) return;
+    const badge = document.createElement('span');
+    badge.className = 'gh-star-badge';
+    badge.setAttribute('aria-label', `${starCount} GitHub stars`);
+    badge.innerHTML =
+      `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="margin-right:3px;vertical-align:-1px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>${fmt(starCount)}`;
+    btn.appendChild(badge);
+  });
+})();
 

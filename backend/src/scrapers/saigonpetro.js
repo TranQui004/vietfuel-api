@@ -74,12 +74,18 @@ async function scrapeViaHttp() {
       }
     });
 
-    // Lấy ngày từ API response trước ("Kể từ 15 giờ 00 ngày 29 tháng 04 năm 2026")
+    // Lấy ngày từ API response trước ("Kể từ 16 gio 00 phút ngày 02.07.2026" hoặc "ngày 29 tháng 04 năm 2026")
     const apiText = $p.root().text();
-    const apiDateMatch = apiText.match(/ngày\s*(\d{1,2})\s*tháng\s*(\d{1,2})\s*năm\s*(\d{4})/i);
-    const apiDate = apiDateMatch
-      ? `${apiDateMatch[1].padStart(2,'0')}/${apiDateMatch[2].padStart(2,'0')}/${apiDateMatch[3]}`
-      : null;
+    let apiDate = null;
+    const dmyMatch = apiText.match(/ngày\s*(\d{1,2})[\.\/](\d{1,2})[\.\/](\d{4})/i);
+    if (dmyMatch) {
+      apiDate = `${dmyMatch[1].padStart(2,'0')}/${dmyMatch[2].padStart(2,'0')}/${dmyMatch[3]}`;
+    } else {
+      const apiDateMatch = apiText.match(/ngày\s*(\d{1,2})\s*tháng\s*(\d{1,2})\s*năm\s*(\d{4})/i);
+      if (apiDateMatch) {
+        apiDate = `${apiDateMatch[1].padStart(2,'0')}/${apiDateMatch[2].padStart(2,'0')}/${apiDateMatch[3]}`;
+      }
+    }
 
     // Fallback từ trang chính
     const fullText = $.root().text();
@@ -96,50 +102,14 @@ async function scrapeViaHttp() {
   }
 }
 
-/**
- * Tầng 2: Fallback Playwright.
- */
-async function scrapeViaBrowser() {
-  const { browser, context } = await createBrowser();
-  try {
-    const page = await context.newPage();
-    await page.goto(SP_PAGE_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await page.waitForTimeout(2000);
-    const rawData = await page.evaluate(() => {
-      const rows = document.querySelectorAll('table tr');
-      const results = [];
-      let dateFound = null;
-      for (const row of rows) {
-        if (!dateFound && row.innerText.includes('Kể Từ')) {
-          const match = row.innerText.match(/Ngày (\d{1,2}) Tháng (\d{1,2}) Năm (\d{4})/i);
-          if (match) dateFound = `${match[1].padStart(2, '0')}/${match[2].padStart(2, '0')}/${match[3]}`;
-        }
-        const cls = row.querySelectorAll('td');
-        if (cls.length >= 3) {
-          results.push({ name: cls[1].innerText.trim(), rawPrice: cls[2].innerText.trim() });
-        }
-      }
-      const bodyText = document.body.innerText || '';
-      const contextualDate = bodyText.match(/(?:Kể\s*Từ|Kể\s*từ)[^\n]{0,120}?(\d{1,2}\/\d{1,2}\/\d{4})/i);
-      const dateCandidates = Array.from(bodyText.matchAll(/(\d{1,2}\/\d{1,2}\/\d{4})/g)).map(m => m[1]);
-      return { priceRows: results, contextualDateTxt: contextualDate ? contextualDate[1] : dateFound, dateCandidates };
-    });
-    return rawData;
-  } finally {
-    await browser.close().catch(() => {});
-  }
-}
-
 async function scrapeSaigonPetro() {
   const start = Date.now();
   let rawData;
   try {
-    console.log('[Scraper:SaigonPetro] Thử HTTP fetch + API động (không cần browser)...');
+    console.log('[Scraper:SaigonPetro] Đang tải dữ liệu qua HTTP fetch + API động...');
     rawData = await scrapeViaHttp();
-    console.log('[Scraper:SaigonPetro] HTTP fetch thành công.');
   } catch (httpErr) {
-    console.warn(`[Scraper:SaigonPetro] HTTP thất bại (${httpErr.message}), chuyển sang Playwright...`);
-    rawData = await scrapeViaBrowser();
+    throw new Error(`[Scraper:SaigonPetro] Lỗi HTTP fetch: ${httpErr.message}`);
   }
 
   const prices = deduplicate(rawData.priceRows.map(p => ({

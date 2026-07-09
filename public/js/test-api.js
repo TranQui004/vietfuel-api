@@ -12,7 +12,18 @@ const ENDPOINTS = {
     path: '/api/fuel-prices',
     desc_vi: 'Lấy giá xăng dầu tổng hợp từ tất cả 11 nguồn, chuẩn hóa về 1 schema duy nhất.',
     desc_en: 'Get unified fuel prices from all 11 sources, normalized to a single schema.',
-    params: [],
+    params: [
+      { name: 'refresh', label: 'refresh', type: 'boolean', desc_vi: 'Bỏ qua cache', default: '' }
+    ],
+  },
+  history: {
+    path: '/api/history',
+    desc_vi: 'Lấy lịch sử giá xăng dầu đã được lưu trong Database.',
+    desc_en: 'Get historical fuel prices from the Database.',
+    params: [
+      { name: 'limit', label: 'limit', type: 'number', default: '100' },
+      { name: 'source', label: 'source', type: 'string', default: '' }
+    ],
   },
   petrolimex: {
     path: '/api/fuel-prices/petrolimex',
@@ -48,6 +59,36 @@ const ENDPOINTS = {
     path: '/api/fuel-prices/petrotimes',
     desc_vi: 'Lấy giá từ Petrotimes — parse HTML từ API get-petro nội bộ.',
     desc_en: 'Get prices from Petrotimes — parse HTML from internal get-petro API.',
+    params: [],
+  },
+  webgia: {
+    path: '/api/fuel-prices/webgia',
+    desc_vi: 'Lấy giá từ WebGia — mirror dữ liệu Petrolimex, nồn chất HTML trang tuyển.',
+    desc_en: 'Get prices from WebGia — Petrolimex mirror, scrapes HTML page.',
+    params: [],
+  },
+  giaxanghomnay: {
+    path: '/api/fuel-prices/giaxanghomnay',
+    desc_vi: 'Lấy giá từ GiaXangHomNay — nguồn dữ liệu tỉnh/thành toàn quốc.',
+    desc_en: 'Get prices from GiaXangHomNay — nationwide province data source.',
+    params: [],
+  },
+  kv2_petrolimex: {
+    path: '/api/fuel-prices/kv2_petrolimex',
+    desc_vi: 'Lấy giá từ Petrolimex KV2 (miền Bắc) — dữ liệu clone từ Petrolimex gốc.',
+    desc_en: 'Get prices from Petrolimex KV2 (North region) — data cloned from main Petrolimex.',
+    params: [],
+  },
+  saigon_petrolimex: {
+    path: '/api/fuel-prices/saigon_petrolimex',
+    desc_vi: 'Lấy giá từ Petrolimex SÀI GÒN — dữ liệu clone từ Petrolimex gốc.',
+    desc_en: 'Get prices from Petrolimex SAIGON — data cloned from main Petrolimex.',
+    params: [],
+  },
+  vungtau_petrolimex: {
+    path: '/api/fuel-prices/vungtau_petrolimex',
+    desc_vi: 'Lấy giá từ Petrolimex VŨNG TÀU — dữ liệu clone từ Petrolimex gốc.',
+    desc_en: 'Get prices from Petrolimex VUNG TAU — data cloned from main Petrolimex.',
     params: [],
   },
   province: {
@@ -132,6 +173,7 @@ const UI = {
 let currentEp    = 'unified';
 let currentTab   = 'curl';
 let lastResponse = null;
+let isCollapsed  = false;
 
 /* ── Init ────────────────────────────────────────────── */
 function init() {
@@ -147,7 +189,14 @@ function init() {
 
   UI.copyBtn.addEventListener('click', copyResponse);
   UI.collapseBtn.addEventListener('click', function() {
-    if (lastResponse) renderJson(lastResponse);
+    if (!lastResponse) return;
+    isCollapsed = !isCollapsed;
+    updateCollapseBtn();
+    if (isCollapsed) {
+      renderJsonCollapsed(lastResponse);
+    } else {
+      renderJson(lastResponse);
+    }
   });
 
   UI.tabs.forEach(function(tab) {
@@ -268,9 +317,12 @@ function showResponse(status, ms, bytes, json, rawText) {
   UI.responseMeta.style.display  = 'flex';
   UI.copyBtn.style.display       = '';
   UI.collapseBtn.style.display   = json ? '' : 'none';
+  // Mặc định thu gọn mỗi khi có phản hồi mới
+  isCollapsed = true;
+  updateCollapseBtn();
 
   if (json !== null) {
-    renderJson(json);
+    renderJsonCollapsed(json);
   } else {
     UI.responseBody.innerHTML = '<pre class="pg-json">' + escHtml(rawText) + '</pre>';
   }
@@ -288,6 +340,37 @@ function showError(msg, ms) {
 function renderJson(data) {
   var raw = JSON.stringify(data, null, 2);
   UI.responseBody.innerHTML = '<div class="pg-json">' + syntaxHighlight(raw) + '</div>';
+}
+
+function renderJsonCollapsed(data) {
+  var raw   = JSON.stringify(data, null, 2);
+  var lines = raw.split('\n');
+  var MAX   = 20;
+  if (lines.length <= MAX) {
+    // Không đủ dài để collapse
+    isCollapsed = false;
+    updateCollapseBtn();
+    UI.responseBody.innerHTML = '<div class="pg-json">' + syntaxHighlight(raw) + '</div>';
+    return;
+  }
+  var preview = lines.slice(0, MAX).join('\n');
+  UI.responseBody.innerHTML =
+    '<div class="pg-json">' + syntaxHighlight(preview) +
+    '</div><div class="pg-collapse-hint" style="color:var(--text-muted,#666);padding:8px 16px;font-size:0.8rem;border-top:1px solid rgba(255,255,255,0.06);cursor:pointer" onclick="document.getElementById(\'pgCollapseBtn\').click()">' +
+    '\u22ef ' + (lines.length - MAX) + ' dòng bị ẩn — click để mở rộng</div>';
+}
+
+function updateCollapseBtn() {
+  if (!UI.collapseBtn) return;
+  if (isCollapsed) {
+    UI.collapseBtn.innerHTML =
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>' +
+      '<span data-vi="Mở rộng" data-en="Expand">Mở rộng</span>';
+  } else {
+    UI.collapseBtn.innerHTML =
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="21" y2="3"/><line x1="3" y1="21" x2="14" y2="10"/></svg>' +
+      '<span data-vi="Thu gọn" data-en="Collapse">Thu gọn</span>';
+  }
 }
 
 function syntaxHighlight(str) {

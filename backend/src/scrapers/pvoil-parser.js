@@ -10,27 +10,49 @@
 
 import { parsePrice, deduplicate, pickMostLikelyPriceDate } from './utils.js';
 
-// Chuẩn hóa về bộ sản phẩm PVOIL cốt lõi để tránh lẫn dữ liệu từ brand khác.
+// Danh sách sản phẩm chính thức niêm yết tại pvoil.com.vn.
+// Nguồn tham khảo: https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram
+// API /api/oilprice/load-view trả về bảng giá bán lẻ với cột:
+// STT | Tên sản phẩm | Giá (VND/lít) | Biến động
+// 5 sản phẩm thực tế (xác nhận 15/05/2026):
+// 1. Xăng RON 95-III
+// 2. Xăng E10 RON 95-III   ← sản phẩm mới (E10 thay thế E5 trong nhóm RON 95)
+// 3. Xăng E5 RON 92-II
+// 4. Dầu DO 0,05S-II
+// 5. Dầu DO 0,001S-V       ← dầu diesel siêu sạch (thêm mới)
 const PRODUCT_SPECS = [
   {
     name: 'Xăng RON 95-III',
-    matcher: /xăng\s*ron\s*95\s*[-–]?\s*iii\b/i,
+    matcher: /xăng\s*ron\s*95\s*[-–]?\s*iii\b(?!\s*e)/i,  // không match E10 RON 95
+  },
+  {
+    name: 'Xăng E10 RON 95-III',
+    matcher: /xăng\s*e10\s*ron\s*95\s*[-–]?\s*iii\b/i,
   },
   {
     name: 'Xăng E5 RON 92-II',
     matcher: /xăng\s*e5\s*ron\s*92\s*[-–]?\s*ii\b/i,
   },
   {
-    name: 'Dầu DO 0,05S-II',
+    name: 'DO 0,05S-II',
+    // Chuẩn hóa: cả "Dầu DO 0,05S-II" và "DO 0,05S-II" đều map về tên này
     matcher: /(dầu\s*)?do\s*0[,.]?05\s*s?\s*[-–]?\s*ii\b/i,
   },
   {
+    name: 'DO 0,001S-V',
+    // Dầu diesel siêu sạch DO 0,001S-V (Euro 5)
+    matcher: /(dầu\s*)?do\s*0[,.]?001\s*s?\s*[-–]?\s*v\b/i,
+  },
+  // Fallback: có thể PVOil thêm lại sau này
+  {
     name: 'Dầu hỏa 2-K',
-    matcher: /(dầu\s*(ko|kero|hỏa|hoa|2\s*[-–]?\s*k))\b/i,
+    // "dầu hỏa", "dầu 2-K", "kerosene 2-K", "Dầu KO" (GXHN notation)
+    matcher: /(dầu\s*(hỏa|hoa|2\s*[-–]?\s*k|ko)|kerosene\s*2[-–]?k)\b/i,
   },
   {
     name: 'Dầu Mazut 180CST 3.5S',
-    matcher: /(mazut|fo|180\s*cst|3[,.]?5\s*s)\b/i,
+    // Chỉ match mazut/FO 180 — không match "3.5S" đơn độc vì trùng với giá DO
+    matcher: /(mazut|fo\s*180|180\s*cst)\b/i,
   },
 ];
 
@@ -173,5 +195,7 @@ export {
   extractDateFromText,
   findPvoilSection,
   extractPvoilPricesFromText,
+  mapLineToCanonical,
+  PRODUCT_SPECS,
  };
 

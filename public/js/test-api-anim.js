@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -37,12 +37,12 @@ const kvi = (key, val, comma = true) =>     // indented (4 spaces)
 
 /* ── COMMANDS ─────────────────────────────── */
 const CMDS = [
-  /* 0 */ `curl -s "http://localhost:3000/api/health"`,
-  /* 1 */ `curl -s "http://localhost:3000/api/fuel-prices" \\\n  -H "Accept: application/json"`,
-  /* 2 */ `curl -s "http://localhost:3000/api/fuel-prices/comeco"`,
-  /* 3 */ `curl -s "http://localhost:3000/api/fuel-prices/pvoil"`,
-  /* 4 */ `curl -s "http://localhost:3000/api/provinces?region=1"`,
-  /* 5 */ `curl -s "http://localhost:3000/api/fuel-prices/province/ho-chi-minh"`,
+  /* 0 */ `curl -s "${window.location.origin}/api/health"`,
+  /* 1 */ `curl -s "${window.location.origin}/api/fuel-prices" \\\n  -H "Accept: application/json"`,
+  /* 2 */ `curl -s "${window.location.origin}/api/fuel-prices/comeco"`,
+  /* 3 */ `curl -s "${window.location.origin}/api/fuel-prices/pvoil"`,
+  /* 4 */ `curl -s "${window.location.origin}/api/provinces?region=1"`,
+  /* 5 */ `curl -s "${window.location.origin}/api/fuel-prices/province/ho-chi-minh"`,
 ];
 
 /* ── JSON BLOCKS ──────────────────────────── */

@@ -5,7 +5,36 @@
 
 ---
 
-## [Unreleased] — 2026-05-14 (latest)
+## [4.0.0] — 2026-07-09 (latest)
+
+### 🖥️ CLI Console Dashboard
+- **Interactive CLI Dashboard (`npm run cli`):** Created a terminal-based visual dashboard application utilizing ANSI terminal colors and ASCII grid tables for administrators to inspect prices, query logs, review health/storage state, and clear KV caches without browser access.
+
+### 📊 Price History & Auto-Pruning (SQLite)
+- **Auto-Pruning:** Added automatic cleanups of historical database records older than 90 days after successful price scrapes.
+- **SQLite Parameter Compatibility:** Replaced all numbered SQL bindings (`?1`, `?2`) with standard positional parameters (`?`) to ensure better-sqlite3 driver compatibility and resolve RangeErrors.
+
+### ⚡ API & Cache Enhancements
+- **Storage Paths in Health Check:** Enhanced `/api/health` to expose active storage engine locations (cache.json and history.db absolute paths).
+- **Dynamic Province Cache Clearing:** Wiped all province-level cache namespaces dynamically on `/api/clear-cache` using prefix KV list lookups.
+
+### 🔄 Scrapers
+- **PVOil Cloudflare Bypass (Tier 0):** Configured a native Node `https` requester with `rejectUnauthorized: false` to bypass SSL altname validation issues on direct raw origin IP requests.
+- **Saigon Petro Date Matcher:** Updated date parser regex to accept dot-separated date formatting (e.g. `02.07.2026`).
+
+---
+
+## [3.1.0] — 2026-05-21
+
+### 📊 Price History & Statistics (D1 SQLite)
+- **Cloudflare D1 / SQLite Integration:** Added database for storing historical fuel price adjustments (`backend/src/db/repository.js`).
+- **New Endpoint `/api/history`:** Supports historical data retrieval with `limit` (default 500) and fuel name filtering.
+- **Statistics Dashboard (`/history`)**: Uses **ApexCharts** to plot a Grouped Column chart comparing Region 1 vs Region 2 prices across fuel types in the latest period. Includes a detailed data table with **Filtering** (by source) and **Sorting** capabilities covering all 11 sources.
+- **Code Comment Standardization**: Cleaned up verbose comments and improved readability.
+
+---
+
+## [3.0.0] — 2026-05-14
 
 ### 🏓 API Playground — Replaces Swagger UI
 

@@ -5,7 +5,40 @@
 
 ---
 
-## [Unreleased] — 2026-05-14 (latest)
+## [4.0.0] — 2026-07-09 (latest)
+
+### 🖥️ CLI Console Dashboard
+- **Interactive CLI Dashboard (`npm run cli`):** Created a terminal-based visual dashboard application utilizing ANSI terminal colors and ASCII grid tables for administrators to inspect prices, query logs, review health/storage state, and clear KV caches without browser access.
+
+### 📊 Lịch sử Giá & Dọn dẹp Tự động (SQLite)
+- **Tự động dọn dẹp lịch sử (Auto-Pruning):** Bổ sung cơ chế tự động dọn dẹp các bản ghi lịch sử lớn hơn 90 ngày sau khi cào và chèn dữ liệu mới thành công.
+- **Tương thích driver SQLite:** Chuyển đổi toàn bộ câu lệnh SQLite sang dạng positional parameters (`?`) chuẩn để loại bỏ lỗi `RangeError` trên driver `better-sqlite3`.
+
+### ⚡ Cải thiện Hệ thống API & Cache
+- **Đường dẫn lưu trữ Health Check:** Endpoint `/api/health` được nâng cấp trả về thêm thông tin chi tiết về loại cache và đường dẫn thư mục lưu trữ cơ sở dữ liệu.
+- **Bổ sung dọn dẹp Cache động:** Endpoint `/api/clear-cache` hỗ trợ xóa động toàn bộ các namespace của cache tỉnh thành (`province:*`) thông qua cơ chế liệt kê prefix.
+
+### 🔄 Scrapers
+- **PVOil bypass Cloudflare (Tầng 0):** Cấu hình module `https` nội bộ Node để bỏ qua xác thực SSL altname (`rejectUnauthorized: false`), cho phép fetch trực tiếp bảng giá từ IP origin `103.21.120.100` thành công 100%.
+- **Saigon Petro Date Regex:** Sửa biểu thức chính quy của Saigon Petro để nhận diện các định dạng ngày phân tách bằng dấu chấm (VD: `ngày 02.07.2026`).
+
+---
+
+## [3.1.0] — 2026-05-21
+
+### 📊 Lịch sử Giá & Thống Kê (D1 SQLite)
+- **Tích hợp Cloudflare D1 / SQLite:** Bổ sung database lưu trữ lịch sử các kỳ điều chỉnh giá xăng dầu (`backend/src/db/repository.js`).
+- **Endpoint mới `/api/history`:** Hỗ trợ truy xuất lịch sử với tham số `limit` (mặc định 500) và filter theo tên nhiên liệu.
+### Giao diện (Frontend)
+- Làm lại toàn bộ giao diện trang **Lịch sử Giá** (`/history`) thành **Thống kê Tổng quan**.
+- Chuyển đổi biểu đồ Line/Area cũ sang **Grouped Column Chart** để theo dõi giá Vùng 1 / Vùng 2 rõ ràng hơn.
+- Thêm tính năng **Lọc (Filter)** theo nguồn và **Sắp xếp (Sort)** cột thông minh.
+- Loại bỏ các tính năng chọn kỳ lọc không còn cần thiết. Bảng dữ liệu chi tiết thống kê đầy đủ 11 nguồn.
+- **Chuẩn hóa Comment Code**: Cải thiện mức độ dễ đọc, tinh gọn các bình luận rườm rà.
+
+---
+
+## [3.0.0] — 2026-05-14
 
 ### 🏓 API Playground — Thay thế Swagger UI
 

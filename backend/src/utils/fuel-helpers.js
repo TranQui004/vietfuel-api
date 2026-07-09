@@ -162,6 +162,7 @@ function normalizeName(name = '') {
     n = n.replace('sinh học ', '').replace('không chì ', '');
   }
   n = n.replace(' mức 2', '-ii').replace(' mức 3', '-iii').replace(' mức 5', '-v');
+  n = n.replace(/-2\b/g, '-ii').replace(/-3\b/g, '-iii').replace(/-5\b/g, '-v');
   if (n.includes('điêzen') || n.includes('diezel') || n.includes('dầu do')) {
     n = n.replace(/dầu điêzen|điêzen|diezel|dầu do/g, 'do');
   }
@@ -256,7 +257,7 @@ async function buildDefaultPrices(kv) {
 
     dataSourcesList.push(key);
 
-    if (!primaryKey && ['petrolimex', 'comeco', 'saigonpetro', 'giaxanghomnay'].includes(key)) {
+    if (!primaryKey && ['petrolimex', 'kv2_petrolimex', 'saigon_petrolimex', 'vungtau_petrolimex', 'giaxanghomnay'].includes(key)) {
       primaryKey = key;
       scrapedAt = d.scrapedAt;
     }
@@ -270,10 +271,20 @@ async function buildDefaultPrices(kv) {
         fuelMap.set(normName, {
           name: item.name,
           unit: item.unit || 'VND/lít',
+          region1: null,
+          region2: null,
           sources: [],
         });
       }
-      fuelMap.get(normName).sources.push({
+      
+      const fuelItem = fuelMap.get(normName);
+      // Lift region1/region2 from the primary source (or first available if not set yet)
+      if (key === primaryKey || (!fuelItem.region1 && item.region1)) {
+        fuelItem.region1 = item.region1 ?? fuelItem.region1;
+        fuelItem.region2 = item.region2 ?? fuelItem.region2;
+      }
+
+      fuelItem.sources.push({
         source: key,
         region1: item.region1 ?? null,
         region2: item.region2 ?? null,
@@ -294,6 +305,7 @@ async function buildDefaultPrices(kv) {
     prices: sortedPrices,
     primarySourceKey: primaryKey || dataSourcesList[0],
     dataSources: dataSourcesList,
+    sourceCount: dataSourcesList.length,   // số nguồn thực tế đóng góp dữ liệu
     priceDate,
     scrapedAt: scrapedAt || new Date().toISOString(),
     cacheHit: primaryStats.hit,

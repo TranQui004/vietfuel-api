@@ -70,42 +70,14 @@ async function scrapeViaHttp() {
   }
 }
 
-/**
- * Tầng 2: Fallback Playwright.
- */
-async function scrapeViaBrowser() {
-  const { browser, context } = await createBrowser();
-  try {
-    const page = await context.newPage();
-    await page.goto(PETROTIMES_API_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    return await page.evaluate(() => {
-      const res = [];
-      const rows = document.querySelectorAll('.table-item');
-      for (const row of rows) {
-        const ps = row.querySelectorAll('p');
-        if (ps.length >= 3) {
-          const name = ps[0].innerText.trim();
-          if (/Sản phẩm/i.test(name)) continue;
-          res.push({ name, p1: ps[1].innerText.trim(), p2: ps[2].innerText.trim() });
-        }
-      }
-      return res;
-    });
-  } finally {
-    await browser.close().catch(() => {});
-  }
-}
-
 async function scrapePetrotimes() {
   const start = Date.now();
   let rawResults;
   try {
-    console.log('[Scraper:Petrotimes] Thử HTTP fetch nội bộ API (không cần browser)...');
+    console.log('[Scraper:Petrotimes] Đang tải dữ liệu qua HTTP fetch nội bộ API...');
     rawResults = await scrapeViaHttp();
-    console.log('[Scraper:Petrotimes] HTTP fetch thành công.');
   } catch (httpErr) {
-    console.warn(`[Scraper:Petrotimes] HTTP thất bại (${httpErr.message}), chuyển sang Playwright...`);
-    rawResults = await scrapeViaBrowser();
+    throw new Error(`[Scraper:Petrotimes] Lỗi HTTP fetch: ${httpErr.message}`);
   }
 
   const parsedObj = deduplicate(rawResults.map(r => ({

@@ -136,9 +136,7 @@ async function fetchLiveData() {
   const metaEn = 'Fetching data...';
   liveMetaText.textContent = currentLang === 'vi' ? metaVi : metaEn;
 
-  const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:3000' 
-    : 'http://localhost:3000'; // [GHI CHÚ] Đổi sang domain production khi triển khai.
+  const API_BASE_URL = window.location.origin;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/fuel-prices`);
@@ -184,12 +182,12 @@ async function fetchLiveData() {
     if (currentLang === 'vi') {
       liveMetaText.textContent = 'Không thể tải dữ liệu.';
       document.getElementById('liveErrorMsg').textContent =
-        'Không thể tải dữ liệu. Hãy đảm bảo server đang chạy trên cổng 3000.';
+        'Không thể tải dữ liệu. Hãy đảm bảo API server đang hoạt động.';
       retryBtn.textContent = 'Thử lại';
     } else {
       liveMetaText.textContent = 'Could not load data.';
       document.getElementById('liveErrorMsg').textContent =
-        'Could not load data. Make sure the server is running on port 3000.';
+        'Could not load data. Make sure the API server is running.';
       retryBtn.textContent = 'Retry';
     }
   }

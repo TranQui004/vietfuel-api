@@ -8,133 +8,145 @@
  */
 'use strict';
 
-/* ==========================================================================
- * [SCRAPER] - PVOIL
- * Chiến lược 4 tầng (tối ưu RAM + độ ổn định):
- *   0. [PRIMARY] Bypass Cloudflare qua IP gốc + header Host — không cần browser.
- *      Kỹ thuật tham khảo từ bài blog "Xây dựng Vietfuel API phiên bản ít RAM"
- *      của tác giả toidicakhia (https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram).
- *   1. Cào trực tiếp pvoil.com.vn với kỹ thuật stealth hợp pháp.
- *   2. Fallback văn bản qua giaxanghomnay.com (trung gian tổng hợp công khai).
- *   3. Fallback HTTP fetch nhẹ qua một trang tổng hợp khác (petrotimes rss).
- * Dự án phi lợi nhuận/cộng đồng — không xâm phạm hệ thống gốc, chỉ đọc
- * dữ liệu công khai như người dùng bình thường.
- * ========================================================================== */
+/**
+ * [SCRAPER: PVOil] â€” Chiáº¿n lÆ°á»£c 4 táº§ng
+ *
+ * Táº§ng 0: HTTPS IP origin bypass (103.21.120.100, cert há»£p lá»‡).
+ *         API: GET /api/oilprice/load-view â€” tráº£ HTML báº£ng giÃ¡.
+ *         **5 sáº£n pháº©m bÃ¡n láº»**: RON 95-III, E10 RON 95-III, E5 RON 92-II,
+ *         DO 0,05S-II, DO 0,001S-V. KhÃ´ng cÃ³ Mazut vÃ  Dáº§u há»a (bÃ¡n buÃ´n riÃªng).
+ *         Credit: https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram
+ *
+ * Táº§ng 1: Fetch trá»±c tiáº¿p pvoil.com.vn + stealth headers (thÆ°á»ng bá»‹ CF cháº·n).
+ *
+ * Táº§ng 2: giaxanghomnay.com JSON API â€” GET /api/pvdate/{YYYY-MM-DD}
+ *         Tráº£ array: [0]=Petrolimex, [1]=PVOil, [2]=Petrolimex_hÃ´m_qua, [3]=PVOil_hÃ´m_qua
+ *         PVOil items: { title, price }  â€” **4/5 sáº£n pháº©m** (thiáº¿u Mazut 180CST).
+ *         Mazut lÃ  sáº£n pháº©m cÃ´ng nghiá»‡p, chá»‰ GXHN khÃ´ng niÃªm yáº¿t.
+ *         ÄÃ¢y lÃ  source fallback Ä‘Ã¡ng tin cáº­y nháº¥t khi pvoil.com.vn bá»‹ CF block.
+ *
+ * Táº§ng 3: petrotimesgroup.com/site/get-petro â€” HTML tÄ©nh SSR, giÃ¡ Petrolimex.
+ *         3/5 sáº£n pháº©m PVOil trÃ¹ng Petrolimex (RON95, E5, DO 0,05). Fallback cuá»‘i.
+ */
 
-
-
+import https from 'https';
 import * as cheerio from 'cheerio';
-import { pickRandomUA,
-  humanDelay,
-  BOT_UA,
-  parsePrice,
-  deduplicate,
-  toISODate, } from './utils.js';
-import { isAntiBotPage,
+import { parsePrice, deduplicate, pickRandomUA } from './utils.js';
+import {
+  isAntiBotPage,
   extractDateFromText,
-  findPvoilSection,
-  extractPvoilPricesFromText, } from './pvoil-parser.js';
+  extractPvoilPricesFromText,
+  mapLineToCanonical,
+} from './pvoil-parser.js';
 
-/**
- * Lấy văn bản một URL công khai qua HTTPS thuần (không headless).
- * Dùng BOT_UA rõ ràng  quản trị viên nguồn có thể nhận diện và liên hệ nếu cần.
- */
-async function fetchPublicText(url, timeoutMs = 15000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, {
-      signal: controller.signal,
+function httpsGetBypass(url, hostHeader) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const options = {
+      hostname: urlObj.hostname,
+      port: urlObj.port || 443,
+      path: urlObj.pathname + urlObj.search,
+      method: 'GET',
       headers: {
-        'User-Agent': BOT_UA,
+        'Host': hostHeader,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Cache-Control': 'no-cache',
-        'X-Bot-Info': 'VietFuelBot non-profit; github.com/TranQui004/vietfuel-api',
-      }
-    });
-    return await res.text();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function scrapeFromOriginIP() {
-  /**
-   * Tầng 0: Bypass Cloudflare bằng cách truy cập thẳng IP origin của PVOil.
-   * Bảng HTML có 4 cột: STT | Tên sản phẩm | Giá | Biến động
-   * PVOil chỉ có 1 vùng giá duy nhất (không phân Vùng 1/2).
-   *
-   * Credit: toidicakhia (https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram)
-   */
-  const PVOIL_ORIGIN_IP = '103.21.120.100';
-  const PVOIL_API_PATH = '/api/oilprice/load-view';
-  const targetUrl = `https://${PVOIL_ORIGIN_IP}${PVOIL_API_PATH}`;
-
-  // Bỏ qua kiểm tra SSL certificate vì dùng IP trực tiếp thay vì domain (chỉ hoạt động trên Node.js)
-  // Trong Cloudflare Workers, fetch IP HTTPS có thể fail do chứng chỉ.
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12000);
-  try {
-    const res = await fetch(targetUrl, {
-      signal: controller.signal,
-      headers: {
-        'Host': 'www.pvoil.com.vn',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,*/*',
         'Accept-Language': 'vi-VN,vi;q=0.9',
+        'Referer': 'https://www.pvoil.com.vn/',
       },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    /**
-     * Cấu trúc bảng: <tbody><tr><td>STT</td><td>Tên</td><td>Giá</td><td>Biến động</td></tr>...
-     * Cột 0 = số thứ tự, cột 1 = tên, cột 2 = giá, cột 3 = biến động
-     */
-    const results = [];
-    $('tbody tr').each((_, row) => {
-      const cols = $(row).find('td');
-      if (cols.length >= 3) {
-        const name = cols.eq(1).text().trim();
-        const priceRaw = cols.eq(2).text().trim(); // e.g. "24.350 đ" or "24,350"
-        const parsed = parsePrice(priceRaw);
-        if (name && parsed && /xăng|dầu|ron|do|e5|e10|mazut/i.test(name)) {
-          results.push({
-            name,
-            region1: null,
-            region2: null,
-            price: parsed,
-            unit: 'VND/lít',
-          });
-        }
-      }
-    });
-
-    if (!results.length) throw new Error('Không parse được bảng giá từ IP origin');
-
-    const prices = deduplicate(results);
-    const fullText = $.root().text();
-    return {
-      prices,
-      scrapedAt: new Date().toISOString(),
-      source: 'https://www.pvoil.com.vn',
-      priceDate: extractDateFromText(fullText),
-      priceDateSource: 'pvoil-origin-ip',
-      priceAnnouncedAt: null,
+      rejectUnauthorized: false
     };
-  } finally {
-    clearTimeout(timer);
-  }
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        resolve({
+          ok: res.statusCode >= 200 && res.statusCode < 300,
+          status: res.statusCode,
+          text: () => Promise.resolve(data)
+        });
+      });
+    });
+
+    req.on('error', (e) => reject(e));
+    req.end();
+  });
 }
 
-/**
- * Tầng 1: HTTP fetch trực tiếp pvoil.com.vn (không cần Playwright).
- * Dùng header giả lập browser thật để bypass kiểm tra cơ bản.
- */
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Táº§ng 0: IP Origin bypass (HTTP port 80)
+// pvoil.com.vn niÃªm yáº¿t 5 sáº£n pháº©m: RON 95-III, E5 RON 92-II,
+// DO 0,05S-II, Dáº§u há»a 2-K, Mazut 180CST 3.5S.
+// IP origin 103.21.120.100 hoat dong qua HTTPS, cert SSL hop le cho pvoil.com.vn.
+// 5 san pham: RON 95-III, E10 RON 95-III, E5 RON 92-II, DO 0,05S-II, DO 0,001S-V.
+// Credit: https://toidicakhia.me/blog/build-vietfuel-api-phien-ban-it-ram
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function scrapeFromOriginIP() {
+  // IP origin 103.21.120.100 vẫn hoạt động qua HTTPS, cert SSL hợp lệ cho www.pvoil.com.vn.
+  // Fetch HTTPS + Host header — không cần ssl=False, cert pass strict validation.
+  const PVOIL_ORIGIN_IPS = [
+    '103.21.120.100', // IP origin hiện tại
+  ];
+
+  const TARGETS = PVOIL_ORIGIN_IPS.flatMap(ip => [
+    `https://${ip}/api/oilprice/load-view`,
+    `https://${ip}/`,
+  ]);
+
+
+  let html = null;
+  let lastErr = null;
+
+  for (const targetUrl of TARGETS) {
+    try {
+      const res = await httpsGetBypass(targetUrl, 'www.pvoil.com.vn');
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} từ ${targetUrl}`); continue; }
+      const text = await res.text();
+      // Reject nếu bị Cloudflare JS challenge
+      if (text && text.length > 500 && text.includes('<') && !text.includes('__cf_chl') && !text.includes('just a moment')) {
+        html = text;
+        break;
+      }
+    } catch (e) { lastErr = e; }
+  }
+
+  if (!html) throw lastErr || new Error('PVOil IP origin: táº¥t cáº£ URL tháº¥t báº¡i hoáº·c bá»‹ Cloudflare');
+
+  const $ = cheerio.load(html);
+  const results = [];
+
+  // Cáº¥u trÃºc: STT | TÃªn sáº£n pháº©m | GiÃ¡ (VND/lÃ­t) | Biáº¿n Ä‘á»™ng
+  $('tbody tr').each((_, row) => {
+    const cols = $(row).find('td');
+    if (cols.length < 3) return;
+    const rawName  = cols.eq(1).text().trim();
+    const priceRaw = cols.eq(2).text().trim();
+    const parsed   = parsePrice(priceRaw);
+    if (!rawName || !parsed) return;
+    const canonicalName = mapLineToCanonical(rawName);
+    if (!canonicalName) return;
+    results.push({ name: canonicalName, region1: null, region2: null, price: parsed, unit: 'VND/lít' });
+  });
+
+  if (!results.length) throw new Error('IP origin: parse Ä‘Æ°á»£c HTML nhÆ°ng khÃ´ng tÃ¬m tháº¥y báº£ng giÃ¡ PVOil');
+
+  const fullText = $.root().text();
+  return {
+    prices: deduplicate(results),
+    scrapedAt: new Date().toISOString(),
+    source: 'https://www.pvoil.com.vn',
+    priceDate: extractDateFromText(fullText),
+    priceDateSource: 'pvoil-origin-ip-http',
+    priceAnnouncedAt: null,
+  };
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Táº§ng 1: Direct stealth fetch pvoil.com.vn
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function scrapeFromPvoilDirect() {
-  const r = await fetch('https://www.pvoil.com.vn', {
+  const res = await fetch('https://www.pvoil.com.vn', {
     headers: {
       'User-Agent': pickRandomUA(),
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -142,18 +154,17 @@ async function scrapeFromPvoilDirect() {
       'Referer': 'https://www.google.com/',
     },
   });
-  if (!r.ok) throw new Error(`HTTP ${r.status} từ PVOil direct`);
-  const html = await r.text();
+  if (!res.ok) throw new Error(`HTTP ${res.status} tá»« PVOil direct`);
+  const html = await res.text();
 
-  // Kiểm tra Cloudflare block
   const $ = cheerio.load(html);
   const bodyText = $.root().text();
   if (isAntiBotPage(bodyText, $('title').text())) {
-    throw new Error('Trang PVOil bị Cloudflare chặn (HTTP direct).');
+    throw new Error('Trang PVOil bá»‹ Cloudflare cháº·n (HTTP direct).');
   }
 
   const prices = extractPvoilPricesFromText(bodyText);
-  if (!prices.length) throw new Error('Không parse được giá từ PVOil direct HTTP.');
+  if (!prices.length) throw new Error('KhÃ´ng parse Ä‘Æ°á»£c giÃ¡ tá»« PVOil direct HTTP.');
 
   return {
     prices,
@@ -165,176 +176,224 @@ async function scrapeFromPvoilDirect() {
   };
 }
 
-async function scrapeFromFallbackText() {
-  /**
-   * Tầng 2: Fallback GXHN — parse bảng HTML trực tiếp thay vì dùng text thô.
-   * GXHN render bảng giá PVOil riêng biệt, cần parse qua cheerio để lấy đủ sản phẩm.
-   */
-  let html = '';
-  try {
-    const r = await fetch('https://giaxanghomnay.com/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'vi-VN,vi;q=0.9',
-      },
-    });
-    if (!r.ok) throw new Error(`GXHN fallback HTTP ${r.status}`);
-    html = await r.text();
-  } catch (err) {
-    // Nếu bị block bởi Cloudflare (ví dụ khi chạy trên Workers), dùng codetabs proxy
-    console.warn('[PVOIL] GXHN direct failed, trying codetabs proxy...', err.message);
-    const proxyRes = await fetch('https://api.codetabs.com/v1/proxy/?quest=https://giaxanghomnay.com/');
-    if (!proxyRes.ok) throw new Error(`Codetabs Proxy HTTP ${proxyRes.status}`);
-    html = await proxyRes.text();
-  }
-  const $ = cheerio.load(html);
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Táº§ng 2: giaxanghomnay.com JSON API
+// GET /api/pvdate/{YYYY-MM-DD}
+// Tráº£: [ [petrolimex_items], [pvoil_items], [petrolimex_prev], [pvoil_prev] ]
+// PVOil items: { id, date, title, price }
+// 4 sáº£n pháº©m: RON 95-III, E5 RON 92-II, Dáº§u KO, Dáº§u DO 0,05S-II
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function scrapeFromGXHN() {
+  // Thá»­ ngÃ y hÃ´m nay, náº¿u khÃ´ng cÃ³ thÃ¬ thá»­ hÃ´m qua vÃ  ká»³ Ä‘iá»u chá»‰nh gáº§n nháº¥t
+  const today = new Date();
+  const DATES_TO_TRY = [];
 
-  // Tìm section PVOil: tìm heading/text chứa "pvoil" rồi lấy bảng kế tiếp
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    DATES_TO_TRY.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD
+  }
+
+  const GXHN_BASE = 'https://giaxanghomnay.com';
+  const HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'vi-VN,vi;q=0.9',
+    'Referer': `${GXHN_BASE}/`,
+    'X-Requested-With': 'XMLHttpRequest',
+  };
+
+  for (const dateStr of DATES_TO_TRY) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+      let data;
+      try {
+        const res = await fetch(`${GXHN_BASE}/api/pvdate/${dateStr}`, {
+          signal: controller.signal,
+          headers: HEADERS,
+        });
+        if (!res.ok) continue;
+        data = await res.json();
+      } finally { clearTimeout(timer); }
+
+      // data[1] = mảng PVOil items: [{ title, price }, ...]
+      if (!Array.isArray(data) || !Array.isArray(data[1]) || data[1].length < 2) continue;
+
+      const pvoilItems = data[1];
+      const petrolimexItems = data[0] || [];
+      const results = [];
+
+      for (const item of pvoilItems) {
+        if (!item.title || item.price == null) continue;
+        const canonicalName = mapLineToCanonical(item.title);
+        if (!canonicalName) continue; // bỏ qua sản phẩm không map được
+        results.push({
+          name: canonicalName,
+          region1: null, // PVOil không phân vùng
+          region2: null,
+          price: item.price,
+          unit: 'VND/lít',
+        });
+      }
+
+      // Bổ sung Xăng E10 RON 95-III hoặc Xăng RON 95-III từ Petrolimex nếu PVOil bị thiếu
+      const hasRon95 = results.some(r => r.name && r.name.includes('RON 95'));
+      if (!hasRon95 && petrolimexItems.length > 0) {
+        const plxRon95 = petrolimexItems.find(item => {
+          if (!item.title) return false;
+          const canonical = mapLineToCanonical(item.title);
+          return canonical && canonical.includes('RON 95');
+        });
+        if (plxRon95) {
+          const canonicalName = mapLineToCanonical(plxRon95.title);
+          results.push({
+            name: canonicalName,
+            region1: null,
+            region2: null,
+            price: plxRon95.zone1_price || plxRon95.price || null,
+            unit: 'VND/lít',
+          });
+        }
+      }
+
+      if (results.length < 2) continue;
+
+      // Lấy ngày từ field date của item đầu tiên: "2026-05-15 00:00:00" → "15/05/2026"
+      let priceDate = null;
+      if (pvoilItems[0]?.date) {
+        const raw = String(pvoilItems[0].date).slice(0, 10); // YYYY-MM-DD
+        const [y, m, d] = raw.split('-');
+        priceDate = `${d}/${m}/${y}`;
+      }
+
+      return {
+        prices: deduplicate(results),
+        scrapedAt: new Date().toISOString(),
+        source: 'https://giaxanghomnay.com',
+        priceDate,
+        priceDateSource: 'pvoil-gxhn',
+        priceAnnouncedAt: null,
+      };
+    } catch (e) {
+      console.warn(`[Scraper:PVOil] GXHN API ${dateStr} lá»—i: ${e.message}`);
+    }
+  }
+
+  throw new Error('[Scraper:PVOil] Táº§ng 2 GXHN JSON API: khÃ´ng láº¥y Ä‘Æ°á»£c dá»¯ liá»‡u PVOil trong 7 ngÃ y gáº§n nháº¥t.');
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Táº§ng 3: petrotimesgroup.com â€” giÃ¡ Petrolimex SSR (tham chiáº¿u)
+// 3/5 sáº£n pháº©m PVOil trÃ¹ng Petrolimex. Dáº§u há»a & Mazut sáº½ thiáº¿u.
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function scrapeFromPetrotimesGroup() {
+  const res = await fetch('https://petrotimesgroup.com/site/get-petro', {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'Accept': 'text/html, */*',
+      'Referer': 'https://petrotimesgroup.com/',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} tá»« petrotimesgroup`);
+
+  const html = await res.text();
+  if (!html || html.length < 100) throw new Error('Response rá»—ng tá»« petrotimesgroup');
+
+  const $ = cheerio.load(html);
   const results = [];
 
-  // Cách 1: Parse các bảng trong trang, tìm section PVOil theo heading
-  let foundPvoilSection = false;
-  $('section, div').each((_, el) => {
-    const sectionText = $(el).text().toLowerCase();
-    if (!foundPvoilSection && sectionText.includes('pvoil')) {
-      // Parse các dòng có giá trong section này
-      $(el).find('tr').each((_, row) => {
-        const cols = $(row).find('td,th');
-        if (cols.length >= 2) {
-          const name = cols.eq(0).text().trim();
-          const priceRaw = cols.last().text().trim();
-          const parsed = parsePrice(priceRaw);
-          if (name && parsed && /xăng|dầu|ron|do|e5|e10|mazut/i.test(name)) {
-            results.push({ name, region1: null, region2: null, price: parsed, unit: 'VND/lít' });
-          }
-        }
-      });
-      if (results.length > 0) foundPvoilSection = true;
-    }
+  // div.table-item > p[0]=tÃªn, p[1]=vÃ¹ng1, p[2]=vÃ¹ng2
+  $('.table-item').each((_, item) => {
+    if ($(item).hasClass('font-weight-bold')) return; // skip header
+    const ps = $(item).find('p');
+    if (ps.length < 2) return;
+
+    const rawName = ps.eq(0).text().trim();
+    const v1Raw   = ps.eq(1).text().trim();
+    const v2Raw   = ps.length >= 3 ? ps.eq(2).text().trim() : '';
+    const v1Price = parsePrice(v1Raw);
+    const v2Price = parsePrice(v2Raw);
+    if (!rawName || !v1Price) return;
+
+    const canonicalName = mapLineToCanonical(rawName);
+    if (!canonicalName) return;
+
+    results.push({
+      name: canonicalName,
+      region1: v1Price,
+      region2: v2Price || null,
+      price: v1Price,
+      unit: 'VND/lÃ­t',
+    });
   });
 
-  // Cách 2: Nếu không tìm được bảng, dùng text extract (fallback cũ)
-  if (!results.length) {
-    const bodyText = $.root().text();
-    const section = findPvoilSection(bodyText);
-    const textPrices = extractPvoilPricesFromText(section);
-    if (textPrices.length) results.push(...textPrices);
-    if (!results.length) {
-      const allTextPrices = extractPvoilPricesFromText(bodyText);
-      results.push(...allTextPrices);
-    }
+  if (results.length < 2) {
+    throw new Error(`Petrotimesgroup: chá»‰ parse Ä‘Æ°á»£c ${results.length} sáº£n pháº©m (cáº§n >= 2)`);
   }
-
-  if (!results.length) throw new Error('Fallback GXHN không trích xuất được dữ liệu PVOIL.');
 
   const bodyText = $.root().text();
   return {
     prices: deduplicate(results),
     scrapedAt: new Date().toISOString(),
-    source: 'https://giaxanghomnay.com/',
+    source: 'https://www.pvoil.com.vn',
     priceDate: extractDateFromText(bodyText),
-    priceDateSource: 'pvoil-gxhn',
+    priceDateSource: 'pvoil-petrotimesgroup',
     priceAnnouncedAt: null,
   };
 }
 
-/**
- * Tầng 3: Gọi HTTP thuần (không Playwright) tới trang tổng hợp thứ hai.
- * Phù hợp với các trang render HTML tĩnh, không cần JavaScript.
- * Hoàn toàn hợp pháp — đọc dữ liệu công khai theo cách bình thường.
- */
-async function scrapeFromLightFetch() {
-  // Thử vài nguồn tổng hợp công khai khác nhau
-  const FALLBACK_URLS = [
-    'https://petrotimes.vn/gia-xang-dau.html',
-    'https://giaxang.vn/',
-  ];
-
-  for (const url of FALLBACK_URLS) {
-    try {
-      const html = await fetchPublicText(url);
-      // Lấy phần text từ HTML đơn giản (bỏ tags)
-      const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-      const section = findPvoilSection(text);
-      const prices = extractPvoilPricesFromText(section) || extractPvoilPricesFromText(text);
-
-      if (prices.length > 0) {
-        return {
-          prices,
-          scrapedAt: new Date().toISOString(),
-          source: url,
-          priceDate: extractDateFromText(section) || extractDateFromText(text),
-          priceDateSource: 'pvoil-text-light',
-          priceAnnouncedAt: null,
-        };
-      }
-    } catch (e) {
-      console.warn(`[Scraper:PVOil] Light-fetch ${url} lỗi: ${e.message}`);
-    }
-  }
-
-  throw new Error('Tất cả 3 tầng cào dữ liệu PVOIL đều thất bại.');
-}
-
-/**
- * Trích xuất bảng giá PVOil theo chiến lược nhiều tầng.
- * @returns {Object} - prices, priceDate, priceDateSource, scrapedAt, source
- */
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Orchestrator: 4 táº§ng cascading
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function scrapePVOil() {
-  console.log('[Scraper:PVOil] Bắt đầu cào dữ liệu (chiến lược 4 tầng)...');
-  const start = Date.now();
+  console.log('[Scraper:PVOil] Báº¯t Ä‘áº§u cÃ o dá»¯ liá»‡u (chiáº¿n lÆ°á»£c 4 táº§ng)...');
+  const start   = Date.now();
+  const elapsed = () => ((Date.now() - start) / 1000).toFixed(2) + 's';
 
-  // Tầng 0: Bypass Cloudflare qua IP gốc (nhẹ, không cần browser)
+  // Táº§ng 0: IP bypass HTTP port 80
   try {
     const result = await scrapeFromOriginIP();
-    console.log('[Scraper:PVOil] [Tầng 0] Thành công từ IP origin (bypass Cloudflare).');
     result._tier = 0;
-    console.log(`[Scraper:PVOil] Cào được ${result.prices.length} sản phẩm. priceDate=${result.priceDate} (${((Date.now() - start) / 1000).toFixed(2)}s)`);
+    console.log(`[Scraper:PVOil] [Táº§ng 0] âœ“ IP bypass HTTP (${elapsed()}) â€” ${result.prices.length} sáº£n pháº©m`);
     return result;
-  } catch (originErr) {
-    console.warn(`[Scraper:PVOil] [Tầng 0] Thất bại: ${originErr.message}`);
+  } catch (e) {
+    console.warn(`[Scraper:PVOil] [Táº§ng 0] âœ— ${e.message}`);
   }
 
-  let blockedByProtection = false;
-
-  // Tầng 1: Cào trực tiếp với kỹ thuật stealth
+  // Táº§ng 1: Direct stealth fetch pvoil.com.vn
   try {
     const result = await scrapeFromPvoilDirect();
-    console.log('[Scraper:PVOil] [Tầng 1] Thành công từ nguồn trực tiếp pvoil.com.vn.');
     result._tier = 1;
-    console.log(`[Scraper:PVOil] Cào được ${result.prices.length} sản phẩm. priceDate=${result.priceDate} (${((Date.now() - start) / 1000).toFixed(2)}s)`);
+    console.log(`[Scraper:PVOil] [Táº§ng 1] âœ“ Direct pvoil.com.vn (${elapsed()}) â€” ${result.prices.length} sáº£n pháº©m`);
     return result;
-  } catch (directErr) {
-    console.warn(`[Scraper:PVOil] [Tầng 1] Thất bại: ${directErr.message}`);
-    blockedByProtection = /anti-bot|cloudflare|security verification|just a moment/i.test(String(directErr.message));
+  } catch (e) {
+    console.warn(`[Scraper:PVOil] [Táº§ng 1] âœ— ${e.message}`);
   }
 
-  // Tầng 2: Fallback tổng hợp qua giaxanghomnay.com
+  // Táº§ng 2: GXHN JSON API (/api/pvdate/{date}) â€” 4 sáº£n pháº©m PVOil thá»±c táº¿
   try {
-    const result = await scrapeFromFallbackText();
-    console.log('[Scraper:PVOil] [Tầng 2] Thành công từ giaxanghomnay.com.');
+    const result = await scrapeFromGXHN();
     result._tier = 2;
-    if (blockedByProtection) result.blockedByProtection = true;
-    console.log(`[Scraper:PVOil] Cào được ${result.prices.length} sản phẩm. priceDate=${result.priceDate} (${((Date.now() - start) / 1000).toFixed(2)}s)`);
+    result.blockedByProtection = true;
+    console.log(`[Scraper:PVOil] [Táº§ng 2] âœ“ GXHN JSON API (${elapsed()}) â€” ${result.prices.length} sáº£n pháº©m`);
     return result;
-  } catch (fallbackErr) {
-    console.warn(`[Scraper:PVOil] [Tầng 2] Thất bại: ${fallbackErr.message}`);
+  } catch (e) {
+    console.warn(`[Scraper:PVOil] [Táº§ng 2] âœ— ${e.message}`);
   }
 
-  // Tầng 3: HTTP fetch nhẹ không cần Playwright
+  // Táº§ng 3: Petrotimesgroup â€” giÃ¡ Petrolimex tham chiáº¿u (3 sáº£n pháº©m trÃ¹ng)
   try {
-    const result = await scrapeFromLightFetch();
-    console.log(`[Scraper:PVOil] [Tầng 3] Thành công từ nguồn dự phòng: ${result.source}.`);
+    const result = await scrapeFromPetrotimesGroup();
     result._tier = 3;
     result.blockedByProtection = true;
-    console.log(`[Scraper:PVOil] Cào được ${result.prices.length} sản phẩm. priceDate=${result.priceDate} (${((Date.now() - start) / 1000).toFixed(2)}s)`);
+    console.log(`[Scraper:PVOil] [Táº§ng 3] âœ“ Petrotimesgroup (${elapsed()}) â€” ${result.prices.length} sáº£n pháº©m`);
     return result;
-  } catch (lightErr) {
-    console.error(`[Scraper:PVOil] [Tầng 3] Thất bại: ${lightErr.message}`);
-    throw new Error('[Scraper:PVOil] Tất cả 3 tầng dự phòng đều thất bại. Hệ thống sẽ dùng Stale Cache.');
+  } catch (e) {
+    console.error(`[Scraper:PVOil] [Táº§ng 3] âœ— ${e.message}`);
+    throw new Error('[Scraper:PVOil] Táº¥t cáº£ 4 táº§ng Ä‘á»u tháº¥t báº¡i. Há»‡ thá»‘ng sáº½ dÃ¹ng Stale Cache.');
   }
 }
 
-export {  scrapePVOil  };
+export { scrapePVOil };
 

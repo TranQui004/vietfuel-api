@@ -5,6 +5,9 @@ node_modules/
 .env
 .wrangler/
 
+# File cấu hình cục bộ (chứa KV ID thật, KHÔNG push lên GitHub)
+wrangler.local.toml
+
 # Runtime cache (generated at startup)
 cache.json
 **/cache.json
@@ -43,3 +46,7 @@ backend/tests/*.snap
 
 # Package lock (tuỳ chọn — comment ra nếu muốn lock version)
 # package-lock.json
+
+# Local SQLite databases and temp brain directories
+backend/data/
+brain/

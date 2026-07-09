@@ -92,53 +92,14 @@ async function scrapeViaHttp() {
   }
 }
 
-/**
- * Tầng 2: Fallback Playwright (giữ nguyên logic cũ).
- */
-async function scrapeViaBrowser() {
-  const { browser, context } = await createBrowser();
-  try {
-    const page = await context.newPage();
-    await page.goto(COMECO_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    const { prices, priceDateRaw, dateCandidates } = await page.evaluate(() => {
-      const results = [];
-      const bodyText = document.body.innerText || '';
-      const textBlocks = bodyText.split(/\n/);
-      let currentName = '';
-      for (let i = 0; i < textBlocks.length; i++) {
-        const line = textBlocks[i].trim();
-        if (line === 'Xăng' || line === 'Dầu') {
-          currentName = line + ' ' + (textBlocks[i + 1] ? textBlocks[i + 1].trim() : '');
-          i++;
-        } else if (currentName && /^[\d.,]{5,}$/.test(line)) {
-          results.push({ name: currentName, rawPrice: line });
-          currentName = '';
-        } else {
-          currentName = '';
-        }
-      }
-      const ctxMatch = bodyText.match(/Gi[aá]\s*b[aá]n\s*lẻ\s*xăng\s*d[aầ]u[\s\S]{0,300}?Gi[aá]\s*điều\s*chỉnh\s*từ[^\n]{0,100}?(\d{1,2}\/\d{1,2}\/\d{4})/i)
-        || bodyText.match(/Gi[aá]\s*điều\s*chỉnh\s*từ[^\n]{0,100}?(\d{1,2}\/\d{1,2}\/\d{4})/i);
-      const priceDateRaw = ctxMatch ? ctxMatch[1] : null;
-      const dateCandidates = Array.from(bodyText.matchAll(/(\d{1,2}\/\d{1,2}\/\d{4})/g)).map(m => m[1]);
-      return { prices: results, priceDateRaw, dateCandidates };
-    });
-    return { results: prices, priceDateRaw, dateCandidates };
-  } finally {
-    await browser.close().catch(() => {});
-  }
-}
-
 async function scrapeComeco() {
   const start = Date.now();
   let raw;
   try {
-    console.log('[Scraper:Comeco] Thử HTTP fetch nhẹ (không cần browser)...');
+    console.log('[Scraper:Comeco] Đang tải dữ liệu qua HTTP fetch...');
     raw = await scrapeViaHttp();
-    console.log('[Scraper:Comeco] HTTP fetch thành công.');
   } catch (httpErr) {
-    console.warn(`[Scraper:Comeco] HTTP thất bại (${httpErr.message}), chuyển sang Playwright...`);
-    raw = await scrapeViaBrowser();
+    throw new Error(`[Scraper:Comeco] Lỗi HTTP fetch: ${httpErr.message}`);
   }
 
   const stdPrices = deduplicate(raw.results.map(p => ({

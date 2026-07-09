@@ -1,4 +1,4 @@
-﻿# English Documentation
+# English Documentation
 
 This is the English documentation index for VietFuelAPI.
 
@@ -10,7 +10,7 @@ This is the English documentation index for VietFuelAPI.
 ## Architecture and Changes
 
 - System architecture: [architecture.md](architecture.md)
-- Changelog: [changelog.md](changelog.md)
+- Changelog: [../../CHANGELOG.en.md](../../CHANGELOG.en.md)
 
 ## Community
 
@@ -28,6 +28,5 @@ This is the English documentation index for VietFuelAPI.
 - Comment style guide: [guides/comment-style.md](guides/comment-style.md)
 
 ---
-**� 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
+**© 2026 TranQui - [GitHub: TranQui004](https://github.com/TranQui004)**
 *VietFuel API Project*
-

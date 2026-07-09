@@ -34,6 +34,7 @@
         <a href="/" class="nav-link " data-vi="Trang chủ" data-en="Home">Trang chủ</a>
         <a href="/endpoints" class="nav-link " data-vi="API Reference" data-en="API Reference">API Reference</a>
         <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/history" class="nav-link " data-vi="Lịch sử giá" data-en="Price History">Lịch sử giá</a>
         <a href="/test-api" class="nav-link nav-active" data-vi="Test API" data-en="Test API">Test API</a>
       </nav>
 
@@ -79,7 +80,7 @@
     <aside class="pg-sidebar" id="pgSidebar">
       <div class="pg-sidebar-header">
         <span class="pg-sidebar-title" data-vi="Endpoints" data-en="Endpoints">Endpoints</span>
-        <span class="pg-sidebar-count" id="pgEndpointCount">11</span>
+        <span class="pg-sidebar-count" id="pgEndpointCount">16</span>
       </div>
 
       <nav class="pg-endpoint-nav" id="pgEndpointNav">
@@ -90,6 +91,12 @@
           <span class="pg-ep-method get">GET</span>
           <span class="pg-ep-path">/api/fuel-prices</span>
           <span class="pg-ep-desc" data-vi="Tất cả nguồn" data-en="All sources">Tất cả nguồn</span>
+        </button>
+
+        <button class="pg-ep-btn" data-ep="history">
+          <span class="pg-ep-method get">GET</span>
+          <span class="pg-ep-path">/api/history</span>
+          <span class="pg-ep-desc" data-vi="Lịch sử giá" data-en="Price history">Lịch sử giá</span>
         </button>
 
         <div class="pg-ep-group-label" data-vi="NGUỒN ĐƠN LẺ" data-en="SINGLE SOURCE">NGUỒN ĐƠN LẺ</div>
@@ -198,9 +205,9 @@
       <div class="pg-card pg-request-card">
         <div class="pg-card-header">
           <span class="pg-card-title" data-vi="Cấu hình request" data-en="Request Builder">Cấu hình request</span>
-          <div class="pg-base-url-chip">
-            <span class="pg-base-label">BASE</span>
-            <span class="pg-base-value" id="pgBaseUrl">http://localhost:3000</span>
+          <div class="pg-base">
+            <span class="pg-base-label" data-vi="Base URL:" data-en="Base URL:">Base URL:</span>
+            <span class="pg-base-value" id="pgBaseUrl">https://vietfuel-api.tranqui.workers.dev</span>
           </div>
         </div>
 

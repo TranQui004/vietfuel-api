@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thống kê tổng quan — VietFuelAPI</title>
+  <meta name="description" content="Vietnam Fuel Price API" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css?v=1.4.0" />
+  
+  <!-- Lucide Icons — served locally to bypass CSP -->
+  <script src="/js/vendor/lucide.min.js" defer></script>
+</head>
+<body >
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/brand/VietFuelAPI_header.png" alt="VietFuelAPI Logo" class="logo-img" />
+        <span class="logo-text">VietFuel<span class="logo-accent">API</span></span>
+      </a>
+      <button class="mobile-toggle" id="mobileNavToggle" aria-label="Mở menu">
+        <div class="hamburger-icon" id="hamburgerIcon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+
+      <nav class="header-nav" id="headerNav" aria-label="Điều hướng chính">
+        <a href="/" class="nav-link " data-vi="Trang chủ" data-en="Home">Trang chủ</a>
+        <a href="/endpoints" class="nav-link " data-vi="API Reference" data-en="API Reference">API Reference</a>
+        <a href="/live" class="nav-link " data-vi="Dữ liệu thực" data-en="Live Data">Dữ liệu thực</a>
+        <a href="/history" class="nav-link nav-active" data-vi="Thống kê tổng quan" data-en="Price History">Thống kê tổng quan</a>
+        <a href="/test-api" class="nav-link " data-vi="Test API" data-en="Test API">Test API</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener noreferrer" class="github-btn" aria-label="GitHub Repository">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+        <button class="lang-toggle" id="langToggle" aria-label="Chuyển ngôn ngữ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span id="langLabel">EN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+<main class="main-content">
+  <div class="page-hero">
+    <div class="container animate-fade-in">
+      <p class="page-overline" data-vi="Thống kê tổng quan" data-en="Market Statistics">Thống kê tổng quan</p>
+      <h1 class="page-title">FUEL PRICE STATISTICS</h1>
+      <p class="page-subtitle"
+         data-vi="Theo dõi và phân tích biến động giá xăng dầu qua các kỳ điều chỉnh, hỗ trợ xuất dữ liệu."
+         data-en="Track and analyze fuel price fluctuations across adjustment periods, with data export support.">
+        Theo dõi và phân tích biến động giá xăng dầu qua các kỳ điều chỉnh.
+      </p>
+    </div>
+  </div>
+
+  <div class="container live-page-shell animate-fade-in animate-delay-1">
+    
+    <!-- Controls removed for statistics page -->
+
+    <!-- ── CHART AREA ──────────────────────────────────────── -->
+    <style>
+      .history-table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+      }
+      .history-table-container thead th {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background-color: var(--bg-surface) !important;
+        border-right: 1px solid var(--border-color);
+        border-bottom: 2px solid var(--border-color);
+        user-select: none;
+      }
+      .history-table-container thead th:last-child {
+        border-right: none;
+      }
+      .history-table-container tbody td {
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+      }
+      .history-table-container tbody td:last-child {
+        border-right: none;
+      }
+      #historyTable tbody tr:hover td {
+        background-color: var(--bg-surface-hover, rgba(255, 99, 0, 0.05));
+      }
+      /* Dropdown filter styling */
+      .custom-select {
+        appearance: none;
+        background-color: var(--bg-surface);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 8px 32px 8px 12px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.2s;
+        color-scheme: dark;
+      }
+      .custom-select option {
+        background-color: #1e1e2e;
+        color: #ffffff;
+      }
+      .custom-select:focus {
+        border-color: var(--accent);
+      }
+      .custom-select-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+      .custom-select-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--text-muted);
+        width: 16px;
+        height: 16px;
+      }
+      .sort-icon {
+        display: inline-block;
+        width: 12px;
+        color: var(--text-muted);
+        margin-left: 4px;
+      }
+      th[data-sort]:hover {
+        background-color: var(--bg-surface-hover);
+      }
+    </style>
+    <div id="historyChartContainer" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-2xl);">
+      <div id="chartLoading" class="live-loading" style="display:none; height: 350px;">
+        <div class="loading-spinner"></div>
+      </div>
+      <div id="priceChart" style="min-height: 350px;"></div>
+    </div>
+
+    <!-- ── DATA TABLE ──────────────────────────────────────── -->
+    <div id="historyTableContainer">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+        <p class="live-section-title" data-vi="Dữ liệu thị trường" data-en="Market Data" style="margin: 0;">Dữ liệu thị trường</p>
+        <div class="live-controls" style="margin-bottom: 0;">
+          <div class="custom-select-wrapper">
+            <select id="sourceFilter" class="custom-select">
+              <option value="all" data-vi="Tất cả nguồn" data-en="All Sources">Tất cả nguồn</option>
+              <!-- Các nguồn sẽ được populate bằng JS -->
+            </select>
+            <i data-lucide="filter" class="custom-select-icon"></i>
+          </div>
+        </div>
+      </div>
+      <div class="live-table-wrap history-table-container">
+        <table id="historyTable" class="live-table">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center; cursor: pointer; position: sticky; left: 0; z-index: 30;" data-sort="id"><span data-vi="STT" data-en="No.">STT</span> <span class="sort-icon"></span></th>
+              <th style="width: 100px; text-align: center; cursor: pointer;" data-sort="price_date"><span data-vi="Ngày" data-en="Date">Ngày</span> <span class="sort-icon"></span></th>
+              <th style="text-align: left; cursor: pointer;" data-sort="fuel_name"><span data-vi="Nhiên liệu" data-en="Fuel">Nhiên liệu</span> <span class="sort-icon"></span></th>
+              <th style="text-align: right; cursor: pointer;" data-sort="region1"><span data-vi="Vùng 1 (₫)" data-en="Region 1 (₫)">Vùng 1 (₫)</span> <span class="sort-icon"></span></th>
+              <th style="text-align: right; cursor: pointer;" data-sort="region2"><span data-vi="Vùng 2 (₫)" data-en="Region 2 (₫)">Vùng 2 (₫)</span> <span class="sort-icon"></span></th>
+              <th style="text-align: center; cursor: pointer;" data-sort="source"><span data-vi="Nguồn" data-en="Source">Nguồn</span> <span class="sort-icon"></span></th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+      <div id="historyErrorIndicator" class="live-error" style="display:none; padding: 20px; text-align: center;">
+        <p id="historyErrorText" style="color: var(--status-error);" data-vi="Không có dữ liệu hoặc lỗi kết nối." data-en="No data or connection error.">Không có dữ liệu hoặc lỗi kết nối.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+  <footer class="site-footer">
+  <div class="footer-huge-text">VIETFUEL API</div>
+  <canvas id="flickering-grid-footer"></canvas>
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Col 1: Brand -->
+      <div class="footer-logo-col">
+        <div class="footer-logo-container">
+          <img src="/brand/VietFuelAPI_footer.png" alt="VietFuelAPI Footer Logo" class="footer-logo-img" />
+        </div>
+        <p class="footer-brand-desc" data-vi="VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa, có nhãn nguồn rõ ràng." data-en="VietFuelAPI provides real-time fuel price data. Aggregated from 11 sources via a standardized Default Endpoint with explicit source labels.">
+          VietFuelAPI cung cấp dữ liệu giá xăng dầu thời gian thực. Tổng hợp từ 11 nguồn qua một Default Endpoint chuẩn hóa.
+        </p>
+      </div>
+
+      <!-- Col 2: Explorer -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="KHÁM PHÁ" data-en="EXPLORER">KHÁM PHÁ</p>
+        <ul class="footer-links">
+          <li><a href="/" data-vi="Trang chủ" data-en="Home">Trang chủ</a></li>
+          <li><a href="/live" data-vi="Dữ liệu thực tế" data-en="Live Tracker">Dữ liệu thực tế</a></li>
+          <li><a href="/endpoints#demo" data-vi="Demo Terminal" data-en="Terminal Demo">Demo Terminal</a></li>
+          <li><a href="https://github.com/TranQui004/vietfuel-api" target="_blank" rel="noopener">GitHub ↗</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Documentation -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="TÀI LIỆU" data-en="DOCUMENTATION">TÀI LIỆU</p>
+        <ul class="footer-links">
+          <li><a href="/endpoints" data-vi="API Reference" data-en="API Reference">API Reference</a></li>
+          <li><a href="/test-api" data-vi="Test API" data-en="Test API">Test API</a></li>
+          <li><a href="/endpoints#schema" data-vi="Cấu trúc dữ liệu" data-en="Data Schema">Cấu trúc dữ liệu</a></li>
+          <li><a href="/endpoints#errors" data-vi="Mã lỗi" data-en="Error Codes">Mã lỗi</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Legal -->
+      <div class="footer-links-col">
+        <p class="footer-title" data-vi="PHÁP LÝ" data-en="LEGAL">PHÁP LÝ</p>
+        <ul class="footer-links">
+          <li><a href="/disclaimer" data-vi="Tuyên bố miễn trừ" data-en="Disclaimer">Tuyên bố miễn trừ</a></li>
+          <li><a href="/privacy" data-vi="Chính sách bảo mật" data-en="Privacy Policy">Chính sách bảo mật</a></li>
+          <li><a href="/terms" data-vi="Điều khoản sử dụng" data-en="Terms of Service">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Centered Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <p class="footer-disclaimer-text" data-vi="Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo." data-en="Disclaimer: VietFuelAPI is an independent open-source project, not affiliated with Petrolimex or any government agency. Aggregated data from 11 sources is for reference only.">
+          Tuyên bố miễn trừ trách nhiệm: VietFuelAPI là dự án mã nguồn mở độc lập, không liên kết với Petrolimex hay bất kỳ cơ quan chính phủ nào. Dữ liệu tổng hợp từ 11 nguồn chỉ mang tính chất tham khảo.
+        </p>
+        <div class="footer-copy">
+          <span class="copy-text">© 2026 VietFuelAPI. Built for developers.</span>
+          <span class="version-badge">v1.1.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <button id="backToTop" class="back-to-top" aria-label="Lên đầu trang">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    <img src="/brand/backtotop.png" alt="Back to top" class="back-to-top-char" />
+  </button>
+
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="/js/lang.js"></script>
+  <script src="/js/ui.js"></script>
+  <script>
+    (function() {
+      const canvas = document.getElementById('flickering-grid-footer');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const config = {
+        squareSize: 4, gridGap: 12,
+        color: [255, 140, 0], // Orange
+        maxOpacity: 0.42, flickerChance: 0.045, transitionSpeed: 0.08
+      };
+      let cols, rows, squares = [];
+      function resize() {
+        const parent = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = parent.clientWidth * dpr;
+        canvas.height = parent.clientHeight * dpr;
+        ctx.scale(dpr, dpr);
+        const cellSize = config.squareSize + config.gridGap;
+        cols = Math.ceil(parent.clientWidth / cellSize);
+        rows = Math.ceil(parent.clientHeight / cellSize);
+        squares = Array.from({ length: cols * rows }, () => ({
+          curr: Math.random() * config.maxOpacity,
+          target: Math.random() * config.maxOpacity
+        }));
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cellSize = config.squareSize + config.gridGap;
+        for (let i = 0; i < squares.length; i++) {
+          let sq = squares[i];
+          if (Math.random() < config.flickerChance) sq.target = Math.random() * config.maxOpacity;
+          sq.curr += (sq.target - sq.curr) * config.transitionSpeed;
+          if (sq.curr < 0.01) continue;
+          const x = (i % cols) * cellSize;
+          const y = Math.floor(i / cols) * cellSize;
+          ctx.fillStyle = `rgba(${config.color[0]}, ${config.color[1]}, ${config.color[2]}, ${sq.curr})`;
+          ctx.fillRect(x, y, config.squareSize, config.squareSize);
+        }
+        requestAnimationFrame(animate);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(animate);
+    })();
+  </script>
+  <script src="/js/history.js?v=3"></script>
+  <script>
+    // Initialize Lucide icons after all scripts loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

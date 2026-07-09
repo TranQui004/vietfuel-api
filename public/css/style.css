@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VietFuel API
  * Copyright (c) 2026 TranQui
  * Github: https://github.com/TranQui004
@@ -140,8 +140,39 @@ body.lang-transitioning [data-vi][data-en] { opacity: 0; transform: translateY(-
   font-family: var(--font-body); font-size: 0.78rem; font-weight: 600;
   letter-spacing: 0.06em; flex-shrink: 0; transition: all var(--transition);
 }
-.github-btn { padding: 5px 8px; } /* Slightly narrower for icon only */
+.source-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--bg-border);
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+.github-btn { padding: 5px 10px; } /* padding đủ chỗ cho star badge */
 .lang-toggle:hover, .github-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--text-muted); }
+.gh-star-badge {
+  display: inline-flex; align-items: center;
+  margin-left: 7px;
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--bg-border);
+  border-radius: 100px;
+  padding: 1px 7px;
+  letter-spacing: 0.03em;
+  transition: color var(--transition), background var(--transition);
+  vertical-align: middle;
+}
+.github-btn:hover .gh-star-badge { color: #fbbf24; background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); }
 
 /* MOBILE TOGGLE (Hidden by default on Desktop) */
 .mobile-toggle { display: none; }
